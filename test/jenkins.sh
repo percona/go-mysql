@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export GOROOT="/usr/local/go"
-export GOPATH="$WORKSPACE/go"
+export GOPATH="$WORKSPACE/go:$HOME/go"
 export PATH="$PATH:$GOROOT/bin:$GOPATH/bin"
 export PCT_TEST_MYSQL_ROOT_DSN="root:@unix(/var/run/mysqld/mysqld.sock)/"
 # rewrite https:// for percona projects to git://
