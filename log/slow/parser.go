@@ -59,7 +59,7 @@ func NewSlowLogParser(file *os.File, opt log.Options) *SlowLogParser {
 		file: file,
 		opt:  opt,
 		// --
-		stopChan:    make(chan bool),
+		stopChan:    make(chan bool, 1),
 		eventChan:   make(chan *log.Event),
 		inHeader:    false,
 		inQuery:     false,
