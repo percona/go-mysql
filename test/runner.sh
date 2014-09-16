@@ -10,17 +10,6 @@ if [ ! -d ".git" ]; then
    exit 1
 fi
 
-set -- $(getopt u "$@")
-while [ $# -gt 0 ]
-do
-    case "$1" in
-    (--) shift; break;;
-    (-*) echo "$0: error - unrecognized option $1" 1>&2; exit 1;;
-    (*)  break;;
-    esac
-    shift
-done
-
 failures="/tmp/go-test-failures.$$"
 coverreport="/tmp/go-test-coverreport.$$"
 
