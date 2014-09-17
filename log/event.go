@@ -30,7 +30,7 @@ type Event struct {
 	BoolMetrics   map[string]bool    // yes/no metrics
 	// Percona Server
 	RateType  string
-	RateLimit byte
+	RateLimit uint
 }
 
 func NewEvent() *Event {

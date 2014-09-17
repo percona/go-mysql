@@ -238,7 +238,7 @@ func (p *SlowLogParser) parseHeader(line string) {
 				p.event.RateType = smv[2]
 			} else if smv[1] == "Log_slow_rate_limit" {
 				val, _ := strconv.ParseUint(smv[2], 10, 64)
-				p.event.RateLimit = byte(val)
+				p.event.RateLimit = uint(val)
 			} else {
 				// integer value
 				val, _ := strconv.ParseUint(smv[2], 10, 64)

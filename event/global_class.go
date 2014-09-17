@@ -18,7 +18,6 @@
 package event
 
 import (
-	"fmt"
 	"github.com/percona/go-mysql/log"
 )
 
@@ -26,20 +25,8 @@ type GlobalClass struct {
 	TotalQueries  uint64
 	UniqueQueries uint64
 	RateType      string `json:",omitempty"`
-	RateLimit     byte   `json:",omitempty"`
+	RateLimit     uint   `json:",omitempty"`
 	Metrics       *Metrics
-}
-
-type MixedRateLimitsError struct {
-	PrevRateType  string
-	PrevRateLimit byte
-	CurRateType   string
-	CurRateLimit  byte
-}
-
-func (e MixedRateLimitsError) Error() string {
-	return fmt.Sprintf("Mixed rate limits: have %s:%d, got %s:%d",
-		e.PrevRateType, e.PrevRateLimit, e.CurRateType, e.CurRateLimit)
 }
 
 func NewGlobalClass() *GlobalClass {
@@ -54,17 +41,13 @@ func NewGlobalClass() *GlobalClass {
 func (c *GlobalClass) AddEvent(e *log.Event) error {
 	var err error
 	if e.RateType != "" {
-		if c.RateType == "" {
-			// Set rate limit for this gg
-			c.RateType = e.RateType
-			c.RateLimit = e.RateLimit
-		} else {
-			// Make sure the rate limit hasn't changed because it's not clear
-			// how to handle a mix of rate limits.
-			if c.RateType != e.RateType && c.RateLimit != e.RateLimit {
-				err = MixedRateLimitsError{c.RateType, c.RateLimit, e.RateType, e.RateLimit}
-			}
-		}
+		// Caller is responsible for making sure rate limits are not mixed,
+		// e.g. first half of slow log is type=query limit=10 and the second
+		// half is type=session limit=100. If rate limit changes, caller should
+		// use different aggregators for each rate limit in order to know the
+		// proper multipler to apply to each final result.
+		c.RateType = e.RateType
+		c.RateLimit = e.RateLimit
 	}
 	c.TotalQueries++
 	c.Metrics.AddEvent(e)

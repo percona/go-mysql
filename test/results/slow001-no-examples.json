@@ -50,9 +50,9 @@
     }
   },
   "Class": {
-    "15152CDCDCD02E97": {
-      "Id": "15152CDCDCD02E97",
-      "Fingerprint": "select sleep(2) from n",
+    "7F7D57ACDD8A346E": {
+      "Id": "7F7D57ACDD8A346E",
+      "Fingerprint": "select sleep(?) from n",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
@@ -101,9 +101,9 @@
       },
       "TotalQueries": 1
     },
-    "75437BEB9448A954": {
-      "Id": "75437BEB9448A954",
-      "Fingerprint": "select sleep(2) from test.n",
+    "3A99CC42AEDCCFCD": {
+      "Id": "3A99CC42AEDCCFCD",
+      "Fingerprint": "select sleep(?) from test.n",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {

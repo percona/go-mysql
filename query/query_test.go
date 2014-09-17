@@ -422,4 +422,11 @@ func (s *TestSuite) TestId(t *C) {
 		Equals,
 		"DB9EF18846547B8C",
 	)
+
+	f = "select sleep(?) from n"
+	t.Check(
+		query.Id(f),
+		Equals,
+		"7F7D57ACDD8A346E",
+	)
 }
