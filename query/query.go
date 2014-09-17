@@ -337,8 +337,16 @@ func Fingerprint(q string) string {
 				cpToOffset = qi
 				s = inNumber
 			case inWord:
-				if Debug {
-					fmt.Println("Number in word")
+				if pr == '(' {
+					if Debug {
+						fmt.Println("Number in function")
+					}
+					cpToOffset = qi
+					s = inNumber
+				} else {
+					if Debug {
+						fmt.Println("Number in word")
+					}
 				}
 			default:
 				if Debug {

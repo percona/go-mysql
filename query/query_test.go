@@ -394,6 +394,18 @@ func (s *TestSuite) TestFingerprintTricky(t *C) {
 	)
 }
 
+func (s *TestSuite) TestNumbersInFunctions(t *C) {
+	var q string
+
+	// Full hex can look like an ident if not for the leading 0x.
+	q = "select sleep(2) from test.n"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select sleep(?) from test.n",
+	)
+}
+
 func (s *TestSuite) TestId(t *C) {
 	var f string
 
