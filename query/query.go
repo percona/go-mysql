@@ -108,6 +108,7 @@ var stateName map[byte]string = map[byte]string{
 	13: "inValues",
 	14: "moreValuesOrUnknown",
 	15: "orderBy",
+	16: "onDupeKeyUpdate",
 }
 
 var Debug bool = false
@@ -115,7 +116,7 @@ var Debug bool = false
 func Fingerprint(q string) string {
 	q += " " // need range to run off end of original query
 	prevWord := ""
-	f := make([]byte, len(q)+2) // @todo what's that magic number "2"?
+	f := make([]byte, len(q))
 	fi := 0
 	pr := rune(0) // previous rune
 	s := unknown  // current state
@@ -130,7 +131,7 @@ func Fingerprint(q string) string {
 
 	for qi, r := range q {
 		if Debug {
-			fmt.Printf("\n%d: %s/%s [%d:%d] %x %q\n", qi, stateName[s], stateName[sqlState], cpFromOffset, cpToOffset, r, r)
+			fmt.Printf("\n%d:%d %s/%s [%d:%d] %x %q\n", qi, fi, stateName[s], stateName[sqlState], cpFromOffset, cpToOffset, r, r)
 		}
 
 		/**
@@ -175,6 +176,10 @@ func Fingerprint(q string) string {
 				fi++
 				s = unknown
 				escape = false
+
+				// qi = the closing quote char, so +1 to ensure we don't copy
+				// anything before this, i.e. quoted value is done, move on.
+				cpFromOffset = qi + 1
 			}
 			continue
 		} else if s == inNumber {
@@ -361,10 +366,16 @@ func Fingerprint(q string) string {
 				}
 				if fi > 0 && !isSpace(rune(f[fi-1])) {
 					if Debug {
-						fmt.Println("Added space")
+						fmt.Println("Add space")
 					}
 					f[fi] = ' '
 					fi++
+					// This is a common case: a space after skipping something,
+					// e.g. col = 'foo'<space>. We want only the first space,
+					// so advance cpFromOffset to whatever is after the space
+					// and if it's more space then space skipping block will
+					// handle it.
+					cpFromOffset = qi + 1
 				}
 			} else if s == inDash {
 				if Debug {
@@ -437,7 +448,14 @@ func Fingerprint(q string) string {
 					quoteChar = r
 					cpToOffset = qi
 					if pr == 'x' || pr == 'b' {
-						cpToOffset--
+						if Debug {
+							fmt.Println("Hex/binary value")
+						}
+						// We're at the first quote char of x'0F'
+						// (or b'0101', etc.), so -2 for the quote char and
+						// the x or b char to copy anything before and up to
+						// this value.
+						cpToOffset = -2
 					}
 				}
 			}

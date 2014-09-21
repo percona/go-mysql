@@ -432,23 +432,33 @@ func (s *TestSuite) TestId(t *C) {
 }
 
 func (s *TestSuite) TestFingerprintPanicChallenge1(t *C) {
-	var q string
-
-	q = "SELECT '' '' ''"
+	q := "SELECT '' '' ''"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		q,
+		"select ? ? ?",
+	)
+
+	q = "SELECT '' '' '' FROM kamil"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select ? ? ? from kamil",
 	)
 }
 
 func (s *TestSuite) TestFingerprintPanicChallenge2(t *C) {
-	var q string
-
-	q = "SELECT 'a' 'b' 'c' 'd'"
+	q := "SELECT 'a' 'b' 'c' 'd'"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		q,
+		"select ? ? ? ?",
+	)
+
+	q = "SELECT 'a' 'b' 'c' 'd' FROM kamil"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select ? ? ? ? from kamil",
 	)
 }
