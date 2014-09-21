@@ -115,7 +115,7 @@ var Debug bool = false
 func Fingerprint(q string) string {
 	q += " " // need range to run off end of original query
 	prevWord := ""
-	f := make([]byte, len(q)+2)
+	f := make([]byte, len(q)+2) // @todo what's that magic number "2"?
 	fi := 0
 	pr := rune(0) // previous rune
 	s := unknown  // current state

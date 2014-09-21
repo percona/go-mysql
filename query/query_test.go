@@ -430,3 +430,25 @@ func (s *TestSuite) TestId(t *C) {
 		"7F7D57ACDD8A346E",
 	)
 }
+
+func (s *TestSuite) TestFingerprintPanicChallenge1(t *C) {
+	var q string
+
+	q = "SELECT '' '' ''"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		q,
+	)
+}
+
+func (s *TestSuite) TestFingerprintPanicChallenge2(t *C) {
+	var q string
+
+	q = "SELECT 'a' 'b' 'c' 'd'"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		q,
+	)
+}
