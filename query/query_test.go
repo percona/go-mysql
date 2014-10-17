@@ -392,6 +392,13 @@ func (s *TestSuite) TestFingerprintTricky(t *C) {
 		Equals,
 		"insert into t values(?+) on duplicate key update query_count=coalesce(query_count, ?) + values(query_count)",
 	)
+
+	q = "select  t.table_schema,t.table_name,engine  from information_schema.tables t  inner join information_schema.columns c  on t.table_schema=c.table_schema and t.table_name=c.table_name group by t.table_schema,t.table_name having  sum(if(column_key in ('PRI','UNI'),1,0))=0"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select t.table_schema,t.table_name,engine from information_schema.tables t inner join information_schema.columns c on t.table_schema=c.table_schema and t.table_name=c.table_name group by t.table_schema,t.table_name having sum(if(column_key in(?+),?,?))=?",
+	)
 }
 
 func (s *TestSuite) TestNumbersInFunctions(t *C) {

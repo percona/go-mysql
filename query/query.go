@@ -244,6 +244,7 @@ func Fingerprint(q string) string {
 			// ends when the next char is not a comma.
 			s = moreValuesOrUnknown
 			pr = r
+			cpFromOffset = qi + 1
 			continue
 		} else if s == inMLC {
 			// We're in a /* mutli-line comments */.  Skip and ignore it all.
@@ -348,6 +349,13 @@ func Fingerprint(q string) string {
 					}
 					cpToOffset = qi
 					s = inNumber
+				} else if pr == ',' {
+					// foo,4 -- 4 may be a number literal or a word/ident
+					if Debug {
+						fmt.Println("Number or word")
+					}
+					s = inNumber
+					cpToOffset = qi
 				} else {
 					if Debug {
 						fmt.Println("Number in word")
@@ -358,6 +366,7 @@ func Fingerprint(q string) string {
 					fmt.Println("Number literal")
 				}
 				s = inNumber
+				cpToOffset = qi
 			}
 		case isSpace(r):
 			if s == unknown {
@@ -411,7 +420,7 @@ func Fingerprint(q string) string {
 					}
 					f[fi] = ' '
 					fi++
-					cpFromOffset = qi
+					cpFromOffset = qi + 1
 				} else if prevWord == "order" && word == "by" {
 					if Debug {
 						fmt.Println("ORDER BY begin")
