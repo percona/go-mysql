@@ -313,6 +313,13 @@ func (s *TestSuite) TestFingerprintInList(t *C) {
 		Equals,
 		"select id, name, parent, type from posts where _name in(?+) and (type = ? or type = ?)",
 	)
+
+	q = "SELECT t FROM field WHERE  (entity_type = 'node') AND (entity_id IN  ('609')) AND (language IN  ('und')) AND (deleted = '0') ORDER BY delta ASC"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select t from field where (entity_type = ?) and (entity_id in(?+)) and (language in(?+)) and (deleted = ?) order by delta",
+	)
 }
 
 func (s *TestSuite) TestFingerprintOrderBy(t *C) {
