@@ -132,7 +132,6 @@ func Fingerprint(q string) string {
 
 	for qi, r := range q {
 		if Debug {
-			fmt.Printf("[%s]\n", string(f[0:fi]))
 			fmt.Printf("\n%d:%d %s/%s [%d:%d] %x %q\n", qi, fi, stateName[s], stateName[sqlState], cpFromOffset, cpToOffset, r, r)
 		}
 
