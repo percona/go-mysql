@@ -68,9 +68,11 @@ func (s *TestSuite) aggregateSlowLog(input, output string) (got *event.Result, e
 		l.Fatal(err)
 	}
 	go p.Start()
-	a := event.NewEventAggregator(query.Fingerprint, query.Id, s.examples)
+	a := event.NewEventAggregator(s.examples)
 	for e := range p.EventChan() {
-		a.AddEvent(e)
+		f := query.Fingerprint(e.Query)
+		id := query.Id(f)
+		a.AddEvent(e, id, f)
 	}
 	got = a.Finalize()
 	return got, expect

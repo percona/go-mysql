@@ -30,46 +30,33 @@ type Result struct {
 }
 
 type EventAggregator struct {
-	digestFunc QueryTransformationFunc
-	idFunc     QueryTransformationFunc
-	examples   bool
+	examples bool
 	// --
 	result *Result
 }
 
-func NewEventAggregator(digestFunc, idFunc QueryTransformationFunc, examples bool) *EventAggregator {
+func NewEventAggregator(examples bool) *EventAggregator {
 	result := &Result{
 		Global: NewGlobalClass(),
 		Class:  make(map[string]*QueryClass),
 	}
 	a := &EventAggregator{
-		digestFunc: digestFunc,
-		idFunc:     idFunc,
-		examples:   examples,
+		examples: examples,
 		// --
 		result: result,
 	}
 	return a
 }
 
-func (a *EventAggregator) AddEvent(event *log.Event) {
+func (a *EventAggregator) AddEvent(event *log.Event, id, fingerprint string) {
 
 	// Add the event to the global class.
 	a.result.Global.AddEvent(event)
-	/*
-		switch err.(type) {
-		case mysqlLog.MixedRateLimitsError:
-			result.Error = err.Error()
-			break EVENT_LOOP
-		}
-	*/
 
 	// Get the query class to which the event belongs.
-	digest := a.digestFunc(event.Query)
-	id := a.idFunc(digest)
 	class, haveClass := a.result.Class[id]
 	if !haveClass {
-		class = NewQueryClass(id, digest, a.examples)
+		class = NewQueryClass(id, fingerprint, a.examples)
 		a.result.Class[id] = class
 	}
 
