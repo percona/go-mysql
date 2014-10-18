@@ -35,7 +35,7 @@ var userRe = regexp.MustCompile(`User@Host: ([^\[]+|\[[^[]+\]).*?@ (\S*) \[(.*)\
 var headerRe = regexp.MustCompile(`^#\s+[A-Z]`)
 var metricsRe = regexp.MustCompile(`(\w+): (\S+|\z)`)
 var adminRe = regexp.MustCompile(`command: (.+)`)
-var setRe = regexp.MustCompile(`SET (?:last_insert_id|insert_id|timestamp)`)
+var setRe = regexp.MustCompile(`^SET (?:last_insert_id|insert_id|timestamp)`)
 
 type SlowLogParser struct {
 	file *os.File
