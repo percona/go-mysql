@@ -244,6 +244,12 @@ func Fingerprint(q string) string {
 				}
 				s = inQuote
 				quoteChar = r
+				continue
+			} else if isSpace(r) {
+				if Debug {
+					fmt.Println("Space")
+				}
+				continue
 			}
 			if parOpen > 0 {
 				// Parenthesis are not balanced yet; i.e. haven't reached

@@ -297,6 +297,17 @@ func (s *TestSuite) TestFingerprintValueList(t *C) {
 	)
 }
 
+func (s *TestSuite) TestFingerprintInList(t *C) {
+	var q string
+
+	q = "select * from t where (base.nid IN  ('1412', '1410', '1411'))"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select * from t where (base.nid in(?+))",
+	)
+}
+
 func (s *TestSuite) TestFingerprintOrderBy(t *C) {
 	var q string
 
