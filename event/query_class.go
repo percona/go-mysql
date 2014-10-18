@@ -22,6 +22,10 @@ import (
 	"time"
 )
 
+const (
+	MAX_EXAMPLE_BYTES = 1024 * 10
+)
+
 type QueryClass struct {
 	Id           string
 	Fingerprint  string
@@ -67,7 +71,11 @@ func (c *QueryClass) AddEvent(e *log.Event) {
 				} else {
 					c.Example.Db = c.lastDb
 				}
-				c.Example.Query = e.Query
+				if len(e.Query) > MAX_EXAMPLE_BYTES {
+					c.Example.Query = e.Query[0:MAX_EXAMPLE_BYTES-3] + "..."
+				} else {
+					c.Example.Query = e.Query
+				}
 				if e.Ts != "" {
 					if t, err := time.Parse("060102 15:04:05", e.Ts); err != nil {
 						c.Example.Ts = ""
