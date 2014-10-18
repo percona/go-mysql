@@ -438,6 +438,14 @@ func (s *TestSuite) TestFingerprintTricky(t *C) {
 		Equals,
 		"select t.table_schema,t.table_name,engine from information_schema.tables t inner join information_schema.columns c on t.table_schema=c.table_schema and t.table_name=c.table_name group by t.table_schema,t.table_name having sum(if(column_key in(?+),?,?))=?",
 	)
+
+	// Empty value list is valid SQL.
+	q = "INSERT INTO t () VALUES ()"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"insert into t () values()",
+	)
 }
 
 func (s *TestSuite) TestNumbersInFunctions(t *C) {

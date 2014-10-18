@@ -129,6 +129,7 @@ func Fingerprint(q string) string {
 	parOpen := 0
 	parOpenTotal := 0
 	valueNo := 0
+	firstPar := 0
 
 	for qi, r := range q {
 		if Debug {
@@ -235,6 +236,9 @@ func Fingerprint(q string) string {
 				if Debug {
 					fmt.Println("Open parenthesis", parOpen)
 				}
+				if parOpen == 1 {
+					firstPar = qi
+				}
 			} else if r == '\'' || r == '"' {
 				// VALUES ('Hello world!') -> enter inQuote state to skip
 				// the quoted value so ')' in 'This ) is a trick' doesn't
@@ -257,7 +261,7 @@ func Fingerprint(q string) string {
 				continue
 			}
 			if parOpenTotal == 0 {
-				// SELECT value FROM ...
+				// SELECT value FROM t
 				if Debug {
 					fmt.Println("Literal values not VALUES()")
 				}
@@ -270,8 +274,15 @@ func Fingerprint(q string) string {
 			}
 			valueNo++
 			if valueNo == 1 {
-				copy(f[fi:fi+4], "(?+)")
-				fi += 4
+				if qi-firstPar > 1 {
+					copy(f[fi:fi+4], "(?+)")
+					fi += 4
+				} else {
+					// INSERT INTO t VALUES ()
+					copy(f[fi:fi+2], "()")
+					fi += 2
+				}
+				firstPar = 0
 			}
 			// ... the difficult part is that there may be other values, e.g.
 			// (1), (2), (3).  So we enter the following state.  The values list
@@ -564,6 +575,7 @@ func Fingerprint(q string) string {
 				s = inValues
 				sqlState = inValues
 				parOpen = 1
+				firstPar = qi
 				if valueNo == 0 {
 					cpToOffset = qi
 				}
