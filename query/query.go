@@ -127,10 +127,12 @@ func Fingerprint(q string) string {
 	addSpace := false
 	escape := false
 	parOpen := 0
+	parOpenTotal := 0
 	valueNo := 0
 
 	for qi, r := range q {
 		if Debug {
+			fmt.Printf("[%s]\n", string(f[0:fi]))
 			fmt.Printf("\n%d:%d %s/%s [%d:%d] %x %q\n", qi, fi, stateName[s], stateName[sqlState], cpFromOffset, cpToOffset, r, r)
 		}
 
@@ -216,6 +218,7 @@ func Fingerprint(q string) string {
 			// () value ends when the parenthesis are balanced, but...
 			if r == ')' {
 				parOpen--
+				parOpenTotal++
 				if Debug {
 					fmt.Println("Close parenthesis", parOpen)
 				}
@@ -228,6 +231,14 @@ func Fingerprint(q string) string {
 			if parOpen > 0 {
 				// Parenthesis are not balanced yet; i.e. haven't reached
 				// closing ) for this value.
+				continue
+			}
+			if parOpenTotal == 0 {
+				// SELECT value FROM ...
+				if Debug {
+					fmt.Println("Literal values not VALUES()")
+				}
+				s = inWord
 				continue
 			}
 			// (<anything>) -> (?+) only for first value
@@ -245,6 +256,7 @@ func Fingerprint(q string) string {
 			s = moreValuesOrUnknown
 			pr = r
 			cpFromOffset = qi + 1
+			parOpenTotal = 0
 			continue
 		} else if s == inMLC {
 			// We're in a /* mutli-line comments */.  Skip and ignore it all.
@@ -399,8 +411,10 @@ func Fingerprint(q string) string {
 				if Debug {
 					fmt.Println("Space after values")
 				}
-				f[fi] = ' '
-				fi++
+				if valueNo == 1 {
+					f[fi] = ' '
+					fi++
+				}
 			} else {
 				if Debug {
 					fmt.Println("Word end")

@@ -393,6 +393,13 @@ func (s *TestSuite) TestFingerprintTricky(t *C) {
 		"insert into t values(?+) on duplicate key update query_count=coalesce(query_count, ?) + values(query_count)",
 	)
 
+	q = "insert into t values (1), (2), (3)\n\n\ton duplicate key update query_count=1"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"insert into t values(?+) on duplicate key update query_count=?",
+	)
+
 	q = "select  t.table_schema,t.table_name,engine  from information_schema.tables t  inner join information_schema.columns c  on t.table_schema=c.table_schema and t.table_name=c.table_name group by t.table_schema,t.table_name having  sum(if(column_key in ('PRI','UNI'),1,0))=0"
 	t.Check(
 		query.Fingerprint(q),
@@ -467,5 +474,17 @@ func (s *TestSuite) TestFingerprintPanicChallenge2(t *C) {
 		query.Fingerprint(q),
 		Equals,
 		"select ? ? ? ? from kamil",
+	)
+}
+
+func (s *TestSuite) TestFingerprintKeywords(t *C) {
+	var q string
+
+	// values is a keyword but value is not. :-\
+	q = "SELECT name, value FROM variable"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select name, value from variable",
 	)
 }
