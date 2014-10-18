@@ -174,14 +174,23 @@ func Fingerprint(q string) string {
 				if Debug {
 					fmt.Println("Quote end")
 				}
-				f[fi] = '?'
-				fi++
-				s = unknown
 				escape = false
 
 				// qi = the closing quote char, so +1 to ensure we don't copy
 				// anything before this, i.e. quoted value is done, move on.
 				cpFromOffset = qi + 1
+
+				if sqlState == inValues {
+					// ('Hello world!', ...) -> VALUES (, ...)
+					// The inValues state uses this state to skip quoted values,
+					// so we don't replace them with ?; the inValues blocks will
+					// replace the entire value list with ?+.
+					s = inValues
+				} else {
+					f[fi] = '?'
+					fi++
+					s = unknown
+				}
 			}
 			continue
 		} else if s == inNumber {
@@ -227,6 +236,15 @@ func Fingerprint(q string) string {
 				if Debug {
 					fmt.Println("Open parenthesis", parOpen)
 				}
+			} else if r == '\'' || r == '"' {
+				// VALUES ('Hello world!') -> enter inQuote state to skip
+				// the quoted value so ')' in 'This ) is a trick' doesn't
+				// balance an outer parenthesis.
+				if Debug {
+					fmt.Println("Quote begin")
+				}
+				s = inQuote
+				quoteChar = r
 			}
 			if parOpen > 0 {
 				// Parenthesis are not balanced yet; i.e. haven't reached
@@ -539,6 +557,7 @@ func Fingerprint(q string) string {
 					fmt.Println("Values begin")
 				}
 				s = inValues
+				sqlState = inValues
 				parOpen = 1
 				if valueNo == 0 {
 					cpToOffset = qi
@@ -603,6 +622,7 @@ func Fingerprint(q string) string {
 				// VALUES () -> values(?+)
 				addSpace = false
 				s = inValues
+				sqlState = inValues
 			} else if addSpace {
 				if Debug {
 					fmt.Println("Add space")

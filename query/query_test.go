@@ -288,6 +288,13 @@ func (s *TestSuite) TestFingerprintValueList(t *C) {
 		Equals,
 		"insert into foo(a, b, c) value(?+)",
 	)
+
+	q = "insert into foo values (1, '(2)', 'This is a trick: ). More values.', 4)"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"insert into foo values(?+)",
+	)
 }
 
 func (s *TestSuite) TestFingerprintOrderBy(t *C) {
