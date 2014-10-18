@@ -605,6 +605,15 @@ func Fingerprint(q string) string {
 				}
 				valueNo = 0
 				cpFromOffset = qi
+
+				if sqlState == inValues {
+					// Values are comma-separated, so the first random char
+					// marks the end of the VALUE() or IN() list.
+					if Debug {
+						fmt.Println("No more values")
+					}
+					sqlState = unknown
+				}
 			}
 			s = inWord
 		}

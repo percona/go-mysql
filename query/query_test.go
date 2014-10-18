@@ -306,6 +306,13 @@ func (s *TestSuite) TestFingerprintInList(t *C) {
 		Equals,
 		"select * from t where (base.nid in(?+))",
 	)
+
+	q = "SELECT ID, name, parent, type FROM posts WHERE _name IN ('perf','caching') AND (type = 'page' OR type = 'attachment')"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select id, name, parent, type from posts where _name in(?+) and (type = ? or type = ?)",
+	)
 }
 
 func (s *TestSuite) TestFingerprintOrderBy(t *C) {
