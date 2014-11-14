@@ -18,9 +18,9 @@
 package slow_test
 
 import (
-	. "github.com/go-test/test"
 	"github.com/percona/go-mysql/log"
 	parser "github.com/percona/go-mysql/log/slow"
+	"github.com/percona/percona-agent/test"
 	. "gopkg.in/check.v1"
 	l "log"
 	"os"
@@ -42,7 +42,7 @@ func (s *TestSuite) SetUpSuite(t *C) {
 	s.opt = log.Options{
 	//Debug: true,
 	}
-	s.sample = RootDir() + "/test/slow-logs"
+	s.sample = "../../test/slow-logs"
 }
 
 func (s *TestSuite) parseSlowLog(filename string, o log.Options) []log.Event {
@@ -68,8 +68,8 @@ func (s *TestSuite) parseSlowLog(filename string, o log.Options) []log.Event {
 func (s *TestSuite) TestParserEmptySlowLog(t *C) {
 	got := s.parseSlowLog("empty.log", s.opt)
 	expect := []log.Event{}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
+	if same, diff := test.IsDeeply(got, expect); !same {
+		test.Dump(got)
 		t.Error(diff)
 	}
 }
@@ -115,8 +115,8 @@ func (s *TestSuite) TestParserSlowLog001(t *C) {
 			BoolMetrics: map[string]bool{},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
+	if same, diff := test.IsDeeply(got, expect); !same {
+		test.Dump(got)
 		t.Error(diff)
 	}
 }
@@ -188,6 +188,7 @@ VALUES ('', 'Exact')`,
 			User:   "[SQL_SLAVE]",
 			Host:   "",
 			Offset: 815,
+			Db:     "db1",
 			TimeMetrics: map[string]float32{
 				"InnoDB_queue_wait":    0.000000,
 				"Lock_time":            0.000077,
@@ -222,6 +223,7 @@ WHERE  vab3concept1upload='6994465'`,
 			User:   "[SQL_SLAVE]",
 			Host:   "",
 			Offset: 1334,
+			Db:     "db1",
 			TimeMetrics: map[string]float32{
 				"Query_time":           0.033384,
 				"InnoDB_IO_r_wait":     0.000000,
@@ -255,6 +257,7 @@ VALUES ('211', '18')`,
 			User:   "[SQL_SLAVE]",
 			Host:   "",
 			Offset: 1864,
+			Db:     "db1",
 			TimeMetrics: map[string]float32{
 				"InnoDB_queue_wait":    0.000000,
 				"Query_time":           0.000530,
@@ -288,6 +291,7 @@ SET    biz = '91848182522'`,
 			User:   "[SQL_SLAVE]",
 			Host:   "",
 			Offset: 2393,
+			Db:     "db1",
 			TimeMetrics: map[string]float32{
 				"Lock_time":            0.000027,
 				"InnoDB_rec_lock_wait": 0.000000,
@@ -322,6 +326,7 @@ WHERE  fillze='899'`,
 			User:   "[SQL_SLAVE]",
 			Host:   "",
 			Offset: 2861,
+			Db:     "db1",
 			TimeMetrics: map[string]float32{
 				"Query_time":           0.000530,
 				"InnoDB_IO_r_wait":     0.000000,
@@ -355,6 +360,7 @@ SET    biz = '91848182522'`,
 			User:   "[SQL_SLAVE]",
 			Host:   "",
 			Offset: 3374,
+			Db:     "db1",
 			TimeMetrics: map[string]float32{
 				"Query_time":           0.000530,
 				"Lock_time":            0.000027,
@@ -382,8 +388,8 @@ SET    biz = '91848182522'`,
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
+	if same, diff := test.IsDeeply(got, expect); !same {
+		test.Dump(got)
 		t.Error(diff)
 	}
 }
@@ -420,8 +426,8 @@ func (s *TestSuite) TestParserSlowLog003(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
+	if same, diff := test.IsDeeply(got, expect); !same {
+		test.Dump(got)
 		t.Error(diff)
 	}
 }
@@ -448,8 +454,8 @@ func (s *TestSuite) TestParserSlowLog004(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
+	if same, diff := test.IsDeeply(got, expect); !same {
+		test.Dump(got)
 		t.Error(diff)
 	}
 }
@@ -492,8 +498,8 @@ func (s *TestSuite) TestParserSlowLog005(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
+	if same, diff := test.IsDeeply(got, expect); !same {
+		test.Dump(got)
 		t.Error(diff)
 	}
 }
@@ -672,8 +678,8 @@ func (s *TestSuite) TestParserSlowLog006(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
+	if same, diff := test.IsDeeply(got, expect); !same {
+		test.Dump(got)
 		t.Error(diff)
 	}
 }
@@ -702,8 +708,8 @@ func (s *TestSuite) TestParserSlowLog007(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
+	if same, diff := test.IsDeeply(got, expect); !same {
+		test.Dump(got)
 		t.Error(diff)
 	}
 }
@@ -772,8 +778,8 @@ func (s *TestSuite) TestParserSlowLog008(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
+	if same, diff := test.IsDeeply(got, expect); !same {
+		test.Dump(got)
 		t.Error(diff)
 	}
 }
@@ -815,8 +821,8 @@ func (s *TestSuite) TestParserSlowLog009(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
+	if same, diff := test.IsDeeply(got, expect); !same {
+		test.Dump(got)
 		t.Error(diff)
 	}
 }
@@ -941,8 +947,8 @@ func (s *TestSuite) TestParserSlowLog011(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
+	if same, diff := test.IsDeeply(got, expect); !same {
+		test.Dump(got)
 		t.Error(diff)
 	}
 }
@@ -998,8 +1004,8 @@ func (s *TestSuite) TestParserSlowLog012(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
+	if same, diff := test.IsDeeply(got, expect); !same {
+		test.Dump(got)
 		t.Error(diff)
 	}
 }
@@ -1054,7 +1060,7 @@ func (s *TestSuite) TestParserSlowLog013(t *C) {
 			Query:  "select count(*) into @discard from `information_schema`.`PARTITIONS`",
 			User:   "debian-sys-maint",
 			Host:   "localhost",
-			Db:     "",
+			Db:     "db961",
 			TimeMetrics: map[string]float32{
 				"Query_time": 94.38144,
 				"Lock_time":  0.000174,
@@ -1109,8 +1115,8 @@ func (s *TestSuite) TestParserSlowLog013(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
+	if same, diff := test.IsDeeply(got, expect); !same {
+		test.Dump(got)
 		t.Error(diff)
 	}
 }
@@ -1289,8 +1295,8 @@ func (s *TestSuite) TestParserSlowLog014(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
+	if same, diff := test.IsDeeply(got, expect); !same {
+		test.Dump(got)
 		t.Error(diff)
 	}
 }
@@ -1317,8 +1323,8 @@ func (s *TestSuite) TestParserSlowLog001StartOffset(t *C) {
 			BoolMetrics: map[string]bool{},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
+	if same, diff := test.IsDeeply(got, expect); !same {
+		test.Dump(got)
 		t.Error(diff)
 	}
 }
@@ -1351,8 +1357,8 @@ func (s *TestSuite) TestParseSlow016(t *C) {
 			BoolMetrics: map[string]bool{},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
+	if same, diff := test.IsDeeply(got, expect); !same {
+		test.Dump(got)
 		t.Error(diff)
 	}
 }
@@ -1378,8 +1384,8 @@ func (s *TestSuite) TestParseSlow017(t *C) {
 			BoolMetrics: map[string]bool{},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
+	if same, diff := test.IsDeeply(got, expect); !same {
+		test.Dump(got)
 		t.Error(diff)
 	}
 }
@@ -1500,6 +1506,7 @@ func (s *TestSuite) TestParseSlow019(t *C) {
 			User:   "percona-agent",
 			Host:   "localhost",
 			Offset: 2006,
+			Db:     "cod7_plos15",
 			TimeMetrics: map[string]float32{
 				"Lock_time":  0.000115,
 				"Query_time": 0.011565,
@@ -1529,8 +1536,8 @@ func (s *TestSuite) TestParseSlow019(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
+	if same, diff := test.IsDeeply(got, expect); !same {
+		test.Dump(got)
 		t.Error(diff)
 	}
 }
