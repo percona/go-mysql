@@ -51,6 +51,7 @@ type SlowLogParser struct {
 	lineOffset  uint64
 	stopped     bool
 	event       *log.Event
+	lastDB      string
 }
 
 func NewSlowLogParser(file *os.File, opt log.Options) *SlowLogParser {
@@ -267,13 +268,14 @@ func (p *SlowLogParser) parseQuery(line string) {
 		return
 	}
 
-	if p.queryLines == 0 && strings.HasPrefix(line, "use ") {
+	if strings.HasPrefix(line, "use ") {
 		if p.opt.Debug {
 			l.Println("use db")
 		}
 		db := strings.TrimPrefix(line, "use ")
 		db = strings.TrimRight(db, ";")
 		p.event.Db = db
+		p.lastDB = db
 	} else if setRe.MatchString(line) {
 		if p.opt.Debug {
 			l.Println("set var")
@@ -325,6 +327,7 @@ func (p *SlowLogParser) sendEvent(inHeader bool, inQuery bool) {
 		p.queryLines = 0
 		p.inHeader = inHeader
 		p.inQuery = inQuery
+		p.event.Db = p.lastDB
 	}()
 
 	if _, ok := p.event.TimeMetrics["Query_time"]; !ok {
