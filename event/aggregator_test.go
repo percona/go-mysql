@@ -126,3 +126,21 @@ func (s *TestSuite) TestSlow002(t *C) {
 		t.Error(diff)
 	}
 }
+
+func (s *TestSuite) TestUseDb(t *C) {
+	got, expect := s.aggregateSlowLog("slow020.log", "slow020.json")
+	if same, diff := IsDeeply(got, expect); !same {
+		Dump(got)
+		t.Error(diff)
+	}
+	got, expect = s.aggregateSlowLog("slow021.log", "slow021.json")
+	if same, diff := IsDeeply(got, expect); !same {
+		Dump(got)
+		t.Error(diff)
+	}
+	got, expect = s.aggregateSlowLog("slow022.log", "slow022.json")
+	if same, diff := IsDeeply(got, expect); !same {
+		Dump(got)
+		t.Error(diff)
+	}
+}

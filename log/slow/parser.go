@@ -267,12 +267,16 @@ func (p *SlowLogParser) parseQuery(line string) {
 		return
 	}
 
-	if p.queryLines == 0 && strings.HasPrefix(line, "use ") {
+	if p.queryLines == 0 && strings.HasPrefix(strings.ToLower(line), "use ") {
 		if p.opt.Debug {
 			l.Println("use db")
 		}
-		db := strings.TrimPrefix(line, "use ")
+		// Just remove the first 4 chars because it can be use or Use or uSe
+		// and we cannot convert the whole line to lower case bacause the db
+		// name can be case sensitive
+		db := line[4:]
 		db = strings.TrimRight(db, ";")
+		db = strings.Trim(db, "`")
 		p.event.Db = db
 	} else if setRe.MatchString(line) {
 		if p.opt.Debug {
