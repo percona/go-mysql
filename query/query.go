@@ -131,6 +131,11 @@ func Fingerprint(q string) string {
 	valueNo := 0
 	firstPar := 0
 
+	// If the query is empty, return without trying to parse it
+	if strings.TrimSpace(q) == "" {
+		return ""
+	}
+
 	for qi, r := range q {
 		if Debug {
 			fmt.Printf("\n%d:%d %s/%s [%d:%d] %x %q\n", qi, fi, stateName[s], stateName[sqlState], cpFromOffset, cpToOffset, r, r)

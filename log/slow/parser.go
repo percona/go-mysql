@@ -262,7 +262,9 @@ func (p *SlowLogParser) parseQuery(line string) {
 		}
 		p.inHeader = true
 		p.inQuery = false
-		p.sendEvent(true, false)
+		if p.event.Query != "" {
+			p.sendEvent(true, false)
+		}
 		p.parseHeader(line)
 		return
 	}
