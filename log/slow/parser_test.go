@@ -1535,6 +1535,7 @@ func (s *TestSuite) TestParseSlow019(t *C) {
 	}
 }
 
+// Test db is not inherited and multiple "use" commands.
 func (s *TestSuite) TestParseSlow023(t *C) {
 	got := s.parseSlowLog("slow023.log", log.Options{Debug: false})
 	expect := []log.Event{
