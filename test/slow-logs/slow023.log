@@ -24,8 +24,8 @@ SET timestamp=1415210700;
 SELECT field FROM table_b WHERE another_field = 'bazinga' AND site_id = 1;
 # User@Host: backup[backup] @ localhost []  Id: 56458
 # Query_time: 0.000558  Lock_time: 0.000000 Rows_sent: 0  Rows_examined: 0
-use `dbnameb`;
 SET timestamp=1415210700;
+use `dbnameb`;
 # User@Host: backup[backup] @ localhost []  Id: 56458
 # Query_time: 0.000204  Lock_time: 0.000000 Rows_sent: 1  Rows_examined: 0
 SET timestamp=1415210700;

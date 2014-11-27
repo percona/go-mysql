@@ -1681,7 +1681,29 @@ func (s *TestSuite) TestParseSlow023(t *C) {
 	}
 	if same, diff := IsDeeply(got, expect); !same {
 		Dump(got)
-		Dump(expect)
+		//Dump(expect)
 		t.Error(diff)
+	}
+}
+func (s *TestSuite) TestParseSlow024(t *C) {
+	filename := "slow023.log"
+	o := log.Options{Debug: false}
+
+	file, err := os.Open(path.Join(s.sample, "/", filename))
+	if err != nil {
+		l.Fatal(err)
+	}
+	p := parser.NewSlowLogParser(file, o)
+	if err != nil {
+		l.Fatal(err)
+	}
+	go p.Start()
+	lastQuery := ""
+	for e := range p.EventChan() {
+		if e.Query == "" {
+			t.Errorf("Empty query at offset: %d. Last valid query: %s\n", e.Offset, lastQuery)
+		} else {
+			lastQuery = e.Query
+		}
 	}
 }
