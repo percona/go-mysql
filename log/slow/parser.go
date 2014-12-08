@@ -273,13 +273,16 @@ func (p *SlowLogParser) parseQuery(line string) {
 		if p.opt.Debug {
 			l.Println("use db")
 		}
-		// Just remove the first 4 chars because it can be use or Use or uSe
-		// and we cannot convert the whole line to lower case bacause the db
-		// name can be case sensitive
 		db := strings.TrimPrefix(line, found)
 		db = strings.TrimRight(db, ";")
 		db = strings.Trim(db, "`")
 		p.event.Db = db
+		// Set the 'use' as the query itself.
+		// In case we are on a group of lines like in test 23, lines 6~8, the 
+		// query will be replaced by the real query "select field...."
+		// In case we are on a group of lines like in test23, lines 27~28, the
+		// query will be "use dbnameb" since the user executed a use command
+		p.event.Query = line
 	} else if setRe.MatchString(line) {
 		if p.opt.Debug {
 			l.Println("set var")
