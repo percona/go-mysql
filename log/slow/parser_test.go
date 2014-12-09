@@ -1539,7 +1539,7 @@ func (s *TestSuite) TestParseSlow019(t *C) {
 func (s *TestSuite) TestParseSlow023(t *C) {
 	got := s.parseSlowLog("slow023.log", log.Options{Debug: false})
 	expect := []log.Event{
-        // Slice 0
+		// Slice 0
 		{
 			Offset: 177,
 			Ts:     "",
@@ -1560,7 +1560,7 @@ func (s *TestSuite) TestParseSlow023(t *C) {
 			RateType:    "",
 			RateLimit:   0,
 		},
-        // Slice 1
+		// Slice 1
 		{
 			Offset: 419,
 			Ts:     "",
@@ -1581,7 +1581,7 @@ func (s *TestSuite) TestParseSlow023(t *C) {
 			RateType:    "",
 			RateLimit:   0,
 		},
-        // Slice 2
+		// Slice 2
 		{
 			Offset: 596,
 			Ts:     "",
@@ -1602,7 +1602,7 @@ func (s *TestSuite) TestParseSlow023(t *C) {
 			RateType:    "",
 			RateLimit:   0,
 		},
-        // Slice 3
+		// Slice 3
 		{
 			Offset: 795,
 			Ts:     "",
@@ -1623,7 +1623,7 @@ func (s *TestSuite) TestParseSlow023(t *C) {
 			RateType:    "",
 			RateLimit:   0,
 		},
-        // Slice 4
+		// Slice 4
 		{
 			Offset: 983,
 			Ts:     "",
@@ -1643,28 +1643,28 @@ func (s *TestSuite) TestParseSlow023(t *C) {
 			BoolMetrics: map[string]bool{},
 			RateType:    "", RateLimit: 0,
 		},
-        // Slice 5
-        {
-            Offset: 1219,
-            Ts: "",
-            Admin: false,
-            Query: "use `dbnameb`",
-            User: "backup",
-            Host: "localhost",
-            Db: "dbnameb",
-            TimeMetrics: map[string]float32 {
-              "Lock_time": 0,
-              "Query_time": 0.000558,
-            },
-            NumberMetrics: map[string]uint64{
-              "Rows_examined": 0,
-              "Rows_sent": 0,
-            },
-            BoolMetrics: map[string]bool{},
-            RateType: "",
-            RateLimit: 0,
-        },
-        // Slice 6
+		// Slice 5
+		{
+			Offset: 1219,
+			Ts:     "",
+			Admin:  false,
+			Query:  "use `dbnameb`",
+			User:   "backup",
+			Host:   "localhost",
+			Db:     "dbnameb",
+			TimeMetrics: map[string]float32{
+				"Lock_time":  0,
+				"Query_time": 0.000558,
+			},
+			NumberMetrics: map[string]uint64{
+				"Rows_examined": 0,
+				"Rows_sent":     0,
+			},
+			BoolMetrics: map[string]bool{},
+			RateType:    "",
+			RateLimit:   0,
+		},
+		// Slice 6
 		{
 			Offset: 1389,
 			Ts:     "",
@@ -1685,7 +1685,7 @@ func (s *TestSuite) TestParseSlow023(t *C) {
 			RateType:    "",
 			RateLimit:   0,
 		},
-        // Slice 7
+		// Slice 7
 		{
 			Offset: 1573,
 			Ts:     "",
