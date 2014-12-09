@@ -36,6 +36,7 @@ var headerRe = regexp.MustCompile(`^#\s+[A-Z]`)
 var metricsRe = regexp.MustCompile(`(\w+): (\S+|\z)`)
 var adminRe = regexp.MustCompile(`command: (.+)`)
 var setRe = regexp.MustCompile(`^SET (?:last_insert_id|insert_id|timestamp)`)
+var useRe = regexp.MustCompile(`^(?i)use `)
 
 type SlowLogParser struct {
 	file *os.File
@@ -267,8 +268,7 @@ func (p *SlowLogParser) parseQuery(line string) {
 		return
 	}
 
-	re := regexp.MustCompile(`^(?i)use `)
-	isUse := re.FindString(line)
+	isUse := useRe.FindString(line)
 	if p.queryLines == 0 && isUse != "" {
 		if p.opt.Debug {
 			l.Println("use db")
