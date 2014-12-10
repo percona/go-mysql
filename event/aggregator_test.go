@@ -126,3 +126,25 @@ func (s *TestSuite) TestSlow002(t *C) {
 		t.Error(diff)
 	}
 }
+
+// Tests for PCT-1006 & PCT-1085
+func (s *TestSuite) TestUseDb(t *C) {
+	// Test db is not inherited
+	got, expect := s.aggregateSlowLog("slow020.log", "slow020.json")
+	if same, diff := IsDeeply(got, expect); !same {
+		Dump(got)
+		t.Error(diff)
+	}
+	// Test "use" is not case sensitive
+	got, expect = s.aggregateSlowLog("slow021.log", "slow021.json")
+	if same, diff := IsDeeply(got, expect); !same {
+		Dump(got)
+		t.Error(diff)
+	}
+	// Test we are parsing db names in backticks
+	got, expect = s.aggregateSlowLog("slow022.log", "slow022.json")
+	if same, diff := IsDeeply(got, expect); !same {
+		Dump(got)
+		t.Error(diff)
+	}
+}

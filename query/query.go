@@ -663,7 +663,7 @@ func Fingerprint(q string) string {
 	}
 
 	// Remove trailing spaces.
-	for isSpace(rune(f[fi-1])) {
+	for fi > 0 && isSpace(rune(f[fi-1])) {
 		fi--
 	}
 

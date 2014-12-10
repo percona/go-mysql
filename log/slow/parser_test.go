@@ -1534,3 +1534,204 @@ func (s *TestSuite) TestParseSlow019(t *C) {
 		t.Error(diff)
 	}
 }
+
+// Test db is not inherited and multiple "use" commands.
+func (s *TestSuite) TestParseSlow023(t *C) {
+	got := s.parseSlowLog("slow023.log", log.Options{Debug: false})
+	expect := []log.Event{
+		// Slice 0
+		{
+			Offset: 177,
+			Ts:     "",
+			Admin:  false,
+			Query:  "SELECT field FROM table_a WHERE some_other_field = 'yahoo' LIMIT 1",
+			User:   "bookblogs",
+			Host:   "localhost",
+			Db:     "dbnamea",
+			TimeMetrics: map[string]float32{
+				"Query_time": 0.321092,
+				"Lock_time":  3.8e-05,
+			},
+			NumberMetrics: map[string]uint64{
+				"Rows_sent":     0,
+				"Rows_examined": 0,
+			},
+			BoolMetrics: map[string]bool{},
+			RateType:    "",
+			RateLimit:   0,
+		},
+		// Slice 1
+		{
+			Offset: 419,
+			Ts:     "",
+			Admin:  false,
+			Query:  "SET NAMES utf8",
+			User:   "bookblogs",
+			Host:   "localhost",
+			Db:     "",
+			TimeMetrics: map[string]float32{
+				"Lock_time":  0,
+				"Query_time": 0.253052,
+			},
+			NumberMetrics: map[string]uint64{
+				"Rows_sent":     0,
+				"Rows_examined": 0,
+			},
+			BoolMetrics: map[string]bool{},
+			RateType:    "",
+			RateLimit:   0,
+		},
+		// Slice 2
+		{
+			Offset: 596,
+			Ts:     "",
+			Admin:  false,
+			Query:  "SET GLOBAL slow_query_log=ON",
+			User:   "percona-agent",
+			Host:   "localhost",
+			Db:     "",
+			TimeMetrics: map[string]float32{
+				"Query_time": 0.31645,
+				"Lock_time":  0,
+			},
+			NumberMetrics: map[string]uint64{
+				"Rows_sent":     0,
+				"Rows_examined": 0,
+			},
+			BoolMetrics: map[string]bool{},
+			RateType:    "",
+			RateLimit:   0,
+		},
+		// Slice 3
+		{
+			Offset: 795,
+			Ts:     "",
+			Admin:  false,
+			Query:  "SELECT @@SESSION.sql_mode",
+			User:   "bookblogs",
+			Host:   "localhost",
+			Db:     "",
+			TimeMetrics: map[string]float32{
+				"Query_time": 3.7e-05,
+				"Lock_time":  0,
+			},
+			NumberMetrics: map[string]uint64{
+				"Rows_examined": 0,
+				"Rows_sent":     1,
+			},
+			BoolMetrics: map[string]bool{},
+			RateType:    "",
+			RateLimit:   0,
+		},
+		// Slice 4
+		{
+			Offset: 983,
+			Ts:     "",
+			Admin:  false,
+			Query:  "SELECT field FROM table_b WHERE another_field = 'bazinga' AND site_id = 1",
+			User:   "bookblogs",
+			Host:   "localhost",
+			Db:     "",
+			TimeMetrics: map[string]float32{
+				"Query_time": 0.000297,
+				"Lock_time":  0.000141,
+			},
+			NumberMetrics: map[string]uint64{
+				"Rows_sent":     1,
+				"Rows_examined": 1,
+			},
+			BoolMetrics: map[string]bool{},
+			RateType:    "", RateLimit: 0,
+		},
+		// Slice 5
+		{
+			Offset: 1219,
+			Ts:     "",
+			Admin:  false,
+			Query:  "use `dbnameb`",
+			User:   "backup",
+			Host:   "localhost",
+			Db:     "dbnameb",
+			TimeMetrics: map[string]float32{
+				"Lock_time":  0,
+				"Query_time": 0.000558,
+			},
+			NumberMetrics: map[string]uint64{
+				"Rows_examined": 0,
+				"Rows_sent":     0,
+			},
+			BoolMetrics: map[string]bool{},
+			RateType:    "",
+			RateLimit:   0,
+		},
+		// Slice 6
+		{
+			Offset: 1389,
+			Ts:     "",
+			Admin:  false,
+			Query:  "select @@collation_database",
+			User:   "backup",
+			Host:   "localhost",
+			Db:     "",
+			TimeMetrics: map[string]float32{
+				"Query_time": 0.000204,
+				"Lock_time":  0,
+			},
+			NumberMetrics: map[string]uint64{
+				"Rows_sent":     1,
+				"Rows_examined": 0,
+			},
+			BoolMetrics: map[string]bool{},
+			RateType:    "",
+			RateLimit:   0,
+		},
+		// Slice 7
+		{
+			Offset: 1573,
+			Ts:     "",
+			Admin:  false,
+			Query:  "SELECT another_field FROM table_c WHERE a_third_field = 'tiruriru' AND site_id = 1",
+			User:   "bookblogs",
+			Host:   "localhost",
+			Db:     "",
+			TimeMetrics: map[string]float32{
+				"Query_time": 0.000164,
+				"Lock_time":  5.9e-05,
+			},
+			NumberMetrics: map[string]uint64{
+				"Rows_sent":     1,
+				"Rows_examined": 1,
+			},
+			BoolMetrics: map[string]bool{},
+			RateType:    "",
+			RateLimit:   0,
+		},
+	}
+	if same, diff := IsDeeply(got, expect); !same {
+		Dump(got)
+		//Dump(expect)
+		t.Error(diff)
+	}
+}
+func (s *TestSuite) TestParseSlow024(t *C) {
+	filename := "slow023.log"
+	o := log.Options{Debug: false}
+
+	file, err := os.Open(path.Join(s.sample, "/", filename))
+	if err != nil {
+		l.Fatal(err)
+	}
+	p := parser.NewSlowLogParser(file, o)
+	if err != nil {
+		l.Fatal(err)
+	}
+	go p.Start()
+	lastQuery := ""
+	for e := range p.EventChan() {
+		if e.Query == "" {
+			t.Errorf("Empty query at offset: %d. Last valid query: %s\n", e.Offset, lastQuery)
+		} else {
+			lastQuery = e.Query
+		}
+	}
+}

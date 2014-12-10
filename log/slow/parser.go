@@ -36,6 +36,7 @@ var headerRe = regexp.MustCompile(`^#\s+[A-Z]`)
 var metricsRe = regexp.MustCompile(`(\w+): (\S+|\z)`)
 var adminRe = regexp.MustCompile(`command: (.+)`)
 var setRe = regexp.MustCompile(`^SET (?:last_insert_id|insert_id|timestamp)`)
+var useRe = regexp.MustCompile(`^(?i)use `)
 
 type SlowLogParser struct {
 	file *os.File
@@ -267,13 +268,21 @@ func (p *SlowLogParser) parseQuery(line string) {
 		return
 	}
 
-	if p.queryLines == 0 && strings.HasPrefix(line, "use ") {
+	isUse := useRe.FindString(line)
+	if p.queryLines == 0 && isUse != "" {
 		if p.opt.Debug {
 			l.Println("use db")
 		}
-		db := strings.TrimPrefix(line, "use ")
+		db := strings.TrimPrefix(line, isUse)
 		db = strings.TrimRight(db, ";")
+		db = strings.Trim(db, "`")
 		p.event.Db = db
+		// Set the 'use' as the query itself.
+		// In case we are on a group of lines like in test 23, lines 6~8, the
+		// query will be replaced by the real query "select field...."
+		// In case we are on a group of lines like in test23, lines 27~28, the
+		// query will be "use dbnameb" since the user executed a use command
+		p.event.Query = line
 	} else if setRe.MatchString(line) {
 		if p.opt.Debug {
 			l.Println("set var")
