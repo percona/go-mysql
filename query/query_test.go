@@ -18,9 +18,10 @@
 package query_test
 
 import (
+	"testing"
+
 	"github.com/percona/go-mysql/query"
 	. "gopkg.in/check.v1"
-	"testing"
 )
 
 func Test(t *testing.T) { TestingT(t) }
@@ -526,5 +527,16 @@ func (s *TestSuite) TestFingerprintKeywords(t *C) {
 		query.Fingerprint(q),
 		Equals,
 		"select name, value from variable",
+	)
+}
+
+func (s *TestSuite) TestFingerprintUseIndex(t *C) {
+	var q string
+
+	q = `SELECT 	1 AS one FROM calls USE INDEX(index_name)`
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select ? as one from calls use index(index_name)",
 	)
 }
