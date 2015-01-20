@@ -112,11 +112,11 @@ func (m *Metrics) AddEvent(e *log.Event) {
 	}
 }
 
-type ByUint64 []uint64
+type byUint64 []uint64
 
-func (a ByUint64) Len() int      { return len(a) }
-func (a ByUint64) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
-func (a ByUint64) Less(i, j int) bool {
+func (a byUint64) Len() int      { return len(a) }
+func (a byUint64) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a byUint64) Less(i, j int) bool {
 	return a[i] < a[j] // ascending order
 }
 
@@ -132,7 +132,7 @@ func (m *Metrics) Finalize() {
 	}
 
 	for _, s := range m.NumberMetrics {
-		sort.Sort(ByUint64(s.vals))
+		sort.Sort(byUint64(s.vals))
 
 		s.Min = s.vals[0]
 		s.Avg = s.Sum / uint64(s.Cnt)

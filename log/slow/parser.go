@@ -15,6 +15,7 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
+// Package slow implements a MySQL slow log parser.
 package slow
 
 import (
@@ -38,6 +39,7 @@ var adminRe = regexp.MustCompile(`command: (.+)`)
 var setRe = regexp.MustCompile(`^SET (?:last_insert_id|insert_id|timestamp)`)
 var useRe = regexp.MustCompile(`^(?i)use `)
 
+// A SlowLogParser parses a MySQL slow log. It implements the LogParser interface.
 type SlowLogParser struct {
 	file *os.File
 	opt  log.Options
@@ -54,8 +56,8 @@ type SlowLogParser struct {
 	event       *log.Event
 }
 
+// NewSlowLogParser returns a new SlowLogParser that reads from the open file.
 func NewSlowLogParser(file *os.File, opt log.Options) *SlowLogParser {
-
 	p := &SlowLogParser{
 		file: file,
 		opt:  opt,
@@ -73,10 +75,14 @@ func NewSlowLogParser(file *os.File, opt log.Options) *SlowLogParser {
 	return p
 }
 
+// EventChan returns the unbuffered event channel on which the caller can
+// receive log events.
 func (p *SlowLogParser) EventChan() <-chan *log.Event {
 	return p.eventChan
 }
 
+// Stop stops the parser before parsing the next event or while blocked on
+// sending the current event to the event channel.
 func (p *SlowLogParser) Stop() {
 	if p.opt.Debug {
 		l.Println("stopping")
@@ -85,6 +91,9 @@ func (p *SlowLogParser) Stop() {
 	return
 }
 
+// Start starts the parser. Events are sent to the unbuffered event channel.
+// Parsing stops on EOF, error, or call to Stop. The event channel is closed
+// when parsing stops. The file is not closed.
 func (p *SlowLogParser) Start() error {
 	if p.opt.Debug {
 		l.SetFlags(l.Ltime | l.Lmicroseconds)

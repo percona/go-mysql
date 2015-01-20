@@ -15,18 +15,5 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
+// Package log provides functionality for working with MySQL log files.
 package log
-
-// Options encapsulate common options for making a new log parser.
-type Options struct {
-	StartOffset        uint64          // byte offset in file at which to start parsing
-	FilterAdminCommand map[string]bool // admin commands to ignore
-	Debug              bool            // print trace info to STDOUT
-}
-
-// A LogParser sends log events to a channel.
-type LogParser interface {
-	Start() error
-	Stop()
-	EventChan() <-chan *Event
-}

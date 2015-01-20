@@ -15,6 +15,7 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
+// Package query provides functions to transform queries.
 package query
 
 /*
@@ -111,8 +112,18 @@ var stateName map[byte]string = map[byte]string{
 	16: "onDupeKeyUpdate",
 }
 
+// Debug prints very verbose tracing information to STDOUT.
 var Debug bool = false
 
+// Fingerprint returns the canonical form of q. The primary transformations are:
+//   - Replace values with ?
+//   - Collapse whitespace
+//   - Remove comments
+//   - Lowercase everything
+// Additional trasnformations are performed which change the syntax of the
+// original query without affecting its performance characteristics. For
+// example, "ORDER BY col ASC" is the same as "ORDER BY col", so "ASC" in the
+// fingerprint is removed.
 func Fingerprint(q string) string {
 	q += " " // need range to run off end of original query
 	prevWord := ""
@@ -685,6 +696,8 @@ func wordIn(q string, words ...string) bool {
 	return false
 }
 
+// Id returns the right-most 16 characters of the MD5 checksum of fingerprint.
+// Query IDs are the shortest way to uniquely identify queries.
 func Id(fingerprint string) string {
 	id := md5.New()
 	io.WriteString(id, fingerprint)

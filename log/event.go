@@ -17,10 +17,13 @@
 
 package log
 
+// An Event is one query and its metadata parsed from a log file. Metadata is
+// not guaranteed to be defined, and frequently it is not. It varies based on
+// the MySQL configuration, distro, and other factors.
 type Event struct {
-	Offset        uint64 // byte offset in log file, start of event
-	Ts            string // if present in log file, often times not
-	Admin         bool   // Query is admin command not SQL query
+	Offset        uint64 // byte offset in file at which event starts
+	Ts            string // raw timestamp of event
+	Admin         bool   // true if Query is admin command
 	Query         string // SQL query or admin command
 	User          string
 	Host          string
@@ -33,6 +36,7 @@ type Event struct {
 	RateLimit uint
 }
 
+// NewEvent returns a new log event with the metric maps initialized.
 func NewEvent() *Event {
 	event := new(Event)
 	event.TimeMetrics = make(map[string]float32)
