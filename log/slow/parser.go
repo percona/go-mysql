@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2014, Percona LLC and/or its affiliates. All rights reserved.
+	Copyright (c) 2014-2015, Percona LLC and/or its affiliates. All rights reserved.
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Affero General Public License as published by
@@ -197,6 +197,9 @@ func (p *SlowLogParser) parseHeader(line string) {
 			l.Println("time")
 		}
 		m := timeRe.FindStringSubmatch(line)
+		if len(m) < 2 {
+			return
+		}
 		p.event.Ts = m[1]
 		if userRe.MatchString(line) {
 			if p.opt.Debug {
@@ -211,6 +214,9 @@ func (p *SlowLogParser) parseHeader(line string) {
 			l.Println("user")
 		}
 		m := userRe.FindStringSubmatch(line)
+		if len(m) < 3 {
+			return
+		}
 		p.event.User = m[1]
 		p.event.Host = m[2]
 	} else if strings.HasPrefix(line, "# admin") {
