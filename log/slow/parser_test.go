@@ -1713,7 +1713,8 @@ func (s *TestSuite) TestParseSlow023(t *C) {
 		t.Error(diff)
 	}
 }
-func (s *TestSuite) TestParseSlow024(t *C) {
+
+func (s *TestSuite) TestParseSlow023A(t *C) {
 	filename := "slow023.log"
 	o := log.Options{Debug: false}
 
@@ -1733,5 +1734,78 @@ func (s *TestSuite) TestParseSlow024(t *C) {
 		} else {
 			lastQuery = e.Query
 		}
+	}
+}
+
+/*
+   Test header with invalid # Time or invalid # User lines
+*/
+func (s *TestSuite) TestParseSlow024(t *C) {
+	got := s.parseSlowLog("slow024.log", log.Options{Debug: false})
+	expect := []log.Event{
+		{
+			Offset: 200,
+			Ts:     "071015 21:43:52",
+			Admin:  false,
+			Query:  "select sleep(1) from n",
+			User:   "root",
+			Host:   "localhost",
+			Db:     "test",
+			TimeMetrics: map[string]float32{
+				"Lock_time":  0,
+				"Query_time": 2,
+			},
+			NumberMetrics: map[string]uint64{
+				"Rows_examined": 0,
+				"Rows_sent":     1,
+			},
+			BoolMetrics: map[string]bool{},
+			RateType:    "",
+			RateLimit:   0,
+		},
+		{
+			Offset: 362,
+			Ts:     "",
+			Admin:  false,
+			Query:  "select sleep(2) from n",
+			User:   "root",
+			Host:   "localhost",
+			Db:     "test",
+			TimeMetrics: map[string]float32{
+				"Lock_time":  0,
+				"Query_time": 2,
+			},
+			NumberMetrics: map[string]uint64{
+				"Rows_examined": 0,
+				"Rows_sent":     1,
+			},
+			BoolMetrics: map[string]bool{},
+			RateType:    "",
+			RateLimit:   0,
+		},
+		{
+			Offset: 508,
+			Ts:     "071015 21:43:52",
+			Admin:  false,
+			Query:  "select sleep(3) from n",
+			User:   "",
+			Host:   "",
+			Db:     "test",
+			TimeMetrics: map[string]float32{
+				"Lock_time":  0,
+				"Query_time": 2,
+			},
+			NumberMetrics: map[string]uint64{
+				"Rows_examined": 0,
+				"Rows_sent":     1,
+			},
+			BoolMetrics: map[string]bool{},
+			RateType:    "",
+			RateLimit:   0,
+		},
+	}
+	if same, diff := IsDeeply(got, expect); !same {
+		Dump(got)
+		t.Error(diff)
 	}
 }
