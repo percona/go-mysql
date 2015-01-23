@@ -490,6 +490,13 @@ func Fingerprint(q string) string {
 						fmt.Println("ON DUPLICATE KEY UPDATE begin")
 					}
 					sqlState = onDupeKeyUpdate
+				} else if prevWord == "from" || prevWord == "update" || prevWord == "into" || prevWord == "join" {
+					if i := strings.IndexRune(word, '.'); i != -1 {
+						if Debug {
+							fmt.Println("Removing database name")
+						}
+						cpFromOffset = cpFromOffset + i + 1
+					}
 				}
 				s = inSpace
 				cpToOffset = qi

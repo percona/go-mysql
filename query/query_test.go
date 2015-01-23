@@ -196,7 +196,7 @@ func (s *TestSuite) TestFingerprintBasic(t *C) {
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"insert into abtemp.coxed select foo.bar from foo",
+		"insert into coxed select foo.bar from foo",
 	)
 
 	// limit alone
@@ -228,7 +228,7 @@ func (s *TestSuite) TestFingerprintBasic(t *C) {
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"load data infile ? into db.tbl",
+		"load data infile ? into tbl",
 	)
 
 	// Fingerprint db.tbl<number>name (preserve number)
@@ -236,7 +236,7 @@ func (s *TestSuite) TestFingerprintBasic(t *C) {
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"select * from prices.rt_5min where id=?",
+		"select * from rt_5min where id=?",
 	)
 
 	// Fingerprint /* -- comment */ SELECT (bug 1174956)
@@ -436,7 +436,7 @@ func (s *TestSuite) TestFingerprintTricky(t *C) {
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"select t.table_schema,t.table_name,engine from information_schema.tables t inner join information_schema.columns c on t.table_schema=c.table_schema and t.table_name=c.table_name group by t.table_schema,t.table_name having sum(if(column_key in(?+),?,?))=?",
+		"select t.table_schema,t.table_name,engine from tables t inner join columns c on t.table_schema=c.table_schema and t.table_name=c.table_name group by t.table_schema,t.table_name having sum(if(column_key in(?+),?,?))=?",
 	)
 
 	// Empty value list is valid SQL.
@@ -456,7 +456,7 @@ func (s *TestSuite) TestNumbersInFunctions(t *C) {
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"select sleep(?) from test.n",
+		"select sleep(?) from n",
 	)
 }
 
@@ -526,5 +526,111 @@ func (s *TestSuite) TestFingerprintKeywords(t *C) {
 		query.Fingerprint(q),
 		Equals,
 		"select name, value from variable",
+	)
+}
+
+func (s *TestSuite) TestFingerprintDbNames(t *C) {
+	var q string
+
+	q = "SELECT * FROM db.table"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select * from table",
+	)
+
+	q = "UPDATE db1.table1 set field1 where field2 = 42"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"update table1 set field1 where field2 = ?",
+	)
+
+	q = "LOAD DATA INFILE '/tmp/foo.txt' INTO db.tbl"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"load data infile ? into tbl",
+	)
+
+	q = "INSERT INTO db.t (ts) VALUES (NOW())"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"insert into t (ts) values(?+)",
+	)
+
+	q = "SELECT * FROM `db`.`table`"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select * from `table`",
+	)
+
+	q = "UPDATE `db1`.`table1` set field1 where field2 = 42"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"update `table1` set field1 where field2 = ?",
+	)
+
+	q = "LOAD DATA INFILE '/tmp/foo.txt' INTO `db`.`tbl`"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"load data infile ? into `tbl`",
+	)
+
+	q = "INSERT INTO `db`.`t` (ts) VALUES (NOW())"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"insert into `t` (ts) values(?+)",
+	)
+
+	q = "SELECT * FROM information_schema.COLUMNS JOIN performance_schema.users LIMIT 1"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select * from columns join users limit ?",
+	)
+
+}
+
+// Below queries are not fingerprinted correctly.
+// They require more complex fixes.
+func (s *TestSuite) TestFingerprintDbNamesTodo(t *C) {
+	var q string
+
+	q = "SELECT * FROM information_schema.COLUMNS, performance_schema.users LIMIT 1"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		// "select * from columns, users limit ?", // @todo correct fingerprint
+		"select * from columns, performance_schema.users limit ?", // only first db is stripped
+	)
+
+	q = "UPDATE LOW_PRIORITY IGNORE db1.table1 set field1 where field2 = 42"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		// "update low_priority ignore table1 set field1 where field2 = ?", // @todo correct fingerprint
+		"update low_priority ignore db1.table1 set field1 where field2 = ?", // not taking into account ignore and low priority modifier
+	)
+
+	q = "UPDATE IGNORE db1.table1 set field1 where field2 = 42"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		// "update ignore table1 set field1 where field2 = ?", // @todo correct fingerprint
+		"update ignore db1.table1 set field1 where field2 = ?", // not taking into account ignore modifier
+	)
+
+	q = "UPDATE LOW_PRIORITY db1.table1 set field1 where field2 = 42"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		// "update low_priority table1 set field1 where field2 = ?", // @todo correct fingerprint
+		"update low_priority db1.table1 set field1 where field2 = ?", // not taking into account low priority modifier
 	)
 }
