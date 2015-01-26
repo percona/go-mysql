@@ -454,7 +454,9 @@ func Fingerprint(q string) string {
 					fmt.Println("Word end")
 				}
 				word := strings.ToLower(q[cpFromOffset:qi])
-				if word == "use" {
+				// Only match USE if it is the first word in the query, otherwise,
+				// it could be a USE INDEX
+				if word == "use" && prevWord == "" {
 					return "use ?"
 				} else if (word == "null" && (prevWord != "is" && prevWord != "not")) || word == "null," {
 					if Debug {
