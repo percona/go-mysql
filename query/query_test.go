@@ -38,6 +38,7 @@ func (s *TestSuite) SetUpSuite(t *C) {
 
 func (s *TestSuite) TestFingerprintBasic(t *C) {
 	var q string
+	query.RemoveDbNames = false
 
 	// A most basic case.
 	q = "SELECT c FROM t WHERE id=1"
@@ -197,7 +198,7 @@ func (s *TestSuite) TestFingerprintBasic(t *C) {
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"insert into coxed select foo.bar from foo",
+		"insert into abtemp.coxed select foo.bar from foo",
 	)
 
 	// limit alone
@@ -229,7 +230,7 @@ func (s *TestSuite) TestFingerprintBasic(t *C) {
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"load data infile ? into tbl",
+		"load data infile ? into db.tbl",
 	)
 
 	// Fingerprint db.tbl<number>name (preserve number)
@@ -237,7 +238,7 @@ func (s *TestSuite) TestFingerprintBasic(t *C) {
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"select * from rt_5min where id=?",
+		"select * from prices.rt_5min where id=?",
 	)
 
 	// Fingerprint /* -- comment */ SELECT (bug 1174956)
@@ -265,6 +266,7 @@ func (s *TestSuite) TestFingerprintBasic(t *C) {
 
 func (s *TestSuite) TestFingerprintValueList(t *C) {
 	var q string
+	query.RemoveDbNames = false
 
 	// VALUES lists
 	q = "insert into foo(a, b, c) values(2, 4, 5)"
@@ -300,6 +302,7 @@ func (s *TestSuite) TestFingerprintValueList(t *C) {
 
 func (s *TestSuite) TestFingerprintInList(t *C) {
 	var q string
+	query.RemoveDbNames = false
 
 	q = "select * from t where (base.nid IN  ('1412', '1410', '1411'))"
 	t.Check(
@@ -325,6 +328,7 @@ func (s *TestSuite) TestFingerprintInList(t *C) {
 
 func (s *TestSuite) TestFingerprintOrderBy(t *C) {
 	var q string
+	query.RemoveDbNames = false
 
 	// Remove ASC from ORDER BY
 	// Issue 1030: Fingerprint can remove ORDER BY ASC
@@ -357,6 +361,7 @@ func (s *TestSuite) TestFingerprintOrderBy(t *C) {
 
 func (s *TestSuite) TestFingerprintOneLineComments(t *C) {
 	var q string
+	query.RemoveDbNames = false
 
 	// Removes one-line comments in fingerprints
 	q = "select \n-- bar\n foo"
@@ -393,6 +398,7 @@ func (s *TestSuite) TestFingerprintOneLineComments(t *C) {
 
 func (s *TestSuite) TestFingerprintTricky(t *C) {
 	var q string
+	query.RemoveDbNames = false
 
 	// Full hex can look like an ident if not for the leading 0x.
 	q = "SELECT c FROM t WHERE id=0xdeadbeaf"
@@ -437,7 +443,7 @@ func (s *TestSuite) TestFingerprintTricky(t *C) {
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"select t.table_schema,t.table_name,engine from tables t inner join columns c on t.table_schema=c.table_schema and t.table_name=c.table_name group by t.table_schema,t.table_name having sum(if(column_key in(?+),?,?))=?",
+		"select t.table_schema,t.table_name,engine from information_schema.tables t inner join information_schema.columns c on t.table_schema=c.table_schema and t.table_name=c.table_name group by t.table_schema,t.table_name having sum(if(column_key in(?+),?,?))=?",
 	)
 
 	// Empty value list is valid SQL.
@@ -451,18 +457,20 @@ func (s *TestSuite) TestFingerprintTricky(t *C) {
 
 func (s *TestSuite) TestNumbersInFunctions(t *C) {
 	var q string
+	query.RemoveDbNames = false
 
 	// Full hex can look like an ident if not for the leading 0x.
 	q = "select sleep(2) from test.n"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"select sleep(?) from n",
+		"select sleep(?) from test.n",
 	)
 }
 
 func (s *TestSuite) TestId(t *C) {
 	var f string
+	query.RemoveDbNames = false
 
 	f = "hello world"
 	t.Check(
@@ -487,6 +495,8 @@ func (s *TestSuite) TestId(t *C) {
 }
 
 func (s *TestSuite) TestFingerprintPanicChallenge1(t *C) {
+	query.RemoveDbNames = false
+
 	q := "SELECT '' '' ''"
 	t.Check(
 		query.Fingerprint(q),
@@ -503,6 +513,8 @@ func (s *TestSuite) TestFingerprintPanicChallenge1(t *C) {
 }
 
 func (s *TestSuite) TestFingerprintPanicChallenge2(t *C) {
+	query.RemoveDbNames = false
+
 	q := "SELECT 'a' 'b' 'c' 'd'"
 	t.Check(
 		query.Fingerprint(q),
@@ -520,6 +532,7 @@ func (s *TestSuite) TestFingerprintPanicChallenge2(t *C) {
 
 func (s *TestSuite) TestFingerprintKeywords(t *C) {
 	var q string
+	query.RemoveDbNames = false
 
 	// values is a keyword but value is not. :-\
 	q = "SELECT name, value FROM variable"
@@ -532,6 +545,7 @@ func (s *TestSuite) TestFingerprintKeywords(t *C) {
 
 func (s *TestSuite) TestFingerprintUseIndex(t *C) {
 	var q string
+	query.RemoveDbNames = false
 
 	q = `SELECT 	1 AS one FROM calls USE INDEX(index_name)`
 	t.Check(
@@ -543,6 +557,7 @@ func (s *TestSuite) TestFingerprintUseIndex(t *C) {
 
 func (s *TestSuite) TestFingerprintDbNames(t *C) {
 	var q string
+	query.RemoveDbNames = true
 
 	q = "SELECT * FROM db.table"
 	t.Check(
@@ -607,12 +622,33 @@ func (s *TestSuite) TestFingerprintDbNames(t *C) {
 		"select * from columns join users limit ?",
 	)
 
+	q = "insert into abtemp.coxed select foo.bar from foo"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"insert into coxed select foo.bar from foo",
+	)
+
+	q = "SELECT * FROM prices.rt_5min where id=1"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select * from rt_5min where id=?",
+	)
+
+	q = "select  t.table_schema,t.table_name,engine  from information_schema.tables t  inner join information_schema.columns c  on t.table_schema=c.table_schema and t.table_name=c.table_name group by t.table_schema,t.table_name having  sum(if(column_key in ('PRI','UNI'),1,0))=0"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select t.table_schema,t.table_name,engine from tables t inner join columns c on t.table_schema=c.table_schema and t.table_name=c.table_name group by t.table_schema,t.table_name having sum(if(column_key in(?+),?,?))=?",
+	)
 }
 
 // Below queries are not fingerprinted correctly.
 // They require more complex fixes.
 func (s *TestSuite) TestFingerprintDbNamesTodo(t *C) {
 	var q string
+	query.RemoveDbNames = true
 
 	q = "SELECT * FROM information_schema.COLUMNS, performance_schema.users LIMIT 1"
 	t.Check(

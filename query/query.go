@@ -112,6 +112,7 @@ var stateName map[byte]string = map[byte]string{
 }
 
 var Debug bool = false
+var RemoveDbNames = false
 
 func Fingerprint(q string) string {
 	q += " " // need range to run off end of original query
@@ -492,12 +493,14 @@ func Fingerprint(q string) string {
 						fmt.Println("ON DUPLICATE KEY UPDATE begin")
 					}
 					sqlState = onDupeKeyUpdate
-				} else if prevWord == "from" || prevWord == "update" || prevWord == "into" || prevWord == "join" {
-					if i := strings.IndexRune(word, '.'); i != -1 {
-						if Debug {
-							fmt.Println("Removing database name")
+				} else if RemoveDbNames {
+					if prevWord == "from" || prevWord == "update" || prevWord == "into" || prevWord == "join" {
+						if i := strings.IndexRune(word, '.'); i != -1 {
+							if Debug {
+								fmt.Println("Removing database name")
+							}
+							cpFromOffset = cpFromOffset + i + 1
 						}
-						cpFromOffset = cpFromOffset + i + 1
 					}
 				}
 				s = inSpace

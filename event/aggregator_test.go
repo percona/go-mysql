@@ -108,7 +108,7 @@ func (s *TestSuite) TestSlow010(t *C) {
 }
 
 func (s *TestSuite) TestAddClassToGlobal(t *C) {
-	expect, _ := s.aggregateSlowLog("slow025.log", "slow025.json")
+	expect, _ := s.aggregateSlowLog("slow001.log", "slow001.json")
 	global := event.NewGlobalClass()
 	for _, class := range expect.Class {
 		global.AddClass(class)
