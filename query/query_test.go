@@ -540,3 +540,46 @@ func (s *TestSuite) TestFingerprintUseIndex(t *C) {
 		"select ? as one from calls use index(index_name)",
 	)
 }
+
+func (s *TestSuite) TestFingerprintWithNumberInDbName(t *C) {
+	var q string
+	query.ReplaceNumbersInWords = true
+
+	// Full hex can look like an ident if not for the leading 0x.
+	q = "SELECT c FROM org235.t WHERE id=0xdeadbeaf"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select c from org?.t where id=?",
+	)
+
+	// Full hex can look like an ident if not for the leading 0x.
+	q = "CREATE DATABASE org235_percona345 COLLATE 'utf8_general_ci'"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"create database org?_percona? collate ?",
+	)
+
+	q = "select foo_1 from foo_2_3"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select foo_? from foo_?_?",
+	)
+
+	q = "SELECT * FROM prices.rt_5min where id=1"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select * from prices.rt_?min where id=?",
+	)
+
+	// @todo prefixes are not supported, requires more hacks
+	q = "select 123foo from 123foo"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select 123foo from 123foo",
+	)
+}
