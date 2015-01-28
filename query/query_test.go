@@ -559,136 +559,115 @@ func (s *TestSuite) TestFingerprintDbNames(t *C) {
 	var q string
 	query.RemoveDbNames = true
 
-	q = "SELECT * FROM db.table"
-	t.Check(
-		query.Fingerprint(q),
-		Equals,
-		"select * from ?.table",
-	)
-
 	q = "UPDATE db1.table1 set field1 where field2 = 42"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"update ?.table1 set field1 where field2 = ?",
+		"update db?.table1 set field1 where field2 = ?",
 	)
 
-	q = "LOAD DATA INFILE '/tmp/foo.txt' INTO db.tbl"
+	q = "LOAD DATA INFILE '/tmp/foo.txt' INTO db345.tbl"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"load data infile ? into ?.tbl",
+		"load data infile ? into db?.tbl",
 	)
 
-	q = "INSERT INTO db.t (ts) VALUES (NOW())"
+	q = "INSERT INTO db12.t (ts) VALUES (NOW())"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"insert into ?.t (ts) values(?+)",
+		"insert into db?.t (ts) values(?+)",
 	)
 
-	q = "SELECT * FROM `db`.`table`"
+	q = "SELECT * FROM `d2b`.`table`"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"select * from ?.`table`",
+		"select * from `d?b`.`table`",
 	)
 
 	q = "UPDATE `db1`.`table1` set field1 where field2 = 42"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"update ?.`table1` set field1 where field2 = ?",
+		"update `db?`.`table1` set field1 where field2 = ?",
 	)
 
-	q = "LOAD DATA INFILE '/tmp/foo.txt' INTO `db`.`tbl`"
+	q = "LOAD DATA INFILE '/tmp/foo.txt' INTO `db12`.`tbl`"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"load data infile ? into ?.`tbl`",
+		"load data infile ? into `db?`.`tbl`",
 	)
 
-	q = "INSERT INTO `db`.`t` (ts) VALUES (NOW())"
+	q = "INSERT INTO `db345`.`t` (ts) VALUES (NOW())"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"insert into ?.`t` (ts) values(?+)",
+		"insert into `db?`.`t` (ts) values(?+)",
 	)
 
-	q = "SELECT * FROM information_schema.COLUMNS JOIN performance_schema.users LIMIT 1"
+	q = "SELECT * FROM prices23.rt_5min where id=1"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"select * from ?.columns join ?.users limit ?",
+		"select * from prices?.rt_5min where id=?",
 	)
 
-	q = "insert into abtemp.coxed select foo.bar from foo"
+	q = "select  t.table_schema,t.table_name,engine  from db13x.tables t  inner join db13x.columns c  on t.table_schema=c.table_schema and t.table_name=c.table_name group by t.table_schema,t.table_name having  sum(if(column_key in ('PRI','UNI'),1,0))=0"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"insert into ?.coxed select foo.bar from foo",
-	)
-
-	q = "SELECT * FROM prices.rt_5min where id=1"
-	t.Check(
-		query.Fingerprint(q),
-		Equals,
-		"select * from ?.rt_5min where id=?",
-	)
-
-	q = "select  t.table_schema,t.table_name,engine  from information_schema.tables t  inner join information_schema.columns c  on t.table_schema=c.table_schema and t.table_name=c.table_name group by t.table_schema,t.table_name having  sum(if(column_key in ('PRI','UNI'),1,0))=0"
-	t.Check(
-		query.Fingerprint(q),
-		Equals,
-		"select t.table_schema,t.table_name,engine from ?.tables t inner join ?.columns c on t.table_schema=c.table_schema and t.table_name=c.table_name group by t.table_schema,t.table_name having sum(if(column_key in(?+),?,?))=?",
+		"select t.table_schema,t.table_name,engine from db?x.tables t inner join db?x.columns c on t.table_schema=c.table_schema and t.table_name=c.table_name group by t.table_schema,t.table_name having sum(if(column_key in(?+),?,?))=?",
 	)
 
 	q = "UPDATE LOW_PRIORITY IGNORE db1.table1 set field1 where field2 = 42"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"update low_priority ignore ?.table1 set field1 where field2 = ?",
+		"update low_priority ignore db?.table1 set field1 where field2 = ?",
 	)
 
 	q = "UPDATE IGNORE db1.table1 set field1 where field2 = 42"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"update ignore ?.table1 set field1 where field2 = ?",
+		"update ignore db?.table1 set field1 where field2 = ?",
 	)
 
 	q = "UPDATE LOW_PRIORITY db1.table1 set field1 where field2 = 42"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"update low_priority ?.table1 set field1 where field2 = ?",
+		"update low_priority db?.table1 set field1 where field2 = ?",
 	)
 
 	q = "CREATE DATABASE org235_percona345 COLLATE 'utf8_general_ci'"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"create database ? collate ?",
+		"create database org?_percona? collate ?",
 	)
 
 	q = "CREATE DATABASE  IF NOT EXISTS org235_percona345 COLLATE 'utf8_general_ci'"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"create database if not exists ? collate ?",
+		"create database if not exists org?_percona? collate ?",
 	)
 
-	q = "SELECT * FROM information_schema.COLUMNS, performance_schema.users LIMIT 1"
+	q = "SELECT * FROM org23.users, org4.users LIMIT 1"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"select * from ?.columns, ?.users limit ?",
+		"select * from org?.users, org?.users limit ?",
 	)
 
 	q = "UPDATE d1.t1, d2.t1 SET d1.t1.v = 2, d2.t1.v = 3"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"update ?.t1, ?.t1 set d1.t1.v = ?, d2.t1.v = ?", // @todo
+		"update d?.t1, d?.t1 set d1.t1.v = ?, d2.t1.v = ?", // @todo
 	)
 }

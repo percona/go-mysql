@@ -513,8 +513,7 @@ func Fingerprint(q string) string {
 							cpFromOffset, fi, f = stripDbName(word, qi, cpFromOffset, fi, f)
 						}
 					} else if sqlState == createDatabase && word != "if" && word != "not" && word != "exists" {
-						f[fi] = '?'
-						fi++
+						cpFromOffset, fi, f = stripNumbersFromWord(word, qi, cpFromOffset, fi, f)
 						f[fi] = ' '
 						fi++
 						cpFromOffset = qi + 1
@@ -748,13 +747,35 @@ func inReservedWordsForDbTemplating(word string) bool {
 
 func stripDbName(word string, qi, cpFromOffset, fi int, f []byte) (int, int, []byte) {
 	if i := strings.IndexRune(word, '.'); i != -1 {
-		if Debug {
-			fmt.Println("Removing database name")
-		}
-		f[fi] = '?'
-		fi++
+		dbName := word[0:i]
+		cpFromOffset, fi, f = stripNumbersFromWord(dbName, qi, cpFromOffset, fi, f)
 		return cpFromOffset + i, fi, f
 	}
 
+	return cpFromOffset, fi, f
+}
+
+func stripNumbersFromWord(word string, qi, cpFromOffset, fi int, f []byte) (int, int, []byte) {
+	if Debug {
+		fmt.Println("Removing database name")
+	}
+	number := false
+	for _, c := range word {
+		if c >= 0x30 && c <= 0x39 {
+			number = true
+			continue
+		} else if number {
+			number = false
+			f[fi] = '?'
+			fi++
+		}
+		f[fi] = byte(c)
+		fi++
+	}
+	// Check if we ended with number
+	if number {
+		f[fi] = '?'
+		fi++
+	}
 	return cpFromOffset, fi, f
 }
