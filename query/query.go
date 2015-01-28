@@ -504,13 +504,13 @@ func Fingerprint(q string) string {
 						if word == "set" {
 							sqlState = unknown
 						} else {
-							cpFromOffset = stripDbName(word, cpFromOffset)
+							cpFromOffset, fi, f = stripDbName(word, qi, cpFromOffset, fi, f)
 						}
 					} else if sqlState == inFromTableReferences {
 						if inFromTableReferencesStopWords(word) {
 							sqlState = unknown
 						} else {
-							cpFromOffset = stripDbName(word, cpFromOffset)
+							cpFromOffset, fi, f = stripDbName(word, qi, cpFromOffset, fi, f)
 						}
 					} else if sqlState == createDatabase && word != "if" && word != "not" && word != "exists" {
 						f[fi] = '?'
@@ -526,7 +526,7 @@ func Fingerprint(q string) string {
 					} else if prevWord == "create" && (word == "database" || word == "schema") {
 						sqlState = createDatabase
 					} else if inReservedWordsForDbTemplating(prevWord) {
-						cpFromOffset = stripDbName(word, cpFromOffset)
+						cpFromOffset, fi, f = stripDbName(word, qi, cpFromOffset, fi, f)
 					}
 				}
 				s = inSpace
@@ -746,13 +746,15 @@ func inReservedWordsForDbTemplating(word string) bool {
 	return false
 }
 
-func stripDbName(word string, cpFromOffset int) int {
+func stripDbName(word string, qi, cpFromOffset, fi int, f []byte) (int, int, []byte) {
 	if i := strings.IndexRune(word, '.'); i != -1 {
 		if Debug {
 			fmt.Println("Removing database name")
 		}
-		return cpFromOffset + i + 1
+		f[fi] = '?'
+		fi++
+		return cpFromOffset + i, fi, f
 	}
 
-	return cpFromOffset
+	return cpFromOffset, fi, f
 }
