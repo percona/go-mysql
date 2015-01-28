@@ -559,7 +559,6 @@ func (s *TestSuite) TestFingerprintWithNumberInDbName(t *C) {
 	var q string
 	query.ReplaceNumbersInWords = true
 
-	// Full hex can look like an ident if not for the leading 0x.
 	q = "SELECT c FROM org235.t WHERE id=0xdeadbeaf"
 	t.Check(
 		query.Fingerprint(q),
@@ -567,7 +566,6 @@ func (s *TestSuite) TestFingerprintWithNumberInDbName(t *C) {
 		"select c from org?.t where id=?",
 	)
 
-	// Full hex can look like an ident if not for the leading 0x.
 	q = "CREATE DATABASE org235_percona345 COLLATE 'utf8_general_ci'"
 	t.Check(
 		query.Fingerprint(q),
