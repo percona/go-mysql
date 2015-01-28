@@ -38,6 +38,7 @@ func (s *TestSuite) SetUpSuite(t *C) {
 
 func (s *TestSuite) TestFingerprintBasic(t *C) {
 	var q string
+	query.RemoveDbNames = false
 
 	// A most basic case.
 	q = "SELECT c FROM t WHERE id=1"
@@ -265,6 +266,7 @@ func (s *TestSuite) TestFingerprintBasic(t *C) {
 
 func (s *TestSuite) TestFingerprintValueList(t *C) {
 	var q string
+	query.RemoveDbNames = false
 
 	// VALUES lists
 	q = "insert into foo(a, b, c) values(2, 4, 5)"
@@ -300,6 +302,7 @@ func (s *TestSuite) TestFingerprintValueList(t *C) {
 
 func (s *TestSuite) TestFingerprintInList(t *C) {
 	var q string
+	query.RemoveDbNames = false
 
 	q = "select * from t where (base.nid IN  ('1412', '1410', '1411'))"
 	t.Check(
@@ -325,6 +328,7 @@ func (s *TestSuite) TestFingerprintInList(t *C) {
 
 func (s *TestSuite) TestFingerprintOrderBy(t *C) {
 	var q string
+	query.RemoveDbNames = false
 
 	// Remove ASC from ORDER BY
 	// Issue 1030: Fingerprint can remove ORDER BY ASC
@@ -357,6 +361,7 @@ func (s *TestSuite) TestFingerprintOrderBy(t *C) {
 
 func (s *TestSuite) TestFingerprintOneLineComments(t *C) {
 	var q string
+	query.RemoveDbNames = false
 
 	// Removes one-line comments in fingerprints
 	q = "select \n-- bar\n foo"
@@ -393,6 +398,7 @@ func (s *TestSuite) TestFingerprintOneLineComments(t *C) {
 
 func (s *TestSuite) TestFingerprintTricky(t *C) {
 	var q string
+	query.RemoveDbNames = false
 
 	// Full hex can look like an ident if not for the leading 0x.
 	q = "SELECT c FROM t WHERE id=0xdeadbeaf"
@@ -451,6 +457,7 @@ func (s *TestSuite) TestFingerprintTricky(t *C) {
 
 func (s *TestSuite) TestNumbersInFunctions(t *C) {
 	var q string
+	query.RemoveDbNames = false
 
 	// Full hex can look like an ident if not for the leading 0x.
 	q = "select sleep(2) from test.n"
@@ -463,6 +470,7 @@ func (s *TestSuite) TestNumbersInFunctions(t *C) {
 
 func (s *TestSuite) TestId(t *C) {
 	var f string
+	query.RemoveDbNames = false
 
 	f = "hello world"
 	t.Check(
@@ -487,6 +495,8 @@ func (s *TestSuite) TestId(t *C) {
 }
 
 func (s *TestSuite) TestFingerprintPanicChallenge1(t *C) {
+	query.RemoveDbNames = false
+
 	q := "SELECT '' '' ''"
 	t.Check(
 		query.Fingerprint(q),
@@ -503,6 +513,8 @@ func (s *TestSuite) TestFingerprintPanicChallenge1(t *C) {
 }
 
 func (s *TestSuite) TestFingerprintPanicChallenge2(t *C) {
+	query.RemoveDbNames = false
+
 	q := "SELECT 'a' 'b' 'c' 'd'"
 	t.Check(
 		query.Fingerprint(q),
@@ -520,6 +532,7 @@ func (s *TestSuite) TestFingerprintPanicChallenge2(t *C) {
 
 func (s *TestSuite) TestFingerprintKeywords(t *C) {
 	var q string
+	query.RemoveDbNames = false
 
 	// values is a keyword but value is not. :-\
 	q = "SELECT name, value FROM variable"
@@ -532,11 +545,150 @@ func (s *TestSuite) TestFingerprintKeywords(t *C) {
 
 func (s *TestSuite) TestFingerprintUseIndex(t *C) {
 	var q string
+	query.RemoveDbNames = false
 
 	q = `SELECT 	1 AS one FROM calls USE INDEX(index_name)`
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
 		"select ? as one from calls use index(index_name)",
+	)
+}
+
+func (s *TestSuite) TestFingerprintDbNames(t *C) {
+	var q string
+	query.RemoveDbNames = true
+
+	q = "SELECT * FROM db.table"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select * from table",
+	)
+
+	q = "UPDATE db1.table1 set field1 where field2 = 42"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"update table1 set field1 where field2 = ?",
+	)
+
+	q = "LOAD DATA INFILE '/tmp/foo.txt' INTO db.tbl"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"load data infile ? into tbl",
+	)
+
+	q = "INSERT INTO db.t (ts) VALUES (NOW())"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"insert into t (ts) values(?+)",
+	)
+
+	q = "SELECT * FROM `db`.`table`"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select * from `table`",
+	)
+
+	q = "UPDATE `db1`.`table1` set field1 where field2 = 42"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"update `table1` set field1 where field2 = ?",
+	)
+
+	q = "LOAD DATA INFILE '/tmp/foo.txt' INTO `db`.`tbl`"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"load data infile ? into `tbl`",
+	)
+
+	q = "INSERT INTO `db`.`t` (ts) VALUES (NOW())"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"insert into `t` (ts) values(?+)",
+	)
+
+	q = "SELECT * FROM information_schema.COLUMNS JOIN performance_schema.users LIMIT 1"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select * from columns join users limit ?",
+	)
+
+	q = "insert into abtemp.coxed select foo.bar from foo"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"insert into coxed select foo.bar from foo",
+	)
+
+	q = "SELECT * FROM prices.rt_5min where id=1"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select * from rt_5min where id=?",
+	)
+
+	q = "select  t.table_schema,t.table_name,engine  from information_schema.tables t  inner join information_schema.columns c  on t.table_schema=c.table_schema and t.table_name=c.table_name group by t.table_schema,t.table_name having  sum(if(column_key in ('PRI','UNI'),1,0))=0"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select t.table_schema,t.table_name,engine from tables t inner join columns c on t.table_schema=c.table_schema and t.table_name=c.table_name group by t.table_schema,t.table_name having sum(if(column_key in(?+),?,?))=?",
+	)
+
+	q = "UPDATE LOW_PRIORITY IGNORE db1.table1 set field1 where field2 = 42"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"update low_priority ignore table1 set field1 where field2 = ?",
+	)
+
+	q = "UPDATE IGNORE db1.table1 set field1 where field2 = 42"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"update ignore table1 set field1 where field2 = ?",
+	)
+
+	q = "UPDATE LOW_PRIORITY db1.table1 set field1 where field2 = 42"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"update low_priority table1 set field1 where field2 = ?",
+	)
+
+	q = "CREATE DATABASE org235_percona345 COLLATE 'utf8_general_ci'"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"create database ? collate ?",
+	)
+
+	q = "CREATE DATABASE  IF NOT EXISTS org235_percona345 COLLATE 'utf8_general_ci'"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"create database if not exists ? collate ?",
+	)
+
+	q = "SELECT * FROM information_schema.COLUMNS, performance_schema.users LIMIT 1"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select * from columns, users limit ?",
+	)
+
+	q = "UPDATE d1.t1, d2.t1 SET d1.t1.v = 2, d2.t1.v = 3"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"update t1, t1 set d1.t1.v = ?, d2.t1.v = ?", // @todo
 	)
 }
