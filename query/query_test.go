@@ -677,20 +677,18 @@ func (s *TestSuite) TestFingerprintDbNames(t *C) {
 		Equals,
 		"create database if not exists ? collate ?",
 	)
-}
-
-// Below queries are not fingerprinted correctly.
-// They require more complex fixes.
-func (s *TestSuite) TestFingerprintDbNamesTodo(t *C) {
-	var q string
-	query.RemoveDbNames = true
 
 	q = "SELECT * FROM information_schema.COLUMNS, performance_schema.users LIMIT 1"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		// "select * from columns, users limit ?", // @todo correct fingerprint
-		"select * from columns, performance_schema.users limit ?", // only first db is stripped
+		"select * from columns, users limit ?",
 	)
 
+	q = "UPDATE d1.t1, d2.t1 SET d1.t1.v = 2, d2.t1.v = 3"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"update t1, t1 set d1.t1.v = ?, d2.t1.v = ?", // @todo
+	)
 }
