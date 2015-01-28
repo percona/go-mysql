@@ -72,23 +72,26 @@ import (
 )
 
 const (
-	unknown             byte = iota
-	inWord                   // \S+
-	inNumber                 // [0-9a-fA-Fx.-]
-	inSpace                  // space, tab, \r, \n
-	inOp                     // [=<>!] (usually precedes a number)
-	opOrNumber               // + in 2 + 2 or +3e-9
-	inQuote                  // '...' or "..."
-	subOrOLC                 // - or start of -- comment
-	inDash                   // -- begins a one-line comment if followed by space
-	inOLC                    // -- comment (at least one space after dash is required)
-	divOrMLC                 // / operator or start of /* comment */
-	mlcOrMySQLCode           // /* comment */ or /*! MySQL-specific code */
-	inMLC                    // /* comment */
-	inValues                 // VALUES (1), ..., (N)
-	moreValuesOrUnknown      // , (2nd+) or ON DUPLICATE KEY or end of query
-	orderBy                  // ORDER BY
-	onDupeKeyUpdate          // ON DUPLICATE KEY UPDATE
+	unknown                 byte = iota
+	inWord                       // \S+
+	inNumber                     // [0-9a-fA-Fx.-]
+	inSpace                      // space, tab, \r, \n
+	inOp                         // [=<>!] (usually precedes a number)
+	opOrNumber                   // + in 2 + 2 or +3e-9
+	inQuote                      // '...' or "..."
+	subOrOLC                     // - or start of -- comment
+	inDash                       // -- begins a one-line comment if followed by space
+	inOLC                        // -- comment (at least one space after dash is required)
+	divOrMLC                     // / operator or start of /* comment */
+	mlcOrMySQLCode               // /* comment */ or /*! MySQL-specific code */
+	inMLC                        // /* comment */
+	inValues                     // VALUES (1), ..., (N)
+	moreValuesOrUnknown          // , (2nd+) or ON DUPLICATE KEY or end of query
+	orderBy                      // ORDER BY
+	onDupeKeyUpdate              // ON DUPLICATE KEY UPDATE
+	createDatabase               // CREATE {DATABASE | SCHEMA}
+	inFromTableReferences        // FROM ... http://dev.mysql.com/doc/refman/5.6/en/select.html
+	inUpdateTableReferences      // UPDATE ... http://dev.mysql.com/doc/refman/5.6/en/update.html
 )
 
 var stateName map[byte]string = map[byte]string{
@@ -109,9 +112,13 @@ var stateName map[byte]string = map[byte]string{
 	14: "moreValuesOrUnknown",
 	15: "orderBy",
 	16: "onDupeKeyUpdate",
+	17: "createDatabase",
+	18: "inFromTableReferences",
+	19: "inUpdateTableReferences",
 }
 
 var Debug bool = false
+var RemoveDbNames = false
 
 func Fingerprint(q string) string {
 	q += " " // need range to run off end of original query
@@ -492,6 +499,34 @@ func Fingerprint(q string) string {
 						fmt.Println("ON DUPLICATE KEY UPDATE begin")
 					}
 					sqlState = onDupeKeyUpdate
+				} else if RemoveDbNames {
+					if sqlState == inUpdateTableReferences {
+						if word == "set" {
+							sqlState = unknown
+						} else {
+							cpFromOffset, fi, f = stripDbName(word, qi, cpFromOffset, fi, f)
+						}
+					} else if sqlState == inFromTableReferences {
+						if inFromTableReferencesStopWords(word) {
+							sqlState = unknown
+						} else {
+							cpFromOffset, fi, f = stripDbName(word, qi, cpFromOffset, fi, f)
+						}
+					} else if sqlState == createDatabase && word != "if" && word != "not" && word != "exists" {
+						cpFromOffset, fi, f = stripNumbersFromWord(word, qi, cpFromOffset, fi, f)
+						f[fi] = ' '
+						fi++
+						cpFromOffset = qi + 1
+						sqlState = unknown
+					} else if word == "from" {
+						sqlState = inFromTableReferences
+					} else if word == "update" {
+						sqlState = inUpdateTableReferences
+					} else if prevWord == "create" && (word == "database" || word == "schema") {
+						sqlState = createDatabase
+					} else if inReservedWordsForDbTemplating(prevWord) {
+						cpFromOffset, fi, f = stripDbName(word, qi, cpFromOffset, fi, f)
+					}
 				}
 				s = inSpace
 				cpToOffset = qi
@@ -692,4 +727,55 @@ func Id(fingerprint string) string {
 	io.WriteString(id, fingerprint)
 	h := fmt.Sprintf("%x", id.Sum(nil))
 	return strings.ToUpper(h[16:32])
+}
+
+func inFromTableReferencesStopWords(word string) bool {
+	switch word {
+	case "where", "group", "having", "order", "limit", "procedure", "into", "for", "inner", "cross", "straight_join", "left", "right", "outer", "natural":
+		return true
+	}
+	return false
+}
+
+func inReservedWordsForDbTemplating(word string) bool {
+	switch word {
+	case "update", "into", "join", "replace", "low_priority", "delayed", "ignore":
+		return true
+	}
+	return false
+}
+
+func stripDbName(word string, qi, cpFromOffset, fi int, f []byte) (int, int, []byte) {
+	if i := strings.IndexRune(word, '.'); i != -1 {
+		dbName := word[0:i]
+		cpFromOffset, fi, f = stripNumbersFromWord(dbName, qi, cpFromOffset, fi, f)
+		return cpFromOffset + i, fi, f
+	}
+
+	return cpFromOffset, fi, f
+}
+
+func stripNumbersFromWord(word string, qi, cpFromOffset, fi int, f []byte) (int, int, []byte) {
+	if Debug {
+		fmt.Println("Removing database name")
+	}
+	number := false
+	for _, c := range word {
+		if c >= 0x30 && c <= 0x39 {
+			number = true
+			continue
+		} else if number {
+			number = false
+			f[fi] = '?'
+			fi++
+		}
+		f[fi] = byte(c)
+		fi++
+	}
+	// Check if we ended with number
+	if number {
+		f[fi] = '?'
+		fi++
+	}
+	return cpFromOffset, fi, f
 }
