@@ -642,6 +642,41 @@ func (s *TestSuite) TestFingerprintDbNames(t *C) {
 		Equals,
 		"select t.table_schema,t.table_name,engine from tables t inner join columns c on t.table_schema=c.table_schema and t.table_name=c.table_name group by t.table_schema,t.table_name having sum(if(column_key in(?+),?,?))=?",
 	)
+
+	q = "UPDATE LOW_PRIORITY IGNORE db1.table1 set field1 where field2 = 42"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"update low_priority ignore table1 set field1 where field2 = ?",
+	)
+
+	q = "UPDATE IGNORE db1.table1 set field1 where field2 = 42"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"update ignore table1 set field1 where field2 = ?",
+	)
+
+	q = "UPDATE LOW_PRIORITY db1.table1 set field1 where field2 = 42"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"update low_priority table1 set field1 where field2 = ?",
+	)
+
+	q = "CREATE DATABASE org235_percona345 COLLATE 'utf8_general_ci'"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"create database ? collate ?",
+	)
+
+	q = "CREATE DATABASE  IF NOT EXISTS org235_percona345 COLLATE 'utf8_general_ci'"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"create database if not exists ? collate ?",
+	)
 }
 
 // Below queries are not fingerprinted correctly.
@@ -658,27 +693,4 @@ func (s *TestSuite) TestFingerprintDbNamesTodo(t *C) {
 		"select * from columns, performance_schema.users limit ?", // only first db is stripped
 	)
 
-	q = "UPDATE LOW_PRIORITY IGNORE db1.table1 set field1 where field2 = 42"
-	t.Check(
-		query.Fingerprint(q),
-		Equals,
-		// "update low_priority ignore table1 set field1 where field2 = ?", // @todo correct fingerprint
-		"update low_priority ignore db1.table1 set field1 where field2 = ?", // not taking into account ignore and low priority modifier
-	)
-
-	q = "UPDATE IGNORE db1.table1 set field1 where field2 = 42"
-	t.Check(
-		query.Fingerprint(q),
-		Equals,
-		// "update ignore table1 set field1 where field2 = ?", // @todo correct fingerprint
-		"update ignore db1.table1 set field1 where field2 = ?", // not taking into account ignore modifier
-	)
-
-	q = "UPDATE LOW_PRIORITY db1.table1 set field1 where field2 = 42"
-	t.Check(
-		query.Fingerprint(q),
-		Equals,
-		// "update low_priority table1 set field1 where field2 = ?", // @todo correct fingerprint
-		"update low_priority db1.table1 set field1 where field2 = ?", // not taking into account low priority modifier
-	)
 }

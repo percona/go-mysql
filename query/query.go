@@ -89,6 +89,7 @@ const (
 	moreValuesOrUnknown      // , (2nd+) or ON DUPLICATE KEY or end of query
 	orderBy                  // ORDER BY
 	onDupeKeyUpdate          // ON DUPLICATE KEY UPDATE
+	createDatabase           // CREATE {DATABASE | SCHEMA}
 )
 
 var stateName map[byte]string = map[byte]string{
@@ -109,6 +110,7 @@ var stateName map[byte]string = map[byte]string{
 	14: "moreValuesOrUnknown",
 	15: "orderBy",
 	16: "onDupeKeyUpdate",
+	17: "createDatabase",
 }
 
 var Debug bool = false
@@ -494,13 +496,22 @@ func Fingerprint(q string) string {
 					}
 					sqlState = onDupeKeyUpdate
 				} else if RemoveDbNames {
-					if prevWord == "from" || prevWord == "update" || prevWord == "into" || prevWord == "join" {
+					if sqlState == createDatabase && word != "if" && word != "not" && word != "exists" {
+						f[fi] = '?'
+						fi++
+						f[fi] = ' '
+						fi++
+						cpFromOffset = qi + 1
+						sqlState = unknown
+					} else if inReservedWordsForDbTemplating(prevWord) {
 						if i := strings.IndexRune(word, '.'); i != -1 {
 							if Debug {
 								fmt.Println("Removing database name")
 							}
 							cpFromOffset = cpFromOffset + i + 1
 						}
+					} else if prevWord == "create" && (word == "database" || word == "schema") {
+						sqlState = createDatabase
 					}
 				}
 				s = inSpace
@@ -702,4 +713,12 @@ func Id(fingerprint string) string {
 	io.WriteString(id, fingerprint)
 	h := fmt.Sprintf("%x", id.Sum(nil))
 	return strings.ToUpper(h[16:32])
+}
+
+func inReservedWordsForDbTemplating(word string) bool {
+	switch word {
+	case "from", "update", "into", "join", "replace", "low_priority", "delayed", "ignore":
+		return true
+	}
+	return false
 }
