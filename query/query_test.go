@@ -38,7 +38,6 @@ func (s *TestSuite) SetUpSuite(t *C) {
 
 func (s *TestSuite) TestFingerprintBasic(t *C) {
 	var q string
-	query.ReplaceNumbersInWords = false
 
 	// A most basic case.
 	q = "SELECT c FROM t WHERE id=1"
@@ -266,7 +265,6 @@ func (s *TestSuite) TestFingerprintBasic(t *C) {
 
 func (s *TestSuite) TestFingerprintValueList(t *C) {
 	var q string
-	query.ReplaceNumbersInWords = false
 
 	// VALUES lists
 	q = "insert into foo(a, b, c) values(2, 4, 5)"
@@ -302,7 +300,6 @@ func (s *TestSuite) TestFingerprintValueList(t *C) {
 
 func (s *TestSuite) TestFingerprintInList(t *C) {
 	var q string
-	query.ReplaceNumbersInWords = false
 
 	q = "select * from t where (base.nid IN  ('1412', '1410', '1411'))"
 	t.Check(
@@ -328,7 +325,6 @@ func (s *TestSuite) TestFingerprintInList(t *C) {
 
 func (s *TestSuite) TestFingerprintOrderBy(t *C) {
 	var q string
-	query.ReplaceNumbersInWords = false
 
 	// Remove ASC from ORDER BY
 	// Issue 1030: Fingerprint can remove ORDER BY ASC
@@ -361,7 +357,6 @@ func (s *TestSuite) TestFingerprintOrderBy(t *C) {
 
 func (s *TestSuite) TestFingerprintOneLineComments(t *C) {
 	var q string
-	query.ReplaceNumbersInWords = false
 
 	// Removes one-line comments in fingerprints
 	q = "select \n-- bar\n foo"
@@ -398,7 +393,6 @@ func (s *TestSuite) TestFingerprintOneLineComments(t *C) {
 
 func (s *TestSuite) TestFingerprintTricky(t *C) {
 	var q string
-	query.ReplaceNumbersInWords = false
 
 	// Full hex can look like an ident if not for the leading 0x.
 	q = "SELECT c FROM t WHERE id=0xdeadbeaf"
@@ -457,7 +451,6 @@ func (s *TestSuite) TestFingerprintTricky(t *C) {
 
 func (s *TestSuite) TestNumbersInFunctions(t *C) {
 	var q string
-	query.ReplaceNumbersInWords = false
 
 	// Full hex can look like an ident if not for the leading 0x.
 	q = "select sleep(2) from test.n"
@@ -470,7 +463,6 @@ func (s *TestSuite) TestNumbersInFunctions(t *C) {
 
 func (s *TestSuite) TestId(t *C) {
 	var f string
-	query.ReplaceNumbersInWords = false
 
 	f = "hello world"
 	t.Check(
@@ -495,7 +487,6 @@ func (s *TestSuite) TestId(t *C) {
 }
 
 func (s *TestSuite) TestFingerprintPanicChallenge1(t *C) {
-	query.ReplaceNumbersInWords = false
 
 	q := "SELECT '' '' ''"
 	t.Check(
@@ -513,7 +504,6 @@ func (s *TestSuite) TestFingerprintPanicChallenge1(t *C) {
 }
 
 func (s *TestSuite) TestFingerprintPanicChallenge2(t *C) {
-	query.ReplaceNumbersInWords = false
 
 	q := "SELECT 'a' 'b' 'c' 'd'"
 	t.Check(
@@ -532,7 +522,6 @@ func (s *TestSuite) TestFingerprintPanicChallenge2(t *C) {
 
 func (s *TestSuite) TestFingerprintKeywords(t *C) {
 	var q string
-	query.ReplaceNumbersInWords = false
 
 	// values is a keyword but value is not. :-\
 	q = "SELECT name, value FROM variable"
@@ -545,7 +534,6 @@ func (s *TestSuite) TestFingerprintKeywords(t *C) {
 
 func (s *TestSuite) TestFingerprintUseIndex(t *C) {
 	var q string
-	query.ReplaceNumbersInWords = false
 
 	q = `SELECT 	1 AS one FROM calls USE INDEX(index_name)`
 	t.Check(
@@ -557,7 +545,12 @@ func (s *TestSuite) TestFingerprintUseIndex(t *C) {
 
 func (s *TestSuite) TestFingerprintWithNumberInDbName(t *C) {
 	var q string
+	defaultReplaceNumbersInWords := query.ReplaceNumbersInWords
 	query.ReplaceNumbersInWords = true
+	defer func() {
+		// Restore default value for other tests
+		query.ReplaceNumbersInWords = defaultReplaceNumbersInWords
+	}()
 
 	q = "SELECT c FROM org235.t WHERE id=0xdeadbeaf"
 	t.Check(
