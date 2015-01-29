@@ -487,7 +487,6 @@ func (s *TestSuite) TestId(t *C) {
 }
 
 func (s *TestSuite) TestFingerprintPanicChallenge1(t *C) {
-
 	q := "SELECT '' '' ''"
 	t.Check(
 		query.Fingerprint(q),
@@ -504,7 +503,6 @@ func (s *TestSuite) TestFingerprintPanicChallenge1(t *C) {
 }
 
 func (s *TestSuite) TestFingerprintPanicChallenge2(t *C) {
-
 	q := "SELECT 'a' 'b' 'c' 'd'"
 	t.Check(
 		query.Fingerprint(q),
