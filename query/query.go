@@ -114,6 +114,10 @@ var stateName map[byte]string = map[byte]string{
 }
 
 var Debug bool = false
+
+// Set ReplaceNumbersInWords to true to cover cases like e.g.:
+// `SELECT c FROM org235.t` -> `SELECT c FROM org?.t`
+// For more examples take a look at test query_test.go/TestFingerprintWithNumberInDbName
 var ReplaceNumbersInWords = false
 
 func Fingerprint(q string) string {
@@ -197,6 +201,10 @@ func Fingerprint(q string) string {
 			}
 			continue
 		} else if s == inNumberInWord {
+			// Replaces number in words with ?
+			// e.g. `db37` to `db?`
+			// Parser can fall into inNumberInWord only if
+			// option ReplaceNumbersInWords is turned on
 			if r >= '0' && r <= '9' {
 				if Debug {
 					fmt.Println("Ignore digit in word")
