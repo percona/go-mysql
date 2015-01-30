@@ -55,7 +55,7 @@ func (c *GlobalClass) AddEvent(e *log.Event) error {
 }
 
 func (c *GlobalClass) AddClass(class *QueryClass) {
-	c.TotalQueries++
+	c.TotalQueries += class.TotalQueries
 	c.UniqueQueries++
 
 	for classMetric, classStats := range class.Metrics.TimeMetrics {

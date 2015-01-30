@@ -18,9 +18,10 @@
 package query_test
 
 import (
+	"testing"
+
 	"github.com/percona/go-mysql/query"
 	. "gopkg.in/check.v1"
-	"testing"
 )
 
 func Test(t *testing.T) { TestingT(t) }
@@ -526,5 +527,62 @@ func (s *TestSuite) TestFingerprintKeywords(t *C) {
 		query.Fingerprint(q),
 		Equals,
 		"select name, value from variable",
+	)
+}
+
+func (s *TestSuite) TestFingerprintUseIndex(t *C) {
+	var q string
+
+	q = `SELECT 	1 AS one FROM calls USE INDEX(index_name)`
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select ? as one from calls use index(index_name)",
+	)
+}
+
+func (s *TestSuite) TestFingerprintWithNumberInDbName(t *C) {
+	var q string
+	defaultReplaceNumbersInWords := query.ReplaceNumbersInWords
+	query.ReplaceNumbersInWords = true
+	defer func() {
+		// Restore default value for other tests
+		query.ReplaceNumbersInWords = defaultReplaceNumbersInWords
+	}()
+
+	q = "SELECT c FROM org235.t WHERE id=0xdeadbeaf"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select c from org?.t where id=?",
+	)
+
+	q = "CREATE DATABASE org235_percona345 COLLATE 'utf8_general_ci'"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"create database org?_percona? collate ?",
+	)
+
+	q = "select foo_1 from foo_2_3"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select foo_? from foo_?_?",
+	)
+
+	q = "SELECT * FROM prices.rt_5min where id=1"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select * from prices.rt_?min where id=?",
+	)
+
+	// @todo prefixes are not supported, requires more hacks
+	q = "select 123foo from 123foo"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select 123foo from 123foo",
 	)
 }
