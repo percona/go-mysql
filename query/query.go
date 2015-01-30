@@ -89,6 +89,7 @@ const (
 	moreValuesOrUnknown      // , (2nd+) or ON DUPLICATE KEY or end of query
 	orderBy                  // ORDER BY
 	onDupeKeyUpdate          // ON DUPLICATE KEY UPDATE
+	inNumberInWord           // e.g. db23
 )
 
 var stateName map[byte]string = map[byte]string{
@@ -109,9 +110,15 @@ var stateName map[byte]string = map[byte]string{
 	14: "moreValuesOrUnknown",
 	15: "orderBy",
 	16: "onDupeKeyUpdate",
+	17: "inNumberInWord",
 }
 
 var Debug bool = false
+
+// Set ReplaceNumbersInWords to true to cover cases like e.g.:
+// `SELECT c FROM org235.t` -> `SELECT c FROM org?.t`
+// For more examples take a look at test query_test.go/TestFingerprintWithNumberInDbName
+var ReplaceNumbersInWords = false
 
 func Fingerprint(q string) string {
 	q += " " // need range to run off end of original query
@@ -193,6 +200,29 @@ func Fingerprint(q string) string {
 				}
 			}
 			continue
+		} else if s == inNumberInWord {
+			// Replaces number in words with ?
+			// e.g. `db37` to `db?`
+			// Parser can fall into inNumberInWord only if
+			// option ReplaceNumbersInWords is turned on
+			if r >= '0' && r <= '9' {
+				if Debug {
+					fmt.Println("Ignore digit in word")
+				}
+				continue
+			}
+			// 123 -> ?, 0xff -> ?, 1e-9 -> ?, etc.
+			if Debug {
+				fmt.Println("Number in word end")
+			}
+			f[fi] = '?'
+			fi++
+			cpFromOffset = qi
+			if isSpace(r) {
+				s = unknown
+			} else {
+				s = inWord
+			}
 		} else if s == inNumber {
 			// We're in a number which can be something simple like 123 or
 			// something trickier like 1e-9 or 0xFF.  The pathological case is
@@ -405,6 +435,10 @@ func Fingerprint(q string) string {
 				} else {
 					if Debug {
 						fmt.Println("Number in word")
+					}
+					if ReplaceNumbersInWords {
+						s = inNumberInWord
+						cpToOffset = qi
 					}
 				}
 			default:
