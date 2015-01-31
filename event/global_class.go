@@ -21,14 +21,16 @@ import (
 	"github.com/percona/go-mysql/log"
 )
 
+// A GlobalClass represents a set of events regardless of class.
 type GlobalClass struct {
-	TotalQueries  uint64
-	UniqueQueries uint64
-	RateType      string `json:",omitempty"`
-	RateLimit     uint   `json:",omitempty"`
-	Metrics       *Metrics
+	TotalQueries  uint64   // total number of queries
+	UniqueQueries uint64   // number of unique queries (classes)
+	RateType      string   `json:",omitempty"` // Percona Server rate limit type
+	RateLimit     uint     `json:",omitempty"` // Percona Server rate limit
+	Metrics       *Metrics // metric statistics
 }
 
+// NewGlobalClass returns a new GlobalClass.
 func NewGlobalClass() *GlobalClass {
 	class := &GlobalClass{
 		TotalQueries:  0,
@@ -38,6 +40,7 @@ func NewGlobalClass() *GlobalClass {
 	return class
 }
 
+// AddEvent adds an event to the global class.
 func (c *GlobalClass) AddEvent(e *log.Event) error {
 	var err error
 	if e.RateType != "" {
@@ -54,6 +57,8 @@ func (c *GlobalClass) AddEvent(e *log.Event) error {
 	return err
 }
 
+// AddClass adds a QueryClass to the global class. This is used with Perfomance
+// Schema which returns pre-aggregated classes instead of events.
 func (c *GlobalClass) AddClass(class *QueryClass) {
 	c.TotalQueries += class.TotalQueries
 	c.UniqueQueries++
@@ -106,6 +111,8 @@ func (c *GlobalClass) AddClass(class *QueryClass) {
 	}
 }
 
+// Finalize calculates all metric statistics given the unique number of queries.
+// Call this function when done adding events or classes to the global class.
 func (c *GlobalClass) Finalize(UniqueQueries uint64) {
 	c.UniqueQueries = UniqueQueries
 	c.Metrics.Finalize()

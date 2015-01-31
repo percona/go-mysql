@@ -26,23 +26,31 @@ const (
 	MAX_EXAMPLE_BYTES = 1024 * 10
 )
 
+// A QueryClass represents all events with the same fingerprint and class ID.
+// This is only enforced by convention, so be careful not to mix events from
+// different classes.
 type QueryClass struct {
-	Id           string
-	Fingerprint  string
-	Metrics      *Metrics
-	TotalQueries uint64
-	Example      Example `json:",omitempty"`
+	Id           string   // 16-character hex checksum of fingerprint
+	Fingerprint  string   // canonical form of query: values replaced with "?"
+	Metrics      *Metrics // statistics for each metric, e.g. max Query_time
+	TotalQueries uint64   // total number of queries in class
+	Example      Example  `json:",omitempty"` // example query with max Query_time
 	lastDb       string
 	example      bool
 }
 
+// An Example is a real query and its database, timestamp, and Query_time.
+// If the query is larger than MAX_EXAMPLE_BYTES, it is truncated and "..."
+// is appended.
 type Example struct {
-	QueryTime float64
-	Db        string
-	Query     string
-	Ts        string `json:",omitempty"`
+	QueryTime float64 // Query_time
+	Db        string  // Schema: <db> or USE <db>
+	Query     string  // truncated to MAX_EXAMPLE_BYTES
+	Ts        string  `json:",omitempty"` // in MySQL time zone
 }
 
+// NewQueryClass returns a new QueryClass for the class ID and fingerprint.
+// If example is true, the query with the greatest Query_time is saved.
 func NewQueryClass(classId string, fingerprint string, example bool) *QueryClass {
 	class := &QueryClass{
 		Id:           classId,
@@ -54,6 +62,7 @@ func NewQueryClass(classId string, fingerprint string, example bool) *QueryClass
 	return class
 }
 
+// AddEvent adds an event to the query class.
 func (c *QueryClass) AddEvent(e *log.Event) {
 	c.TotalQueries++
 	c.Metrics.AddEvent(e)
@@ -90,6 +99,8 @@ func (c *QueryClass) AddEvent(e *log.Event) {
 	}
 }
 
+// Finalize calculates all metric statistics. Call this function when done
+// adding events to the class.
 func (c *QueryClass) Finalize() {
 	c.Metrics.Finalize()
 }
