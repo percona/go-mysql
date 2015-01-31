@@ -22,41 +22,44 @@ import (
 	"sort"
 )
 
+// Metrics encapsulate the metrics of an event like Query_time and Rows_sent.
 type Metrics struct {
 	TimeMetrics   map[string]*TimeStats   `json:",omitempty"`
 	NumberMetrics map[string]*NumberStats `json:",omitempty"`
 	BoolMetrics   map[string]*BoolStats   `json:",omitempty"`
 }
 
+// TimeStats are microsecond-based metrics like Query_time and Lock_time.
 type TimeStats struct {
-	vals   []float64 `json:"-"`
-	Cnt    uint
-	Sum    float64
-	Min    float64
-	Avg    float64
-	Pct95  float64
-	Stddev uint64
-	Med    float64
-	Max    float64
+	vals  []float64 `json:"-"`
+	Cnt   uint
+	Sum   float64
+	Min   float64
+	Avg   float64
+	Med   float64 // median
+	Pct95 float64 // 95th percentile
+	Max   float64
 }
 
+// NumberStats are integer-based metrics like Rows_sent and Merge_passes.
 type NumberStats struct {
-	vals   []uint64 `json:"-"`
-	Cnt    uint
-	Sum    uint64
-	Min    uint64
-	Avg    uint64
-	Pct95  uint64
-	Stddev uint64
-	Med    uint64
-	Max    uint64
+	vals  []uint64 `json:"-"`
+	Cnt   uint
+	Sum   uint64
+	Min   uint64
+	Avg   uint64
+	Med   uint64 // median
+	Pct95 uint64 // 95th percentile
+	Max   uint64
 }
 
+// BoolStats are boolean-based metrics like QC_Hit and Filesort.
 type BoolStats struct {
 	Cnt  uint
-	True uint
+	True uint // %True = True/Cnt, %False=(Cnt-True)/Cnt
 }
 
+// NewMetrics returns a pointer to an initialized Metrics structure.
 func NewMetrics() *Metrics {
 	m := &Metrics{
 		TimeMetrics:   make(map[string]*TimeStats),
@@ -66,6 +69,7 @@ func NewMetrics() *Metrics {
 	return m
 }
 
+// AddEvent saves all the metrics of the event.
 func (m *Metrics) AddEvent(e *log.Event) {
 	for metric, val := range e.TimeMetrics {
 		stats, seenMetric := m.TimeMetrics[metric]
@@ -112,14 +116,16 @@ func (m *Metrics) AddEvent(e *log.Event) {
 	}
 }
 
-type ByUint64 []uint64
+type byUint64 []uint64
 
-func (a ByUint64) Len() int      { return len(a) }
-func (a ByUint64) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
-func (a ByUint64) Less(i, j int) bool {
+func (a byUint64) Len() int      { return len(a) }
+func (a byUint64) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a byUint64) Less(i, j int) bool {
 	return a[i] < a[j] // ascending order
 }
 
+// Finalize calculates the statistics of the added metrics. Call this function
+// when done adding events.
 func (m *Metrics) Finalize() {
 	for _, s := range m.TimeMetrics {
 		sort.Float64s(s.vals)
@@ -132,7 +138,7 @@ func (m *Metrics) Finalize() {
 	}
 
 	for _, s := range m.NumberMetrics {
-		sort.Sort(ByUint64(s.vals))
+		sort.Sort(byUint64(s.vals))
 
 		s.Min = s.vals[0]
 		s.Avg = s.Sum / uint64(s.Cnt)

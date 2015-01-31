@@ -21,20 +21,24 @@ import (
 	"github.com/percona/go-mysql/log"
 )
 
-type QueryTransformationFunc func(string) string
-
+// A Result contains a global class and query classes with finalized metric
+// statistics. The query classes are keyed on class ID.
 type Result struct {
 	Global *GlobalClass
-	Class  map[string]*QueryClass
+	Class  map[string]*QueryClass // keyed on class ID
 	Error  string
 }
 
+// An EventAggregator groups events into a global class and query classes by
+// class ID. When there are no more events, a call to Finalize computes all
+// metric statistics and returns a Result.
 type EventAggregator struct {
 	examples bool
 	// --
 	result *Result
 }
 
+// NewEventAggregator returns a new EventAggregator.
 func NewEventAggregator(examples bool) *EventAggregator {
 	result := &Result{
 		Global: NewGlobalClass(),
@@ -48,6 +52,8 @@ func NewEventAggregator(examples bool) *EventAggregator {
 	return a
 }
 
+// AddEvent adds the event to the aggregator, automatically creating new query
+// classes as needed.
 func (a *EventAggregator) AddEvent(event *log.Event, id, fingerprint string) {
 
 	// Add the event to the global class.
@@ -64,6 +70,8 @@ func (a *EventAggregator) AddEvent(event *log.Event, id, fingerprint string) {
 	class.AddEvent(event)
 }
 
+// Finalize calculates all metric statistics and returns a Result.
+// Call this function when done adding events to the aggregator.
 func (a *EventAggregator) Finalize() *Result {
 	for _, class := range a.result.Class {
 		class.Finalize()
