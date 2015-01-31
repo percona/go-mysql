@@ -25,3 +25,9 @@ Packages are not versioned. Interfaces, data structures, and overall usage are s
 To test these packages locally, you'll need:
 * github.com/go-test/test
 * gopkg.in/check.v1
+
+## Contributors
+
+* Daniel Nichter
+* Kamil Dziedzic
+* Carlos Salguero
