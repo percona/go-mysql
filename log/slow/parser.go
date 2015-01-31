@@ -76,7 +76,7 @@ func NewSlowLogParser(file *os.File, opt log.Options) *SlowLogParser {
 }
 
 // EventChan returns the unbuffered event channel on which the caller can
-// receive log events.
+// receive events.
 func (p *SlowLogParser) EventChan() <-chan *log.Event {
 	return p.eventChan
 }
