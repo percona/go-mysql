@@ -44,16 +44,17 @@ type SlowLogParser struct {
 	file *os.File
 	opt  log.Options
 	// --
-	stopChan    chan bool
-	eventChan   chan *log.Event
-	inHeader    bool
-	inQuery     bool
-	headerLines uint
-	queryLines  uint64
-	bytesRead   uint64
-	lineOffset  uint64
-	stopped     bool
-	event       *log.Event
+	stopChan      chan bool
+	eventChan     chan *log.Event
+	inHeader      bool
+	inQuery       bool
+	headerLines   uint
+	queryLines    uint64
+	bytesRead     uint64
+	lineOffset    uint64
+	stopped       bool
+	event         *log.Event
+	lastQueryTime uint64
 }
 
 // NewSlowLogParser returns a new SlowLogParser that reads from the open file.
@@ -358,7 +359,9 @@ func (p *SlowLogParser) sendEvent(inHeader bool, inQuery bool) {
 		// Started parsing in header after Query_time.  Throw away event.
 		return
 	}
-
+	if p.opt.MaxQueryTime > 0 && p.event.TimeMetrics["Query_time"] > p.opt.MaxQueryTime {
+		return // Ignore the event if it took more than MaxQueryTime
+	}
 	// Clean up the event.
 	p.event.Db = strings.TrimSuffix(p.event.Db, ";\n")
 	p.event.Query = strings.TrimSuffix(p.event.Query, ";")

@@ -55,6 +55,7 @@ type Options struct {
 	StartOffset        uint64          // byte offset in file at which to start parsing
 	FilterAdminCommand map[string]bool // admin commands to ignore
 	Debug              bool            // print trace info to STDOUT
+	MaxQueryTime       float32         // Ignore queries having Query_time > MaxQueryTime
 }
 
 // A LogParser sends events to a channel.
