@@ -44,17 +44,16 @@ type SlowLogParser struct {
 	file *os.File
 	opt  log.Options
 	// --
-	stopChan      chan bool
-	eventChan     chan *log.Event
-	inHeader      bool
-	inQuery       bool
-	headerLines   uint
-	queryLines    uint64
-	bytesRead     uint64
-	lineOffset    uint64
-	stopped       bool
-	event         *log.Event
-	lastQueryTime uint64
+	stopChan    chan bool
+	eventChan   chan *log.Event
+	inHeader    bool
+	inQuery     bool
+	headerLines uint
+	queryLines  uint64
+	bytesRead   uint64
+	lineOffset  uint64
+	stopped     bool
+	event       *log.Event
 }
 
 // NewSlowLogParser returns a new SlowLogParser that reads from the open file.
