@@ -1810,21 +1810,44 @@ func (s *TestSuite) TestParseSlow024(t *C) {
 	}
 }
 
-// slow025 Test setting MaxQueryTime
-// The first query should be skipped because Query_time = 2 > MaxQueryTime = 1
+// slow025 Test setting RateMaxQueryTime
 func (s *TestSuite) TestParserSlowLog025(t *C) {
 	opt := s.opt
-	opt.MaxQueryTime = 1
+	opt.RateMaxQueryTime = 1
 	got := s.parseSlowLog("slow025.log", opt)
 	expect := []log.Event{
 		{
-			Ts:     "071015 21:45:10",
-			Admin:  false,
-			Query:  `select sleep(2) from test.n`,
-			User:   "root",
-			Host:   "localhost",
-			Db:     "sakila",
-			Offset: 359,
+			Ts:       "071015 21:43:52",
+			Admin:    false,
+			Query:    `select sleep(1) from n`,
+			User:     "root",
+			Host:     "localhost",
+			Db:       "test",
+			Offset:   200,
+			RateType: "query",
+			// In slow025.log, RateLimit = 2 but the parser must
+			// return 0 because Query_time > RateMaxQueryTime
+			RateLimit: 0,
+			TimeMetrics: map[string]float32{
+				"Query_time": 2,
+				"Lock_time":  0,
+			},
+			NumberMetrics: map[string]uint64{
+				"Rows_sent":     1,
+				"Rows_examined": 0,
+			},
+			BoolMetrics: map[string]bool{},
+		},
+		{
+			Ts:        "071015 21:45:10",
+			Admin:     false,
+			Query:     `select sleep(2) from test.n`,
+			User:      "root",
+			Host:      "localhost",
+			Db:        "sakila",
+			Offset:    411,
+			RateType:  "query",
+			RateLimit: 2,
 			TimeMetrics: map[string]float32{
 				"Query_time": 1,
 				"Lock_time":  0,

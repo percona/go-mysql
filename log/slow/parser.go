@@ -358,8 +358,10 @@ func (p *SlowLogParser) sendEvent(inHeader bool, inQuery bool) {
 		// Started parsing in header after Query_time.  Throw away event.
 		return
 	}
-	if p.opt.MaxQueryTime > 0 && p.event.TimeMetrics["Query_time"] > p.opt.MaxQueryTime {
-		return // Ignore the event if it took more than MaxQueryTime
+	// If the query was logged because it took more than RateMaxQueryTime
+	// the rate should be ignored to prevent a wrong sampling
+	if p.opt.RateMaxQueryTime > 0 && p.event.TimeMetrics["Query_time"] > p.opt.RateMaxQueryTime {
+		p.event.RateLimit = 0
 	}
 	// Clean up the event.
 	p.event.Db = strings.TrimSuffix(p.event.Db, ";\n")
