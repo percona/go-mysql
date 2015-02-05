@@ -1809,3 +1809,35 @@ func (s *TestSuite) TestParseSlow024(t *C) {
 		t.Error(diff)
 	}
 }
+
+// slow025 Test setting MaxQueryTime
+// The first query should be skipped because Query_time = 2 > MaxQueryTime = 1
+func (s *TestSuite) TestParserSlowLog025(t *C) {
+	opt := s.opt
+	opt.MaxQueryTime = 1
+	got := s.parseSlowLog("slow025.log", opt)
+	expect := []log.Event{
+		{
+			Ts:     "071015 21:45:10",
+			Admin:  false,
+			Query:  `select sleep(2) from test.n`,
+			User:   "root",
+			Host:   "localhost",
+			Db:     "sakila",
+			Offset: 359,
+			TimeMetrics: map[string]float32{
+				"Query_time": 1,
+				"Lock_time":  0,
+			},
+			NumberMetrics: map[string]uint64{
+				"Rows_sent":     1,
+				"Rows_examined": 0,
+			},
+			BoolMetrics: map[string]bool{},
+		},
+	}
+	if same, diff := IsDeeply(got, expect); !same {
+		Dump(got)
+		t.Error(diff)
+	}
+}
