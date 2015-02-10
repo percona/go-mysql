@@ -34,7 +34,7 @@ type QueryClass struct {
 	Fingerprint  string   // canonical form of query: values replaced with "?"
 	Metrics      *Metrics // statistics for each metric, e.g. max Query_time
 	TotalQueries uint64   // total number of queries in class
-	Example      Example  `json:",omitempty"` // example query with max Query_time
+	Example      *Example `json:",omitempty"` // example query with max Query_time
 	lastDb       string
 	example      bool
 }
@@ -57,6 +57,7 @@ func NewQueryClass(classId string, fingerprint string, example bool) *QueryClass
 		Fingerprint:  fingerprint,
 		Metrics:      NewMetrics(),
 		TotalQueries: 0,
+		Example:      &Example{},
 		example:      example,
 	}
 	return class
@@ -103,4 +104,7 @@ func (c *QueryClass) AddEvent(e *log.Event) {
 // adding events to the class.
 func (c *QueryClass) Finalize() {
 	c.Metrics.Finalize()
+	if c.Example.QueryTime == 0 {
+		c.Example = nil
+	}
 }
