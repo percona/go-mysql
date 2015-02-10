@@ -69,7 +69,6 @@ func (c *GlobalClass) AddClass(class *QueryClass) {
 			m := *classStats
 			c.Metrics.TimeMetrics[classMetric] = &m
 		} else {
-			globalStats.Cnt += classStats.Cnt
 			globalStats.Sum += classStats.Sum
 			globalStats.Avg = (globalStats.Avg + classStats.Avg) / 2
 			if classStats.Min < globalStats.Min {
@@ -87,7 +86,6 @@ func (c *GlobalClass) AddClass(class *QueryClass) {
 			m := *classStats
 			c.Metrics.NumberMetrics[classMetric] = &m
 		} else {
-			globalStats.Cnt += classStats.Cnt
 			globalStats.Sum += classStats.Sum
 			globalStats.Avg = (globalStats.Avg + classStats.Avg) / 2
 			if classStats.Min < globalStats.Min {
@@ -105,7 +103,6 @@ func (c *GlobalClass) AddClass(class *QueryClass) {
 			m := *classStats
 			c.Metrics.BoolMetrics[classMetric] = &m
 		} else {
-			globalStats.Cnt += classStats.Cnt
 			globalStats.True += classStats.True
 		}
 	}

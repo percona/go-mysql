@@ -32,30 +32,27 @@ type Metrics struct {
 // TimeStats are microsecond-based metrics like Query_time and Lock_time.
 type TimeStats struct {
 	vals  []float64 `json:"-"`
-	Cnt   uint
-	Sum   float64
-	Min   float64
-	Avg   float64
-	Med   float64 // median
-	Pct95 float64 // 95th percentile
-	Max   float64
+	Sum   float64   `json:",omitempty"`
+	Min   float64   `json:",omitempty"`
+	Avg   float64   `json:",omitempty"`
+	Med   float64   `json:",omitempty"` // median
+	Pct95 float64   `json:",omitempty"` // 95th percentile
+	Max   float64   `json:",omitempty"`
 }
 
 // NumberStats are integer-based metrics like Rows_sent and Merge_passes.
 type NumberStats struct {
 	vals  []uint64 `json:"-"`
-	Cnt   uint
-	Sum   uint64
-	Min   uint64
-	Avg   uint64
-	Med   uint64 // median
-	Pct95 uint64 // 95th percentile
-	Max   uint64
+	Sum   uint64   `json:",omitempty"`
+	Min   uint64   `json:",omitempty"`
+	Avg   uint64   `json:",omitempty"`
+	Med   uint64   `json:",omitempty"` // median
+	Pct95 uint64   `json:",omitempty"` // 95th percentile
+	Max   uint64   `json:",omitempty"`
 }
 
 // BoolStats are boolean-based metrics like QC_Hit and Filesort.
 type BoolStats struct {
-	Cnt  uint
 	True uint // %True = True/Cnt, %False=(Cnt-True)/Cnt
 }
 
@@ -79,7 +76,6 @@ func (m *Metrics) AddEvent(e *log.Event) {
 			}
 			stats = m.TimeMetrics[metric]
 		}
-		stats.Cnt++
 		stats.Sum += float64(val)
 		stats.vals = append(stats.vals, float64(val))
 	}
@@ -92,7 +88,6 @@ func (m *Metrics) AddEvent(e *log.Event) {
 			}
 			stats = m.NumberMetrics[metric]
 		}
-		stats.Cnt++
 		stats.Sum += val
 		stats.vals = append(stats.vals, val)
 	}
@@ -100,14 +95,11 @@ func (m *Metrics) AddEvent(e *log.Event) {
 	for metric, val := range e.BoolMetrics {
 		stats, seenMetric := m.BoolMetrics[metric]
 		if seenMetric {
-			stats.Cnt++
 			if val {
 				stats.True++
 			}
 		} else {
-			stats := &BoolStats{
-				Cnt: 1,
-			}
+			stats := &BoolStats{}
 			if val {
 				stats.True++
 			}
@@ -129,21 +121,23 @@ func (a byUint64) Less(i, j int) bool {
 func (m *Metrics) Finalize() {
 	for _, s := range m.TimeMetrics {
 		sort.Float64s(s.vals)
+		cnt := len(s.vals)
 
 		s.Min = s.vals[0]
-		s.Avg = s.Sum / float64(s.Cnt)
-		s.Pct95 = s.vals[(95*s.Cnt)/100]
-		s.Med = s.vals[(50*s.Cnt)/100] // median = 50th percentile
-		s.Max = s.vals[s.Cnt-1]
+		s.Avg = s.Sum / float64(cnt)
+		s.Pct95 = s.vals[(95*cnt)/100]
+		s.Med = s.vals[(50*cnt)/100] // median = 50th percentile
+		s.Max = s.vals[cnt-1]
 	}
 
 	for _, s := range m.NumberMetrics {
 		sort.Sort(byUint64(s.vals))
+		cnt := len(s.vals)
 
 		s.Min = s.vals[0]
-		s.Avg = s.Sum / uint64(s.Cnt)
-		s.Pct95 = s.vals[(95*s.Cnt)/100]
-		s.Med = s.vals[(50*s.Cnt)/100] // median = 50th percentile
-		s.Max = s.vals[s.Cnt-1]
+		s.Avg = s.Sum / uint64(cnt)
+		s.Pct95 = s.vals[(95*cnt)/100]
+		s.Med = s.vals[(50*cnt)/100] // median = 50th percentile
+		s.Max = s.vals[cnt-1]
 	}
 }
