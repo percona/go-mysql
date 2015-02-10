@@ -32,23 +32,23 @@ type Metrics struct {
 // TimeStats are microsecond-based metrics like Query_time and Lock_time.
 type TimeStats struct {
 	vals  []float64 `json:"-"`
-	Sum   float64   `json:",omitempty"`
-	Min   float64   `json:",omitempty"`
-	Avg   float64   `json:",omitempty"`
-	Med   float64   `json:",omitempty"` // median
-	Pct95 float64   `json:",omitempty"` // 95th percentile
-	Max   float64   `json:",omitempty"`
+	Sum   float64
+	Min   float64 `json:",omitempty"`
+	Avg   float64 `json:",omitempty"`
+	Med   float64 `json:",omitempty"` // median
+	Pct95 float64 `json:",omitempty"` // 95th percentile
+	Max   float64 `json:",omitempty"`
 }
 
 // NumberStats are integer-based metrics like Rows_sent and Merge_passes.
 type NumberStats struct {
 	vals  []uint64 `json:"-"`
-	Sum   uint64   `json:",omitempty"`
-	Min   uint64   `json:",omitempty"`
-	Avg   uint64   `json:",omitempty"`
-	Med   uint64   `json:",omitempty"` // median
-	Pct95 uint64   `json:",omitempty"` // 95th percentile
-	Max   uint64   `json:",omitempty"`
+	Sum   uint64
+	Min   uint64 `json:",omitempty"`
+	Avg   uint64 `json:",omitempty"`
+	Med   uint64 `json:",omitempty"` // median
+	Pct95 uint64 `json:",omitempty"` // 95th percentile
+	Max   uint64 `json:",omitempty"`
 }
 
 // BoolStats are boolean-based metrics like QC_Hit and Filesort.
