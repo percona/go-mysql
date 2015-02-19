@@ -21,13 +21,14 @@ package slow
 import (
 	"bufio"
 	"fmt"
-	"github.com/percona/go-mysql/log"
 	"io"
 	l "log"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/percona/go-mysql/log"
 )
 
 // Regular expressions to match important lines in slow log.
@@ -358,7 +359,16 @@ func (p *SlowLogParser) sendEvent(inHeader bool, inQuery bool) {
 		// Started parsing in header after Query_time.  Throw away event.
 		return
 	}
-
+	// If the query was logged because it took more than RateMaxQueryTime
+	// the rate should be ignored to prevent a wrong sampling
+	// I.e. one query took 5 minutes with sampling 1/1000 we shuld not count
+	// it as 1000 of 5min queries.
+	// This depends on the value of slow_query_log_always_write_time so it
+	// affects only to Percona Server 5.6.13+
+	// http://www.percona.com/doc/percona-server/5.6/diagnostics/slow_extended.html#slow_query_log_always_write_time
+	if p.opt.RateMaxQueryTime > 0 && p.event.TimeMetrics["Query_time"] > p.opt.RateMaxQueryTime {
+		p.event.RateLimit = 0
+	}
 	// Clean up the event.
 	p.event.Db = strings.TrimSuffix(p.event.Db, ";\n")
 	p.event.Query = strings.TrimSuffix(p.event.Query, ";")
