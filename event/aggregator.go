@@ -18,6 +18,8 @@
 package event
 
 import (
+	"time"
+
 	"github.com/percona/go-mysql/log"
 )
 
@@ -35,11 +37,12 @@ type Result struct {
 type EventAggregator struct {
 	examples bool
 	// --
-	result *Result
+	result    *Result
+	tzDiffUTC time.Duration
 }
 
 // NewEventAggregator returns a new EventAggregator.
-func NewEventAggregator(examples bool) *EventAggregator {
+func NewEventAggregator(examples bool, tzDiff time.Duration) *EventAggregator {
 	result := &Result{
 		Global: NewGlobalClass(),
 		Class:  make(map[string]*QueryClass),
@@ -47,7 +50,8 @@ func NewEventAggregator(examples bool) *EventAggregator {
 	a := &EventAggregator{
 		examples: examples,
 		// --
-		result: result,
+		result:    result,
+		tzDiffUTC: tzDiff,
 	}
 	return a
 }
@@ -62,7 +66,7 @@ func (a *EventAggregator) AddEvent(event *log.Event, id, fingerprint string) {
 	// Get the query class to which the event belongs.
 	class, haveClass := a.result.Class[id]
 	if !haveClass {
-		class = NewQueryClass(id, fingerprint, a.examples)
+		class = NewQueryClass(id, fingerprint, a.examples, a.tzDiffUTC)
 		a.result.Class[id] = class
 	}
 

@@ -18,8 +18,9 @@
 package event
 
 import (
-	"github.com/percona/go-mysql/log"
 	"time"
+
+	"github.com/percona/go-mysql/log"
 )
 
 const (
@@ -37,6 +38,7 @@ type QueryClass struct {
 	Example      *Example `json:",omitempty"` // example query with max Query_time
 	lastDb       string
 	example      bool
+	tzDiffUTC    time.Duration // difference between mysql current tz and UTC
 }
 
 // An Example is a real query and its database, timestamp, and Query_time.
@@ -51,7 +53,7 @@ type Example struct {
 
 // NewQueryClass returns a new QueryClass for the class ID and fingerprint.
 // If example is true, the query with the greatest Query_time is saved.
-func NewQueryClass(classId string, fingerprint string, example bool) *QueryClass {
+func NewQueryClass(classId string, fingerprint string, example bool, tzDiff time.Duration) *QueryClass {
 	class := &QueryClass{
 		Id:           classId,
 		Fingerprint:  fingerprint,
@@ -59,6 +61,7 @@ func NewQueryClass(classId string, fingerprint string, example bool) *QueryClass
 		TotalQueries: 0,
 		Example:      &Example{},
 		example:      example,
+		tzDiffUTC:    tzDiff,
 	}
 	return class
 }
@@ -90,7 +93,7 @@ func (c *QueryClass) AddEvent(e *log.Event) {
 					if t, err := time.Parse("060102 15:04:05", e.Ts); err != nil {
 						c.Example.Ts = ""
 					} else {
-						c.Example.Ts = t.Format("2006-01-02 15:04:05")
+						c.Example.Ts = t.Add(c.tzDiffUTC).Format("2006-01-02 15:04:05")
 					}
 				} else {
 					c.Example.Ts = ""
