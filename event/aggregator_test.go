@@ -51,7 +51,7 @@ func (s *TestSuite) SetUpSuite(t *C) {
 	s.examples = true
 }
 
-func (s *TestSuite) aggregateSlowLog(input, output string, tzDiffUTC time.Duration) (got *event.Result, expect *event.Result) {
+func (s *TestSuite) aggregateSlowLog(input, output string, utcOffset time.Duration) (got *event.Result, expect *event.Result) {
 	bytes, err := ioutil.ReadFile(path.Join(s.result, "/", output))
 	if err != nil {
 		l.Fatal(err)
@@ -70,7 +70,7 @@ func (s *TestSuite) aggregateSlowLog(input, output string, tzDiffUTC time.Durati
 		l.Fatal(err)
 	}
 	go p.Start()
-	a := event.NewEventAggregator(s.examples, tzDiffUTC)
+	a := event.NewEventAggregator(s.examples, utcOffset)
 	for e := range p.EventChan() {
 		f := query.Fingerprint(e.Query)
 		id := query.Id(f)

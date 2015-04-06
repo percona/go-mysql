@@ -30,6 +30,8 @@ const (
 // A QueryClass represents all events with the same fingerprint and class ID.
 // This is only enforced by convention, so be careful not to mix events from
 // different classes.
+// utcOffset holds the offset between MySQL tz and UTC to correct the timestamp
+// when parsing slow log files.
 type QueryClass struct {
 	Id           string   // 16-character hex checksum of fingerprint
 	Fingerprint  string   // canonical form of query: values replaced with "?"
@@ -38,7 +40,7 @@ type QueryClass struct {
 	Example      *Example `json:",omitempty"` // example query with max Query_time
 	lastDb       string
 	example      bool
-	tzDiffUTC    time.Duration // difference between mysql current tz and UTC
+	utcOffset    time.Duration // difference between mysql current tz and UTC
 }
 
 // An Example is a real query and its database, timestamp, and Query_time.
@@ -53,7 +55,7 @@ type Example struct {
 
 // NewQueryClass returns a new QueryClass for the class ID and fingerprint.
 // If example is true, the query with the greatest Query_time is saved.
-func NewQueryClass(classId string, fingerprint string, example bool, tzDiff time.Duration) *QueryClass {
+func NewQueryClass(classId string, fingerprint string, example bool, utcOffset time.Duration) *QueryClass {
 	class := &QueryClass{
 		Id:           classId,
 		Fingerprint:  fingerprint,
@@ -61,7 +63,7 @@ func NewQueryClass(classId string, fingerprint string, example bool, tzDiff time
 		TotalQueries: 0,
 		Example:      &Example{},
 		example:      example,
-		tzDiffUTC:    tzDiff,
+		utcOffset:    utcOffset,
 	}
 	return class
 }
@@ -93,7 +95,7 @@ func (c *QueryClass) AddEvent(e *log.Event) {
 					if t, err := time.Parse("060102 15:04:05", e.Ts); err != nil {
 						c.Example.Ts = ""
 					} else {
-						c.Example.Ts = t.Add(c.tzDiffUTC).Format("2006-01-02 15:04:05")
+						c.Example.Ts = t.Add(c.utcOffset).Format("2006-01-02 15:04:05")
 					}
 				} else {
 					c.Example.Ts = ""
