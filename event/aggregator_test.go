@@ -19,17 +19,19 @@ package event_test
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	l "log"
+	"os"
+	"path"
+	"testing"
+	"time"
+
 	. "github.com/go-test/test"
 	"github.com/percona/go-mysql/event"
 	log "github.com/percona/go-mysql/log"
 	parser "github.com/percona/go-mysql/log/slow"
 	"github.com/percona/go-mysql/query"
 	. "gopkg.in/check.v1"
-	"io/ioutil"
-	l "log"
-	"os"
-	"path"
-	"testing"
 )
 
 func Test(t *testing.T) { TestingT(t) }
@@ -49,7 +51,7 @@ func (s *TestSuite) SetUpSuite(t *C) {
 	s.examples = true
 }
 
-func (s *TestSuite) aggregateSlowLog(input, output string) (got *event.Result, expect *event.Result) {
+func (s *TestSuite) aggregateSlowLog(input, output string, utcOffset time.Duration) (got *event.Result, expect *event.Result) {
 	bytes, err := ioutil.ReadFile(path.Join(s.result, "/", output))
 	if err != nil {
 		l.Fatal(err)
@@ -68,7 +70,7 @@ func (s *TestSuite) aggregateSlowLog(input, output string) (got *event.Result, e
 		l.Fatal(err)
 	}
 	go p.Start()
-	a := event.NewEventAggregator(s.examples)
+	a := event.NewEventAggregator(s.examples, utcOffset)
 	for e := range p.EventChan() {
 		f := query.Fingerprint(e.Query)
 		id := query.Id(f)
@@ -81,7 +83,18 @@ func (s *TestSuite) aggregateSlowLog(input, output string) (got *event.Result, e
 // --------------------------------------------------------------------------
 
 func (s *TestSuite) TestSlow001(t *C) {
-	got, expect := s.aggregateSlowLog("slow001.log", "slow001.json")
+	got, expect := s.aggregateSlowLog("slow001.log", "slow001.json", 0)
+	if same, diff := IsDeeply(got, expect); !same {
+		Dump(got)
+		t.Error(diff)
+	}
+}
+
+func (s *TestSuite) TestSlow001WithTzOffset(t *C) {
+	got, expect := s.aggregateSlowLog("slow001.log", "slow001.json", -1*time.Hour)
+	// Use the same files as TestSlow001NoExamples but with a tz=-1
+	expect.Class["7F7D57ACDD8A346E"].Example.Ts = "2007-10-15 20:43:52"
+	expect.Class["3A99CC42AEDCCFCD"].Example.Ts = "2007-10-15 20:45:10"
 	if same, diff := IsDeeply(got, expect); !same {
 		Dump(got)
 		t.Error(diff)
@@ -91,7 +104,7 @@ func (s *TestSuite) TestSlow001(t *C) {
 func (s *TestSuite) TestSlow001NoExamples(t *C) {
 	s.examples = false
 	defer func() { s.examples = true }()
-	got, expect := s.aggregateSlowLog("slow001.log", "slow001-no-examples.json")
+	got, expect := s.aggregateSlowLog("slow001.log", "slow001-no-examples.json", 0)
 	if same, diff := IsDeeply(got, expect); !same {
 		Dump(got)
 		t.Error(diff)
@@ -100,7 +113,7 @@ func (s *TestSuite) TestSlow001NoExamples(t *C) {
 
 // Test p95 and median.
 func (s *TestSuite) TestSlow010(t *C) {
-	got, expect := s.aggregateSlowLog("slow010.log", "slow010.json")
+	got, expect := s.aggregateSlowLog("slow010.log", "slow010.json", 0)
 	if same, diff := IsDeeply(got, expect); !same {
 		Dump(got)
 		t.Error(diff)
@@ -108,7 +121,7 @@ func (s *TestSuite) TestSlow010(t *C) {
 }
 
 func (s *TestSuite) TestAddClassToGlobal(t *C) {
-	expect, _ := s.aggregateSlowLog("slow001.log", "slow001.json")
+	expect, _ := s.aggregateSlowLog("slow001.log", "slow001.json", 0)
 	global := event.NewGlobalClass()
 	for _, class := range expect.Class {
 		global.AddClass(class)
@@ -120,7 +133,7 @@ func (s *TestSuite) TestAddClassToGlobal(t *C) {
 }
 
 func (s *TestSuite) TestSlow002(t *C) {
-	got, expect := s.aggregateSlowLog("slow018.log", "slow018.json")
+	got, expect := s.aggregateSlowLog("slow018.log", "slow018.json", 0)
 	if same, diff := IsDeeply(got, expect); !same {
 		Dump(got)
 		t.Error(diff)
@@ -130,21 +143,22 @@ func (s *TestSuite) TestSlow002(t *C) {
 // Tests for PCT-1006 & PCT-1085
 func (s *TestSuite) TestUseDb(t *C) {
 	// Test db is not inherited
-	got, expect := s.aggregateSlowLog("slow020.log", "slow020.json")
+	got, expect := s.aggregateSlowLog("slow020.log", "slow020.json", 0)
 	if same, diff := IsDeeply(got, expect); !same {
 		Dump(got)
 		t.Error(diff)
 	}
 	// Test "use" is not case sensitive
-	got, expect = s.aggregateSlowLog("slow021.log", "slow021.json")
+	got, expect = s.aggregateSlowLog("slow021.log", "slow021.json", 0)
 	if same, diff := IsDeeply(got, expect); !same {
 		Dump(got)
 		t.Error(diff)
 	}
 	// Test we are parsing db names in backticks
-	got, expect = s.aggregateSlowLog("slow022.log", "slow022.json")
+	got, expect = s.aggregateSlowLog("slow022.log", "slow022.json", 0)
 	if same, diff := IsDeeply(got, expect); !same {
 		Dump(got)
 		t.Error(diff)
 	}
+
 }
