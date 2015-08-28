@@ -130,32 +130,40 @@ func (a byUint64) Less(i, j int) bool {
 
 // Finalize calculates the statistics of the added metrics. Call this function
 // when done adding events.
-func (m *Metrics) Finalize(rate uint) {
+func (m *Metrics) Finalize(rateLimit uint) {
+	if rateLimit == 0 {
+		rateLimit = 1
+	}
+
 	for _, s := range m.TimeMetrics {
 		sort.Float64s(s.vals)
 		cnt := len(s.vals)
 
-		s.Sum = (s.Sum * float64(rate)) + s.outlierSum
 		s.Min = s.vals[0]
 		s.Avg = (s.Sum + s.outlierSum) / float64(cnt)
 		s.Med = s.vals[(50*cnt)/100] // median = 50th percentile
 		s.P95 = s.vals[(95*cnt)/100]
 		s.Max = s.vals[cnt-1]
+
+		// Update sum last because avg ^ needs the original value.
+		s.Sum = (s.Sum * float64(rateLimit)) + s.outlierSum
 	}
 
 	for _, s := range m.NumberMetrics {
 		sort.Sort(byUint64(s.vals))
 		cnt := len(s.vals)
 
-		s.Sum = (s.Sum * uint64(rate)) + s.outlierSum
 		s.Min = s.vals[0]
 		s.Avg = (s.Sum + s.outlierSum) / uint64(cnt)
 		s.Med = s.vals[(50*cnt)/100] // median = 50th percentile
 		s.P95 = s.vals[(95*cnt)/100]
 		s.Max = s.vals[cnt-1]
+
+		// Update sum last because avg ^ needs the original value.
+		s.Sum = (s.Sum * uint64(rateLimit)) + s.outlierSum
 	}
 
 	for _, s := range m.BoolMetrics {
-		s.Sum = (s.Sum * uint64(rate)) + s.outlierSum
+		s.Sum = (s.Sum * uint64(rateLimit)) + s.outlierSum
 	}
 }

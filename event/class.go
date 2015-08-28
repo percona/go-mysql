@@ -154,9 +154,12 @@ func (c *Class) AddClass(newClass *Class) {
 
 // Finalize calculates all metric statistics. Call this function when done
 // adding events to the class.
-func (c *Class) Finalize(rate uint) {
-	c.Metrics.Finalize(rate)
-	c.TotalQueries = (c.TotalQueries * rate) + c.outliers
+func (c *Class) Finalize(rateLimit uint) {
+	if rateLimit == 0 {
+		rateLimit = 1
+	}
+	c.Metrics.Finalize(rateLimit)
+	c.TotalQueries = (c.TotalQueries * rateLimit) + c.outliers
 	if c.Sample.QueryTime == 0 {
 		c.Sample = nil
 	}

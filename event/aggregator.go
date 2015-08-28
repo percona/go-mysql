@@ -26,9 +26,10 @@ import (
 // A Result contains a global class and per-ID classes with finalized metric
 // statistics. The classes are keyed on class ID.
 type Result struct {
-	Global *Class            // all classes
-	Class  map[string]*Class // keyed on class ID
-	Error  string
+	Global    *Class            // all classes
+	Class     map[string]*Class // keyed on class ID
+	RateLimit uint
+	Error     string
 }
 
 // An Aggregator groups events by class ID. When there are no more events,
@@ -38,8 +39,9 @@ type Aggregator struct {
 	utcOffset   time.Duration
 	outlierTime float64
 	// --
-	global  *Class
-	classes map[string]*Class
+	global    *Class
+	classes   map[string]*Class
+	rateLimit uint
 }
 
 // NewAggregator returns a new Aggregator.
@@ -58,6 +60,10 @@ func NewAggregator(samples bool, utcOffset time.Duration, outlierTime float64) *
 // AddEvent adds the event to the aggregator, automatically creating new classes
 // as needed.
 func (a *Aggregator) AddEvent(event *log.Event, id, fingerprint string) {
+	if a.rateLimit != event.RateLimit {
+		a.rateLimit = event.RateLimit
+	}
+
 	outlier := false
 	if a.outlierTime > 0 && event.TimeMetrics["Query_time"] > a.outlierTime {
 		outlier = true
@@ -75,14 +81,11 @@ func (a *Aggregator) AddEvent(event *log.Event, id, fingerprint string) {
 
 // Finalize calculates all metric statistics and returns a Result.
 // Call this function when done adding events to the aggregator.
-func (a *Aggregator) Finalize(rate uint) Result {
-	if rate == 0 {
-		rate = 1
-	}
-	a.global.Finalize(rate)
+func (a *Aggregator) Finalize() Result {
+	a.global.Finalize(a.rateLimit)
 	a.global.UniqueQueries = uint(len(a.classes))
 	for _, class := range a.classes {
-		class.Finalize(rate)
+		class.Finalize(a.rateLimit)
 		class.UniqueQueries = 1
 		if class.Sample != nil && class.Sample.Ts != "" {
 			if t, err := time.Parse("060102 15:04:05", class.Sample.Ts); err != nil {
@@ -93,7 +96,8 @@ func (a *Aggregator) Finalize(rate uint) Result {
 		}
 	}
 	return Result{
-		Global: a.global,
-		Class:  a.classes,
+		Global:    a.global,
+		Class:     a.classes,
+		RateLimit: a.rateLimit,
 	}
 }
