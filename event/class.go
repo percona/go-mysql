@@ -111,10 +111,12 @@ func (c *Class) AddClass(newClass *Class) {
 		stats, ok := c.Metrics.TimeMetrics[newMetric]
 		if !ok {
 			m := *newStats
+			m.Med = 0
+			m.P95 = 0
 			c.Metrics.TimeMetrics[newMetric] = &m
 		} else {
 			stats.Sum += newStats.Sum
-			stats.Avg = (stats.Avg + newStats.Avg) / 2
+			stats.Avg = stats.Sum / float64(c.TotalQueries)
 			if newStats.Min < stats.Min {
 				stats.Min = newStats.Min
 			}
@@ -128,10 +130,12 @@ func (c *Class) AddClass(newClass *Class) {
 		stats, ok := c.Metrics.NumberMetrics[newMetric]
 		if !ok {
 			m := *newStats
+			m.Med = 0
+			m.P95 = 0
 			c.Metrics.NumberMetrics[newMetric] = &m
 		} else {
 			stats.Sum += newStats.Sum
-			stats.Avg = (stats.Avg + newStats.Avg) / 2
+			stats.Avg = stats.Sum / uint64(c.TotalQueries)
 			if newStats.Min < stats.Min {
 				stats.Min = newStats.Min
 			}

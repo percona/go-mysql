@@ -80,6 +80,27 @@ func (s *TestSuite) aggregateSlowLog(input, output string, utcOffset time.Durati
 	return got, expect
 }
 
+func zeroPercentiles(r *event.Result) {
+	for _, metrics := range r.Global.Metrics.TimeMetrics {
+		metrics.Med = 0
+		metrics.P95 = 0
+	}
+	for _, metrics := range r.Global.Metrics.NumberMetrics {
+		metrics.Med = 0
+		metrics.P95 = 0
+	}
+	for _, class := range r.Class {
+		for _, metrics := range class.Metrics.TimeMetrics {
+			metrics.Med = 0
+			metrics.P95 = 0
+		}
+		for _, metrics := range class.Metrics.NumberMetrics {
+			metrics.Med = 0
+			metrics.P95 = 0
+		}
+	}
+}
+
 // --------------------------------------------------------------------------
 
 func (s *TestSuite) TestSlow001(t *C) {
@@ -120,8 +141,22 @@ func (s *TestSuite) TestSlow010(t *C) {
 	}
 }
 
-func (s *TestSuite) TestAddClass(t *C) {
+func (s *TestSuite) TestAddClassSlow001(t *C) {
 	expect, _ := s.aggregateSlowLog("slow001.log", "slow001.json", 0)
+	zeroPercentiles(&expect)
+	global := event.NewClass("", "", false)
+	for _, class := range expect.Class {
+		global.AddClass(class)
+	}
+	if same, diff := IsDeeply(global, expect.Global); !same {
+		Dump(global)
+		t.Error(diff)
+	}
+}
+
+func (s *TestSuite) TestAddClassSlow023(t *C) {
+	expect, _ := s.aggregateSlowLog("slow023.log", "slow018.json", 0)
+	zeroPercentiles(&expect)
 	global := event.NewClass("", "", false)
 	for _, class := range expect.Class {
 		global.AddClass(class)
