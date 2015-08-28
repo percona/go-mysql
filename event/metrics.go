@@ -105,8 +105,8 @@ func (m *Metrics) AddEvent(e *log.Event, outlier bool) {
 	}
 
 	for metric, val := range e.BoolMetrics {
-		stats, ok := m.BoolMetrics[metric]
-		if !ok {
+		stats, seenMetric := m.BoolMetrics[metric]
+		if !seenMetric {
 			stats = &BoolStats{}
 			m.BoolMetrics[metric] = stats
 		}
