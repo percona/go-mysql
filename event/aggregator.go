@@ -87,11 +87,11 @@ func (a *Aggregator) Finalize() Result {
 	for _, class := range a.classes {
 		class.Finalize(a.rateLimit)
 		class.UniqueQueries = 1
-		if class.Sample != nil && class.Sample.Ts != "" {
-			if t, err := time.Parse("060102 15:04:05", class.Sample.Ts); err != nil {
-				class.Sample.Ts = ""
+		if class.Example != nil && class.Example.Ts != "" {
+			if t, err := time.Parse("060102 15:04:05", class.Example.Ts); err != nil {
+				class.Example.Ts = ""
 			} else {
-				class.Sample.Ts = t.Add(a.utcOffset).Format("2006-01-02 15:04:05")
+				class.Example.Ts = t.Add(a.utcOffset).Format("2006-01-02 15:04:05")
 			}
 		}
 	}

@@ -113,16 +113,16 @@ func (s *TestSuite) TestSlow001(t *C) {
 
 func (s *TestSuite) TestSlow001WithTzOffset(t *C) {
 	got, expect := s.aggregateSlowLog("slow001.log", "slow001.json", -1*time.Hour)
-	// Use the same files as TestSlow001NoSamples but with a tz=-1
-	expect.Class["7F7D57ACDD8A346E"].Sample.Ts = "2007-10-15 20:43:52"
-	expect.Class["3A99CC42AEDCCFCD"].Sample.Ts = "2007-10-15 20:45:10"
+	// Use the same files as TestSlow001NoExamples but with a tz=-1
+	expect.Class["7F7D57ACDD8A346E"].Example.Ts = "2007-10-15 20:43:52"
+	expect.Class["3A99CC42AEDCCFCD"].Example.Ts = "2007-10-15 20:45:10"
 	if same, diff := IsDeeply(got, expect); !same {
 		Dump(got)
 		t.Error(diff)
 	}
 }
 
-func (s *TestSuite) TestSlow001NoSamples(t *C) {
+func (s *TestSuite) TestSlow001NoExamples(t *C) {
 	s.examples = false
 	defer func() { s.examples = true }()
 	got, expect := s.aggregateSlowLog("slow001.log", "slow001-no-examples.json", 0)

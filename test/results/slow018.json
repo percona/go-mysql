@@ -1,7 +1,7 @@
 {
     "Class": {
         "B2414E722E8A89DD": {
-            "Sample": {
+            "Example": {
                 "Db": "db1",
                 "Query": "select * from t where id in (10000,20000,30000)",
                 "QueryTime": 0.900001

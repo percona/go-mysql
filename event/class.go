@@ -34,17 +34,17 @@ type Class struct {
 	Metrics       *Metrics // statistics for each metric, e.g. max Query_time
 	TotalQueries  uint     // total number of queries in class
 	UniqueQueries uint     // unique number of queries in class
-	Sample        *Sample  `json:",omitempty"` // sample query with max Query_time
+	Example       *Example `json:",omitempty"` // sample query with max Query_time
 	// --
 	outliers uint
 	lastDb   string
 	sample   bool
 }
 
-// A Sample is a real query and its database, timestamp, and Query_time.
+// A Example is a real query and its database, timestamp, and Query_time.
 // If the query is larger than MAX_EXAMPLE_BYTES, it is truncated and "..."
 // is appended.
-type Sample struct {
+type Example struct {
 	QueryTime float64 // Query_time
 	Db        string  // Schema: <db> or USE <db>
 	Query     string  // truncated to MAX_EXAMPLE_BYTES
@@ -59,7 +59,7 @@ func NewClass(id, fingerprint string, sample bool) *Class {
 		Fingerprint:  fingerprint,
 		Metrics:      NewMetrics(),
 		TotalQueries: 0,
-		Sample:       &Sample{},
+		Example:      &Example{},
 		sample:       sample,
 	}
 	return class
@@ -82,19 +82,19 @@ func (c *Class) AddEvent(e *log.Event, outlier bool) {
 	}
 	if c.sample {
 		if n, ok := e.TimeMetrics["Query_time"]; ok {
-			if float64(n) > c.Sample.QueryTime {
-				c.Sample.QueryTime = float64(n)
+			if float64(n) > c.Example.QueryTime {
+				c.Example.QueryTime = float64(n)
 				if e.Db != "" {
-					c.Sample.Db = e.Db
+					c.Example.Db = e.Db
 				} else {
-					c.Sample.Db = c.lastDb
+					c.Example.Db = c.lastDb
 				}
 				if len(e.Query) > MAX_EXAMPLE_BYTES {
-					c.Sample.Query = e.Query[0:MAX_EXAMPLE_BYTES-3] + "..."
+					c.Example.Query = e.Query[0:MAX_EXAMPLE_BYTES-3] + "..."
 				} else {
-					c.Sample.Query = e.Query
+					c.Example.Query = e.Query
 				}
-				c.Sample.Ts = e.Ts
+				c.Example.Ts = e.Ts
 			}
 		}
 	}
@@ -105,7 +105,7 @@ func (c *Class) AddEvent(e *log.Event, outlier bool) {
 func (c *Class) AddClass(newClass *Class) {
 	c.UniqueQueries++
 	c.TotalQueries += newClass.TotalQueries
-	c.Sample = nil
+	c.Example = nil
 
 	for newMetric, newStats := range newClass.Metrics.TimeMetrics {
 		stats, ok := c.Metrics.TimeMetrics[newMetric]
@@ -164,7 +164,7 @@ func (c *Class) Finalize(rateLimit uint) {
 	}
 	c.Metrics.Finalize(rateLimit)
 	c.TotalQueries = (c.TotalQueries * rateLimit) + c.outliers
-	if c.Sample.QueryTime == 0 {
-		c.Sample = nil
+	if c.Example.QueryTime == 0 {
+		c.Example = nil
 	}
 }

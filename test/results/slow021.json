@@ -93,7 +93,7 @@
         }
       },
       "TotalQueries": 1,
-      "Sample": {
+      "Example": {
         "QueryTime": 2,
         "Db": "test",
         "Query": "select sleep(2) from n",
