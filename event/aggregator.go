@@ -23,65 +23,77 @@ import (
 	"github.com/percona/go-mysql/log"
 )
 
-// A Result contains a global class and query classes with finalized metric
-// statistics. The query classes are keyed on class ID.
+// A Result contains a global class and per-ID classes with finalized metric
+// statistics. The classes are keyed on class ID.
 type Result struct {
-	Global *GlobalClass
-	Class  map[string]*QueryClass // keyed on class ID
+	Global *Class            // all classes
+	Class  map[string]*Class // keyed on class ID
 	Error  string
 }
 
-// An EventAggregator groups events into a global class and query classes by
-// class ID. When there are no more events, a call to Finalize computes all
-// metric statistics and returns a Result.
-// utcOffset holds the offset between MySQL tz and UTC to correct the timestamp
-// when parsing slow log files.
-type EventAggregator struct {
-	examples bool
+// An Aggregator groups events by class ID. When there are no more events,
+// a call to Finalize computes all metric statistics and returns a Result.
+type Aggregator struct {
+	samples     bool
+	utcOffset   time.Duration
+	outlierTime float64
 	// --
-	result    *Result
-	utcOffset time.Duration
+	global  *Class
+	classes map[string]*Class
 }
 
-// NewEventAggregator returns a new EventAggregator.
-func NewEventAggregator(examples bool, utcOffset time.Duration) *EventAggregator {
-	result := &Result{
-		Global: NewGlobalClass(),
-		Class:  make(map[string]*QueryClass),
-	}
-	a := &EventAggregator{
-		examples: examples,
+// NewAggregator returns a new Aggregator.
+func NewAggregator(samples bool, utcOffset time.Duration, outlierTime float64) *Aggregator {
+	a := &Aggregator{
+		samples:     samples,
+		utcOffset:   utcOffset,
+		outlierTime: outlierTime,
 		// --
-		result:    result,
-		utcOffset: utcOffset,
+		global:  NewClass("", "", false),
+		classes: make(map[string]*Class),
 	}
 	return a
 }
 
-// AddEvent adds the event to the aggregator, automatically creating new query
-// classes as needed.
-func (a *EventAggregator) AddEvent(event *log.Event, id, fingerprint string) {
-
-	// Add the event to the global class.
-	a.result.Global.AddEvent(event)
-
-	// Get the query class to which the event belongs.
-	class, haveClass := a.result.Class[id]
-	if !haveClass {
-		class = NewQueryClass(id, fingerprint, a.examples, a.utcOffset)
-		a.result.Class[id] = class
+// AddEvent adds the event to the aggregator, automatically creating new classes
+// as needed.
+func (a *Aggregator) AddEvent(event *log.Event, id, fingerprint string) {
+	outlier := false
+	if a.outlierTime > 0 && event.TimeMetrics["Query_time"] > a.outlierTime {
+		outlier = true
 	}
 
-	// Add the event to its query class.
-	class.AddEvent(event)
+	a.global.AddEvent(event, outlier)
+
+	class, ok := a.classes[id]
+	if !ok {
+		class = NewClass(id, fingerprint, a.samples)
+		a.classes[id] = class
+	}
+	class.AddEvent(event, outlier)
 }
 
 // Finalize calculates all metric statistics and returns a Result.
 // Call this function when done adding events to the aggregator.
-func (a *EventAggregator) Finalize() *Result {
-	for _, class := range a.result.Class {
-		class.Finalize()
+func (a *Aggregator) Finalize(rate uint) Result {
+	if rate == 0 {
+		rate = 1
 	}
-	a.result.Global.Finalize(uint64(len(a.result.Class)))
-	return a.result
+	a.global.Finalize(rate)
+	a.global.UniqueQueries = uint(len(a.classes))
+	for _, class := range a.classes {
+		class.Finalize(rate)
+		class.UniqueQueries = 1
+		if class.Sample != nil && class.Sample.Ts != "" {
+			if t, err := time.Parse("060102 15:04:05", class.Sample.Ts); err != nil {
+				class.Sample.Ts = ""
+			} else {
+				class.Sample.Ts = t.Add(a.utcOffset).Format("2006-01-02 15:04:05")
+			}
+		}
+	}
+	return Result{
+		Global: a.global,
+		Class:  a.classes,
+	}
 }

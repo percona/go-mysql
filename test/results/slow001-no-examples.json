@@ -9,8 +9,7 @@
           "Sum": 0,
           "Min": 0,
           "Avg": 0,
-          "Pct95": 0,
-          "Stddev": 0,
+          "P95": 0,
           "Med": 0,
           "Max": 0
         },
@@ -19,8 +18,7 @@
           "Sum": 4,
           "Min": 2,
           "Avg": 2,
-          "Pct95": 2,
-          "Stddev": 0,
+          "P95": 2,
           "Med": 2,
           "Max": 2
         }
@@ -31,8 +29,7 @@
           "Sum": 0,
           "Min": 0,
           "Avg": 0,
-          "Pct95": 0,
-          "Stddev": 0,
+          "P95": 0,
           "Med": 0,
           "Max": 0
         },
@@ -41,8 +38,7 @@
           "Sum": 2,
           "Min": 1,
           "Avg": 1,
-          "Pct95": 1,
-          "Stddev": 0,
+          "P95": 1,
           "Med": 1,
           "Max": 1
         }
@@ -53,6 +49,7 @@
     "7F7D57ACDD8A346E": {
       "Id": "7F7D57ACDD8A346E",
       "Fingerprint": "select sleep(?) from n",
+      "UniqueQueries": 1,
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
@@ -60,8 +57,7 @@
             "Sum": 0,
             "Min": 0,
             "Avg": 0,
-            "Pct95": 0,
-            "Stddev": 0,
+            "P95": 0,
             "Med": 0,
             "Max": 0
           },
@@ -70,8 +66,7 @@
             "Sum": 2,
             "Min": 2,
             "Avg": 2,
-            "Pct95": 2,
-            "Stddev": 0,
+            "P95": 2,
             "Med": 2,
             "Max": 2
           }
@@ -82,8 +77,7 @@
             "Sum": 0,
             "Min": 0,
             "Avg": 0,
-            "Pct95": 0,
-            "Stddev": 0,
+            "P95": 0,
             "Med": 0,
             "Max": 0
           },
@@ -92,8 +86,7 @@
             "Sum": 1,
             "Min": 1,
             "Avg": 1,
-            "Pct95": 1,
-            "Stddev": 0,
+            "P95": 1,
             "Med": 1,
             "Max": 1
           }
@@ -104,6 +97,7 @@
     "3A99CC42AEDCCFCD": {
       "Id": "3A99CC42AEDCCFCD",
       "Fingerprint": "select sleep(?) from test.n",
+      "UniqueQueries": 1,
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
@@ -111,8 +105,7 @@
             "Sum": 0,
             "Min": 0,
             "Avg": 0,
-            "Pct95": 0,
-            "Stddev": 0,
+            "P95": 0,
             "Med": 0,
             "Max": 0
           },
@@ -121,8 +114,7 @@
             "Sum": 2,
             "Min": 2,
             "Avg": 2,
-            "Pct95": 2,
-            "Stddev": 0,
+            "P95": 2,
             "Med": 2,
             "Max": 2
           }
@@ -133,8 +125,7 @@
             "Sum": 0,
             "Min": 0,
             "Avg": 0,
-            "Pct95": 0,
-            "Stddev": 0,
+            "P95": 0,
             "Med": 0,
             "Max": 0
           },
@@ -143,8 +134,7 @@
             "Sum": 1,
             "Min": 1,
             "Avg": 1,
-            "Pct95": 1,
-            "Stddev": 0,
+            "P95": 1,
             "Med": 1,
             "Max": 1
           }

@@ -31,29 +31,32 @@ type Metrics struct {
 
 // TimeStats are microsecond-based metrics like Query_time and Lock_time.
 type TimeStats struct {
-	vals  []float64 `json:"-"`
-	Sum   float64
-	Min   float64 `json:",omitempty"`
-	Avg   float64 `json:",omitempty"`
-	Med   float64 `json:",omitempty"` // median
-	Pct95 float64 `json:",omitempty"` // 95th percentile
-	Max   float64 `json:",omitempty"`
+	vals       []float64 `json:"-"`
+	Sum        float64
+	Min        float64 `json:",omitempty"`
+	Avg        float64 `json:",omitempty"`
+	Med        float64 `json:",omitempty"` // median
+	P95        float64 `json:",omitempty"` // 95th percentile
+	Max        float64 `json:",omitempty"`
+	outlierSum float64
 }
 
 // NumberStats are integer-based metrics like Rows_sent and Merge_passes.
 type NumberStats struct {
-	vals  []uint64 `json:"-"`
-	Sum   uint64
-	Min   uint64 `json:",omitempty"`
-	Avg   uint64 `json:",omitempty"`
-	Med   uint64 `json:",omitempty"` // median
-	Pct95 uint64 `json:",omitempty"` // 95th percentile
-	Max   uint64 `json:",omitempty"`
+	vals       []uint64 `json:"-"`
+	Sum        uint64
+	Min        uint64 `json:",omitempty"`
+	Avg        uint64 `json:",omitempty"`
+	Med        uint64 `json:",omitempty"` // median
+	P95        uint64 `json:",omitempty"` // 95th percentile
+	Max        uint64 `json:",omitempty"`
+	outlierSum uint64
 }
 
 // BoolStats are boolean-based metrics like QC_Hit and Filesort.
 type BoolStats struct {
-	True uint // %True = True/Cnt, %False=(Cnt-True)/Cnt
+	Sum        uint64 // %true = Sum/Cnt
+	outlierSum uint64
 }
 
 // NewMetrics returns a pointer to an initialized Metrics structure.
@@ -67,7 +70,8 @@ func NewMetrics() *Metrics {
 }
 
 // AddEvent saves all the metrics of the event.
-func (m *Metrics) AddEvent(e *log.Event) {
+func (m *Metrics) AddEvent(e *log.Event, outlier bool) {
+
 	for metric, val := range e.TimeMetrics {
 		stats, seenMetric := m.TimeMetrics[metric]
 		if !seenMetric {
@@ -76,7 +80,11 @@ func (m *Metrics) AddEvent(e *log.Event) {
 			}
 			stats = m.TimeMetrics[metric]
 		}
-		stats.Sum += float64(val)
+		if outlier {
+			stats.outlierSum += val
+		} else {
+			stats.Sum += val
+		}
 		stats.vals = append(stats.vals, float64(val))
 	}
 
@@ -88,22 +96,26 @@ func (m *Metrics) AddEvent(e *log.Event) {
 			}
 			stats = m.NumberMetrics[metric]
 		}
-		stats.Sum += val
+		if outlier {
+			stats.outlierSum += val
+		} else {
+			stats.Sum += val
+		}
 		stats.vals = append(stats.vals, val)
 	}
 
 	for metric, val := range e.BoolMetrics {
-		stats, seenMetric := m.BoolMetrics[metric]
-		if seenMetric {
-			if val {
-				stats.True++
-			}
-		} else {
-			stats := &BoolStats{}
-			if val {
-				stats.True++
-			}
+		stats, ok := m.BoolMetrics[metric]
+		if !ok {
+			stats = &BoolStats{}
 			m.BoolMetrics[metric] = stats
+		}
+		if val {
+			if outlier {
+				stats.outlierSum += 1
+			} else {
+				stats.Sum += 1
+			}
 		}
 	}
 }
@@ -118,15 +130,16 @@ func (a byUint64) Less(i, j int) bool {
 
 // Finalize calculates the statistics of the added metrics. Call this function
 // when done adding events.
-func (m *Metrics) Finalize() {
+func (m *Metrics) Finalize(rate uint) {
 	for _, s := range m.TimeMetrics {
 		sort.Float64s(s.vals)
 		cnt := len(s.vals)
 
+		s.Sum = (s.Sum * float64(rate)) + s.outlierSum
 		s.Min = s.vals[0]
-		s.Avg = s.Sum / float64(cnt)
-		s.Pct95 = s.vals[(95*cnt)/100]
+		s.Avg = (s.Sum + s.outlierSum) / float64(cnt)
 		s.Med = s.vals[(50*cnt)/100] // median = 50th percentile
+		s.P95 = s.vals[(95*cnt)/100]
 		s.Max = s.vals[cnt-1]
 	}
 
@@ -134,10 +147,15 @@ func (m *Metrics) Finalize() {
 		sort.Sort(byUint64(s.vals))
 		cnt := len(s.vals)
 
+		s.Sum = (s.Sum * uint64(rate)) + s.outlierSum
 		s.Min = s.vals[0]
-		s.Avg = s.Sum / uint64(cnt)
-		s.Pct95 = s.vals[(95*cnt)/100]
+		s.Avg = (s.Sum + s.outlierSum) / uint64(cnt)
 		s.Med = s.vals[(50*cnt)/100] // median = 50th percentile
+		s.P95 = s.vals[(95*cnt)/100]
 		s.Max = s.vals[cnt-1]
+	}
+
+	for _, s := range m.BoolMetrics {
+		s.Sum = (s.Sum * uint64(rate)) + s.outlierSum
 	}
 }

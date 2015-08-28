@@ -34,7 +34,7 @@ type Event struct {
 	User          string
 	Host          string
 	Db            string
-	TimeMetrics   map[string]float32 // *_time and *_wait metrics
+	TimeMetrics   map[string]float64 // *_time and *_wait metrics
 	NumberMetrics map[string]uint64  // most metrics
 	BoolMetrics   map[string]bool    // yes/no metrics
 	RateType      string             // Percona Server rate limit type
@@ -44,7 +44,7 @@ type Event struct {
 // NewEvent returns a new Event with initialized metric maps.
 func NewEvent() *Event {
 	event := new(Event)
-	event.TimeMetrics = make(map[string]float32)
+	event.TimeMetrics = make(map[string]float64)
 	event.NumberMetrics = make(map[string]uint64)
 	event.BoolMetrics = make(map[string]bool)
 	return event
