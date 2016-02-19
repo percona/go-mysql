@@ -185,8 +185,7 @@ func (dsn DSN) Verify() error {
 	return nil
 }
 
-func HidePassword(dsn DSN) string {
-	dsnString := dsn.String()
+func HidePassword(dsnString string) string {
 	dsnParts := strings.Split(dsnString, "@")
 	userPart := dsnParts[0]
 	hostPart := ""
