@@ -92,22 +92,22 @@ func (dsn DSN) AutoDetect() (DSN, error) {
 		}
 	}
 
-	if dsn.Socket == "" && defaults.Socket != "" {
-		dsn.Socket = defaults.Socket
-	}
-
 	// MySQL magic: localhost means socket if socket isn't set and protocol isn't tcp.
 	if dsn.Hostname == "localhost" && dsn.Socket == "" && dsn.Protocol != "tcp" {
-		// Try to auto-detect MySQL socket from netstat output.
-		out, err := exec.Command("netstat", "-anp").Output()
-		if err != nil {
-			return dsn, ErrNoSocket
+		if defaults.Socket != "" {
+			dsn.Socket = defaults.Socket
+		} else {
+			// Try to auto-detect MySQL socket from netstat output.
+			out, err := exec.Command("netstat", "-anp").Output()
+			if err != nil {
+				return dsn, ErrNoSocket
+			}
+			socket := ParseSocketFromNetstat(string(out))
+			if socket == "" {
+				return dsn, ErrNoSocket
+			}
+			dsn.Socket = socket
 		}
-		socket := ParseSocketFromNetstat(string(out))
-		if socket == "" {
-			return dsn, ErrNoSocket
-		}
-		dsn.Socket = socket
 	}
 
 	return dsn, nil
