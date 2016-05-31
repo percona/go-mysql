@@ -248,6 +248,13 @@ func (s *TestSuite) TestFingerprintBasic(t *C) {
 		"select sql_small_result sql_cache distinct centro_atividade from est_dia where unidade_id=? and item_id=? and item_id_red=?",
 	)
 
+	q = "insert into foo (a) values(0)"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"insert into foo (a) values(?+)",
+	)
+
 	q = "INSERT INTO t (ts) VALUES (NOW())"
 	t.Check(
 		query.Fingerprint(q),
