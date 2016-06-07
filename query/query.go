@@ -80,6 +80,7 @@ const (
 	inOp                     // [=<>!] (usually precedes a number)
 	opOrNumber               // + in 2 + 2 or +3e-9
 	inQuote                  // '...' or "..."
+	inBackticks              // `...`
 	subOrOLC                 // - or start of -- comment
 	inDash                   // -- begins a one-line comment if followed by space
 	inOLC                    // -- comment (at least one space after dash is required)
@@ -112,6 +113,7 @@ var stateName map[byte]string = map[byte]string{
 	15: "orderBy",
 	16: "onDupeKeyUpdate",
 	17: "inNumberInWord",
+	18: "inBackticks",
 }
 
 // Debug prints very verbose tracing information to STDOUT.
@@ -211,6 +213,48 @@ func Fingerprint(q string) string {
 				}
 			}
 			continue
+		} else if s == inBackticks {
+			if r != '`' {
+				// The only char inside a quoted value we need to track is \,
+				// the escape char.  This allows us to tell that the 2nd ' in
+				// '\`' is escaped, not the ending quote char.
+				if escape {
+					if Debug {
+						fmt.Println("Ignore backtick literal")
+					}
+					escape = false
+				} else if r == '\\' {
+					if Debug {
+						fmt.Println("Escape")
+					}
+					escape = true
+				} else {
+					if Debug {
+						fmt.Println("Ignore quoted value")
+					}
+				}
+			} else if escape {
+				// \`
+				if Debug {
+					fmt.Println("Quote literal")
+				}
+				escape = false
+			} else {
+				if Debug {
+					fmt.Println("Quote end")
+				}
+				escape = false
+
+				// qi = the closing backtick, so +1 to ensure we don't copy
+				// anything before this, i.e. quoted value is done, move on.
+				//cpFromOffset = qi + 1
+				cpToOffset = qi + 1
+
+				fi++
+				s = inWord
+			}
+			continue
+
 		} else if s == inNumberInWord {
 			// Replaces number in words with ?
 			// e.g. `db37` to `db?`
@@ -563,6 +607,17 @@ func Fingerprint(q string) string {
 					}
 				}
 			}
+		case r == '`':
+			if pr != '\\' {
+				if s != inBackticks {
+					if Debug {
+						fmt.Println("Beckticks begin")
+					}
+					s = inBackticks
+					cpFromOffset = qi
+				}
+
+			}
 		case r == '=' || r == '<' || r == '>' || r == '!':
 			if Debug {
 				fmt.Println("Operator")
@@ -605,6 +660,9 @@ func Fingerprint(q string) string {
 				}
 				s = inNumber
 				cpToOffset = qi
+			} else {
+				cpToOffset = qi + 1
+				s = unknown
 			}
 		case r == '(':
 			if prevWord == "call" {
