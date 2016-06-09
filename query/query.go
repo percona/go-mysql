@@ -772,8 +772,8 @@ func Fingerprint(q string) string {
 		fi--
 	}
 
-	// Return the fingerprint.
-	return string(f[0:fi])
+        // Clean up control characters, and return the fingerprint
+        return strings.Replace(string(f[0:fi]), "\x00", "", -1)
 }
 
 func isSpace(r rune) bool {
