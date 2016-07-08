@@ -21,8 +21,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
-	"os/user"
 	"path"
 	"regexp"
 	"strings"
@@ -64,11 +64,10 @@ func (dsn DSN) AutoDetect() (DSN, error) {
 		if defaults.Username != "" {
 			dsn.Username = defaults.Username
 		} else {
-			user, err := user.Current()
-			if err != nil {
-				return dsn, err
+			dsn.Username = os.Getenv("USER")
+			if dsn.Username == "" {
+				dsn.Username = "root"
 			}
-			dsn.Username = user.Username
 		}
 	}
 
