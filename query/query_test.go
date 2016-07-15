@@ -533,6 +533,13 @@ func (s *TestSuite) TestFingerprintDashesInNames(t *C) {
 		Equals,
 		"select field from `masterdb?`.`table?` order by id, ?;",
 	)
+
+	q = "select field from `-master-db-1`.`-table-1-` order by id, ?;"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select field from `masterdb?`.`table?` order by id, ?;",
+	)
 }
 
 func (s *TestSuite) TestFingerprintKeywords(t *C) {
