@@ -534,7 +534,6 @@ func Fingerprint(q string) string {
 				s = inOLC
 				if cpToOffset > 2 {
 					cpToOffset = qi - 2
-					addSpace = false
 				}
 			} else if s == moreValuesOrUnknown {
 				if Debug {
