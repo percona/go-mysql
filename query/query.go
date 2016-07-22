@@ -80,7 +80,6 @@ const (
 	inOp                     // [=<>!] (usually precedes a number)
 	opOrNumber               // + in 2 + 2 or +3e-9
 	inQuote                  // '...' or "..."
-	inBackticks              // `...`
 	subOrOLC                 // - or start of -- comment
 	inDash                   // -- begins a one-line comment if followed by space
 	inOLC                    // -- comment (at least one space after dash is required)
@@ -114,7 +113,6 @@ var stateName map[byte]string = map[byte]string{
 	15: "orderBy",
 	16: "onDupeKeyUpdate",
 	17: "inNumberInWord",
-	18: "inBackticks",
 }
 
 // Debug prints very verbose tracing information to STDOUT.
@@ -664,9 +662,6 @@ func Fingerprint(q string) string {
 				}
 				s = inNumber
 				cpToOffset = qi
-			} else {
-				cpToOffset = qi + 1
-				s = unknown
 			}
 		case r == '(':
 			if prevWord == "call" {
