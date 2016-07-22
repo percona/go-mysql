@@ -91,6 +91,8 @@ const (
 	orderBy                  // ORDER BY
 	onDupeKeyUpdate          // ON DUPLICATE KEY UPDATE
 	inNumberInWord           // e.g. db23
+	inBackticks              // `table-1`
+	inMySQLCode              // /*! MySQL-specific code */
 )
 
 var stateName map[byte]string = map[byte]string{
@@ -112,6 +114,8 @@ var stateName map[byte]string = map[byte]string{
 	15: "orderBy",
 	16: "onDupeKeyUpdate",
 	17: "inNumberInWord",
+	18: "inBackTicks",
+	19: "inMySQLCode",
 }
 
 // Debug prints very verbose tracing information to STDOUT.
@@ -211,6 +215,47 @@ func Fingerprint(q string) string {
 				}
 			}
 			continue
+		} else if s == inBackticks {
+			if r != '`' {
+				// The only char inside a quoted value we need to track is \,
+				// the escape char.  This allows us to tell that the 2nd ' in
+				// '\`' is escaped, not the ending quote char.
+				if escape {
+					if Debug {
+						fmt.Println("Ignore backtick literal")
+					}
+					escape = false
+				} else if r == '\\' {
+					if Debug {
+						fmt.Println("Escape")
+					}
+					escape = true
+				} else {
+					if Debug {
+						fmt.Println("Ignore quoted value")
+					}
+				}
+			} else if escape {
+				// \`
+				if Debug {
+					fmt.Println("Quote literal")
+				}
+				escape = false
+			} else {
+				if Debug {
+					fmt.Println("Quote end")
+				}
+				escape = false
+
+				// qi = the closing backtick, so +1 to ensure we don't copy
+				// anything before this, i.e. quoted value is done, move on.
+				//cpFromOffset = qi + 1
+				cpToOffset = qi + 1
+
+				s = inWord
+			}
+			continue
+
 		} else if s == inNumberInWord {
 			// Replaces number in words with ?
 			// e.g. `db37` to `db?`
@@ -252,6 +297,11 @@ func Fingerprint(q string) string {
 				}
 				cpToOffset = qi
 				s = inWord
+			} else if sqlState == inMySQLCode {
+				// If we are in /*![version] ... */, keep the version number
+				cpToOffset = qi
+				s = inWord
+				sqlState = unknown
 			} else {
 				// 123 -> ?, 0xff -> ?, 1e-9 -> ?, etc.
 				if Debug {
@@ -363,6 +413,7 @@ func Fingerprint(q string) string {
 					fmt.Println("MySQL-specific code")
 				}
 				s = inWord
+				sqlState = inMySQLCode
 			}
 		} else if s == inOLC {
 			// We're in a -- one line comment.  A space after -- is required.
@@ -484,7 +535,6 @@ func Fingerprint(q string) string {
 				s = inOLC
 				if cpToOffset > 2 {
 					cpToOffset = qi - 2
-					addSpace = true
 				}
 			} else if s == moreValuesOrUnknown {
 				if Debug {
@@ -562,6 +612,16 @@ func Fingerprint(q string) string {
 						cpToOffset = -2
 					}
 				}
+			}
+		case r == '`':
+			if pr != '\\' {
+				if s != inBackticks {
+					if Debug {
+						fmt.Println("Beckticks begin")
+					}
+					s = inBackticks
+				}
+
 			}
 		case r == '=' || r == '<' || r == '>' || r == '!':
 			if Debug {
@@ -648,6 +708,7 @@ func Fingerprint(q string) string {
 			if Debug {
 				fmt.Println("One-line comment begin")
 			}
+			addSpace = false
 			s = inOLC
 		default:
 			if s != inWord && s != inOp {
@@ -714,8 +775,8 @@ func Fingerprint(q string) string {
 		fi--
 	}
 
-        // Clean up control characters, and return the fingerprint
-        return strings.Replace(string(f[0:fi]), "\x00", "", -1)
+	// Clean up control characters, and return the fingerprint
+	return strings.Replace(string(f[0:fi]), "\x00", "", -1)
 }
 
 func isSpace(r rune) bool {
