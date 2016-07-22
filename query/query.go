@@ -80,7 +80,6 @@ const (
 	inOp                     // [=<>!] (usually precedes a number)
 	opOrNumber               // + in 2 + 2 or +3e-9
 	inQuote                  // '...' or "..."
-	inBackticks              // `...`
 	subOrOLC                 // - or start of -- comment
 	inDash                   // -- begins a one-line comment if followed by space
 	inOLC                    // -- comment (at least one space after dash is required)
@@ -113,11 +112,10 @@ var stateName map[byte]string = map[byte]string{
 	15: "orderBy",
 	16: "onDupeKeyUpdate",
 	17: "inNumberInWord",
-	18: "inBackticks",
 }
 
 // Debug prints very verbose tracing information to STDOUT.
-var Debug bool = false
+var Debug = false
 
 // ReplaceNumbersInWords enables replacing numbers in words. For example:
 // `SELECT c FROM org235.t` -> `SELECT c FROM org?.t`. For more examples
@@ -150,6 +148,7 @@ func Fingerprint(q string) string {
 	parOpenTotal := 0
 	valueNo := 0
 	firstPar := 0
+	skippingDash := false
 
 	for qi, r := range q {
 		if Debug {
@@ -213,48 +212,6 @@ func Fingerprint(q string) string {
 				}
 			}
 			continue
-		} else if s == inBackticks {
-			if r != '`' {
-				// The only char inside a quoted value we need to track is \,
-				// the escape char.  This allows us to tell that the 2nd ' in
-				// '\`' is escaped, not the ending quote char.
-				if escape {
-					if Debug {
-						fmt.Println("Ignore backtick literal")
-					}
-					escape = false
-				} else if r == '\\' {
-					if Debug {
-						fmt.Println("Escape")
-					}
-					escape = true
-				} else {
-					if Debug {
-						fmt.Println("Ignore quoted value")
-					}
-				}
-			} else if escape {
-				// \`
-				if Debug {
-					fmt.Println("Quote literal")
-				}
-				escape = false
-			} else {
-				if Debug {
-					fmt.Println("Quote end")
-				}
-				escape = false
-
-				// qi = the closing backtick, so +1 to ensure we don't copy
-				// anything before this, i.e. quoted value is done, move on.
-				//cpFromOffset = qi + 1
-				cpToOffset = qi + 1
-
-				fi++
-				s = inWord
-			}
-			continue
-
 		} else if s == inNumberInWord {
 			// Replaces number in words with ?
 			// e.g. `db37` to `db?`
@@ -301,11 +258,17 @@ func Fingerprint(q string) string {
 				if Debug {
 					fmt.Println("Number end")
 				}
-				f[fi] = '?'
-				fi++
-				cpFromOffset = qi
-				cpToOffset = qi
-				s = unknown
+
+				if addSpace || endsWithSymbol(prevWord) || f[fi-1] == ' ' {
+					f[fi] = '?'
+					fi++
+					cpFromOffset = qi
+					cpToOffset = qi
+					s = unknown
+				} else {
+					cpToOffset = qi
+					s = inWord
+				}
 			}
 		} else if s == inValues {
 			// We're in the (val1),...,(valN) after IN or VALUE[S].  A single
@@ -607,17 +570,6 @@ func Fingerprint(q string) string {
 					}
 				}
 			}
-		case r == '`':
-			if pr != '\\' {
-				if s != inBackticks {
-					if Debug {
-						fmt.Println("Beckticks begin")
-					}
-					s = inBackticks
-					cpFromOffset = qi
-				}
-
-			}
 		case r == '=' || r == '<' || r == '>' || r == '!':
 			if Debug {
 				fmt.Println("Operator")
@@ -651,6 +603,10 @@ func Fingerprint(q string) string {
 				if Debug {
 					fmt.Println("Operator or number")
 				}
+				if qi < len(q)-1 && q[qi+1] != '-' {
+					skippingDash = true
+				}
+				cpToOffset = qi
 				s = opOrNumber
 			}
 		case r == '.':
@@ -660,9 +616,6 @@ func Fingerprint(q string) string {
 				}
 				s = inNumber
 				cpToOffset = qi
-			} else {
-				cpToOffset = qi + 1
-				s = unknown
 			}
 		case r == '(':
 			if prevWord == "call" {
@@ -762,7 +715,15 @@ func Fingerprint(q string) string {
 				fi++
 				cpFromOffset++
 				addSpace = false
+			} else if skippingDash {
+				if Debug {
+					fmt.Println("Add dash")
+				}
+				f[fi] = '-'
+				fi++
+				cpFromOffset++
 			}
+			skippingDash = false
 		}
 		pr = r
 	}
@@ -772,12 +733,18 @@ func Fingerprint(q string) string {
 		fi--
 	}
 
-        // Clean up control characters, and return the fingerprint
-        return strings.Replace(string(f[0:fi]), "\x00", "", -1)
+	// Clean up control characters, and return the fingerprint
+	return strings.Replace(string(f[0:fi]), "\x00", "", -1)
 }
 
 func isSpace(r rune) bool {
 	return r == 0x20 || r == 0x09 || r == 0x0D || r == 0x0A
+}
+
+func endsWithSymbol(s string) bool {
+	r := s[len(s)-1:]
+
+	return r == "," || r == ";" || r == "-" || r == "+" || r == "=" || r == "(" || r == ")"
 }
 
 func wordIn(q string, words ...string) bool {
