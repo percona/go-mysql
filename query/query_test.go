@@ -167,7 +167,7 @@ func (s *TestSuite) TestFingerprintBasic(t *C) {
 		"select * from foo where a in(?+) and b in(?+)",
 	)
 
-	// Numeric table names.  By default, PT will return foo_?, etc. because
+	// Numeric table names.  By default, PT will return foo_n, etc. because
 	// match_embedded_numbers is false by default for speed.
 	q = "select foo_1 from foo_2_3"
 	t.Check(
@@ -267,18 +267,6 @@ func (s *TestSuite) TestFingerprintBasic(t *C) {
 		query.Fingerprint(q),
 		Equals,
 		"select `col` from `table-1` where `id` = ?",
-	)
-}
-
-func (s *TestSuite) TestNew(t *C) {
-	t.Skip("all")
-	// Removes one-line comments in fingerprint without mushing things together
-	query.Debug = true
-	q := "select foo-- bar\n,foo"
-	t.Check(
-		query.Fingerprint(q),
-		Equals,
-		"select foo,foo",
 	)
 }
 
@@ -551,6 +539,13 @@ func (s *TestSuite) TestFingerprintDashesInNames(t *C) {
 		query.Fingerprint(q),
 		Equals,
 		"select field from `-master-db-1`.`-table-1-` order by id, ?;",
+	)
+
+	q = "SELECT BENCHMARK(100000000, pow(rand(), rand())), 1 FROM `-hj-7d6-shdj5-7jd-kf-g988h-`.`-aaahj-7d6-shdj5-7&^%$jd-kf-g988h-9+4-5*6ab-`"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select benchmark(?, pow(rand(), rand())), ? from `-hj-7d6-shdj5-7jd-kf-g988h-`.`-aaahj-7d6-shdj5-7&^%$jd-kf-g988h-9+4-5*6ab-`",
 	)
 }
 

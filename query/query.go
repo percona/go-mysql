@@ -92,6 +92,7 @@ const (
 	orderBy                  // ORDER BY
 	onDupeKeyUpdate          // ON DUPLICATE KEY UPDATE
 	inNumberInWord           // e.g. db23
+	inMySQLCode              // /*! MySQL-specific code */
 )
 
 var stateName map[byte]string = map[byte]string{
@@ -134,7 +135,7 @@ var ReplaceNumbersInWords = false
 // example, "ORDER BY col ASC" is the same as "ORDER BY col", so "ASC" in the
 // fingerprint is removed.
 func Fingerprint(q string) string {
-	q += "         " // need range to run off end of original query
+	q += " " // need range to run off end of original query
 	prevWord := ""
 	f := make([]byte, len(q))
 	fi := 0
@@ -250,7 +251,6 @@ func Fingerprint(q string) string {
 				//cpFromOffset = qi + 1
 				cpToOffset = qi + 1
 
-				fi++
 				s = inWord
 			}
 			continue
@@ -296,6 +296,11 @@ func Fingerprint(q string) string {
 				}
 				cpToOffset = qi
 				s = inWord
+			} else if sqlState == inMySQLCode {
+				// If we are in /*![version] ... */, keep the version number
+				cpToOffset = qi
+				s = inWord
+				sqlState = unknown
 			} else {
 				// 123 -> ?, 0xff -> ?, 1e-9 -> ?, etc.
 				if Debug {
@@ -407,6 +412,7 @@ func Fingerprint(q string) string {
 					fmt.Println("MySQL-specific code")
 				}
 				s = inWord
+				sqlState = inMySQLCode
 			}
 		} else if s == inOLC {
 			// We're in a -- one line comment.  A space after -- is required.
@@ -614,7 +620,6 @@ func Fingerprint(q string) string {
 						fmt.Println("Beckticks begin")
 					}
 					s = inBackticks
-					cpFromOffset = qi
 				}
 
 			}
@@ -647,7 +652,6 @@ func Fingerprint(q string) string {
 					fmt.Println("Dash")
 				}
 				s = inDash
-				fmt.Printf("add space: %v\n", addSpace)
 			} else {
 				if Debug {
 					fmt.Println("Operator or number")
