@@ -91,6 +91,7 @@ const (
 	orderBy                  // ORDER BY
 	onDupeKeyUpdate          // ON DUPLICATE KEY UPDATE
 	inNumberInWord           // e.g. db23
+	inBackticks              // `table-1`
 	inMySQLCode              // /*! MySQL-specific code */
 )
 
@@ -113,6 +114,8 @@ var stateName map[byte]string = map[byte]string{
 	15: "orderBy",
 	16: "onDupeKeyUpdate",
 	17: "inNumberInWord",
+	18: "inBackTicks",
+	19: "inMySQLCode",
 }
 
 // Debug prints very verbose tracing information to STDOUT.
