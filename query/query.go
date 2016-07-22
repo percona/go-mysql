@@ -148,6 +148,7 @@ func Fingerprint(q string) string {
 	parOpenTotal := 0
 	valueNo := 0
 	firstPar := 0
+	skippingDash := false
 
 	for qi, r := range q {
 		if Debug {
@@ -257,11 +258,17 @@ func Fingerprint(q string) string {
 				if Debug {
 					fmt.Println("Number end")
 				}
-				f[fi] = '?'
-				fi++
-				cpFromOffset = qi
-				cpToOffset = qi
-				s = unknown
+
+				if addSpace || endsWithSymbol(prevWord) || f[fi-1] == ' ' {
+					f[fi] = '?'
+					fi++
+					cpFromOffset = qi
+					cpToOffset = qi
+					s = unknown
+				} else {
+					cpToOffset = qi
+					s = inWord
+				}
 			}
 		} else if s == inValues {
 			// We're in the (val1),...,(valN) after IN or VALUE[S].  A single
@@ -596,6 +603,9 @@ func Fingerprint(q string) string {
 				if Debug {
 					fmt.Println("Operator or number")
 				}
+				if qi < len(q)-1 && q[qi+1] != '-' {
+					skippingDash = true
+				}
 				cpToOffset = qi
 				s = opOrNumber
 			}
@@ -705,7 +715,15 @@ func Fingerprint(q string) string {
 				fi++
 				cpFromOffset++
 				addSpace = false
+			} else if skippingDash {
+				if Debug {
+					fmt.Println("Add dash")
+				}
+				f[fi] = '-'
+				fi++
+				cpFromOffset++
 			}
+			skippingDash = false
 		}
 		pr = r
 	}
@@ -721,6 +739,12 @@ func Fingerprint(q string) string {
 
 func isSpace(r rune) bool {
 	return r == 0x20 || r == 0x09 || r == 0x0D || r == 0x0A
+}
+
+func endsWithSymbol(s string) bool {
+	r := s[len(s)-1:]
+
+	return r == "," || r == ";" || r == "-" || r == "+" || r == "=" || r == "(" || r == ")"
 }
 
 func wordIn(q string, words ...string) bool {

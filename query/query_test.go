@@ -60,7 +60,7 @@ func (s *TestSuite) TestFingerprintBasic(t *C) {
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"select /*!? sql_no_cache */ * from `film`",
+		"select /*!40001 sql_no_cache */ * from `film`",
 	)
 
 	// Fingerprints stored procedure calls specially
@@ -266,7 +266,7 @@ func (s *TestSuite) TestFingerprintBasic(t *C) {
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"select `col` from `table?` where `id` = ?",
+		"select `col` from `table-1` where `id` = ?",
 	)
 }
 
@@ -531,14 +531,14 @@ func (s *TestSuite) TestFingerprintDashesInNames(t *C) {
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"select field from `masterdb?`.`table?` order by id, ?;",
+		"select field from `master-db-1`.`table-1` order by id, ?;",
 	)
 
 	q = "select field from `-master-db-1`.`-table-1-` order by id, ?;"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"select field from `masterdb?`.`table?` order by id, ?;",
+		"select field from `-master-db-1`.`-table-1-` order by id, ?;",
 	)
 }
 
