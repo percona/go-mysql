@@ -134,7 +134,7 @@ var ReplaceNumbersInWords = false
 // example, "ORDER BY col ASC" is the same as "ORDER BY col", so "ASC" in the
 // fingerprint is removed.
 func Fingerprint(q string) string {
-	q += " " // need range to run off end of original query
+	q += "         " // need range to run off end of original query
 	prevWord := ""
 	f := make([]byte, len(q))
 	fi := 0
@@ -528,7 +528,7 @@ func Fingerprint(q string) string {
 				s = inOLC
 				if cpToOffset > 2 {
 					cpToOffset = qi - 2
-					addSpace = true
+					addSpace = false
 				}
 			} else if s == moreValuesOrUnknown {
 				if Debug {
@@ -647,6 +647,7 @@ func Fingerprint(q string) string {
 					fmt.Println("Dash")
 				}
 				s = inDash
+				fmt.Printf("add space: %v\n", addSpace)
 			} else {
 				if Debug {
 					fmt.Println("Operator or number")
@@ -706,6 +707,7 @@ func Fingerprint(q string) string {
 			if Debug {
 				fmt.Println("One-line comment begin")
 			}
+			addSpace = false
 			s = inOLC
 		default:
 			if s != inWord && s != inOp {
@@ -772,8 +774,8 @@ func Fingerprint(q string) string {
 		fi--
 	}
 
-        // Clean up control characters, and return the fingerprint
-        return strings.Replace(string(f[0:fi]), "\x00", "", -1)
+	// Clean up control characters, and return the fingerprint
+	return strings.Replace(string(f[0:fi]), "\x00", "", -1)
 }
 
 func isSpace(r rune) bool {

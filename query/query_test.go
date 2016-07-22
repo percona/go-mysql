@@ -33,7 +33,7 @@ var _ = Suite(&TestSuite{})
 
 func (s *TestSuite) SetUpSuite(t *C) {
 	// Uncomment to check for 100% test coverage:
-	// query.Debug = true
+	//query.Debug = true
 }
 
 func (s *TestSuite) TestFingerprintBasic(t *C) {
@@ -60,7 +60,7 @@ func (s *TestSuite) TestFingerprintBasic(t *C) {
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"select /*!? sql_no_cache */ * from `film`",
+		"select /*!40001 sql_no_cache */ * from `film`",
 	)
 
 	// Fingerprints stored procedure calls specially
@@ -261,6 +261,25 @@ func (s *TestSuite) TestFingerprintBasic(t *C) {
 		Equals,
 		"insert into t (ts) values(?+)",
 	)
+
+	q = "select `col` from `table-1` where `id` = 5"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select `col` from `table-1` where `id` = ?",
+	)
+}
+
+func (s *TestSuite) TestNew(t *C) {
+	t.Skip("all")
+	// Removes one-line comments in fingerprint without mushing things together
+	query.Debug = true
+	q := "select foo-- bar\n,foo"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select foo,foo",
+	)
 }
 
 func (s *TestSuite) TestFingerprintValueList(t *C) {
@@ -367,11 +386,11 @@ func (s *TestSuite) TestFingerprintOneLineComments(t *C) {
 	)
 
 	// Removes one-line comments in fingerprint without mushing things together
-	q = "select foo-- bar\nfoo"
+	q = "select foo-- bar\n,foo"
 	t.Check(
 		query.Fingerprint(q),
 		Equals,
-		"select foo foo",
+		"select foo,foo",
 	)
 
 	// Removes one-line EOL comments in fingerprints
@@ -515,6 +534,23 @@ func (s *TestSuite) TestFingerprintPanicChallenge2(t *C) {
 		query.Fingerprint(q),
 		Equals,
 		"select ? ? ? ? from kamil",
+	)
+}
+
+func (s *TestSuite) TestFingerprintDashesInNames(t *C) {
+
+	q := "select field from `master-db-1`.`table-1` order by id, ?;"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select field from `master-db-1`.`table-1` order by id, ?;",
+	)
+
+	q = "select field from `-master-db-1`.`-table-1-` order by id, ?;"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select field from `-master-db-1`.`-table-1-` order by id, ?;",
 	)
 }
 
