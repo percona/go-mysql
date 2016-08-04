@@ -113,17 +113,16 @@ func (dsn DSN) AutoDetect() (DSN, error) {
 }
 
 func Defaults(defaultsFile string) (DSN, error) {
-	versionParams := [][]string{}
-	versionParams = append(versionParams, []string{}) // [0] = params for MySQL 5.6+
-	versionParams = append(versionParams, []string{}) // [1] = params for MySQL 5.5
-	if defaultsFile != "" {
-		versionParams[0] = append(versionParams[0], "--defaults-file="+defaultsFile)
-		versionParams[1] = append(versionParams[1], "--defaults-file="+defaultsFile)
+	versionParams := [][]string{
+		[]string{"-s", "client"},
+		[]string{"client"},
 	}
-
-	versionParams[0] = append(versionParams[0], "-s")
-	versionParams[0] = append(versionParams[0], "client")
-	versionParams[1] = append(versionParams[1], "client")
+	if defaultsFile != "" {
+		versionParams = [][]string{
+			[]string{"--defaults-file=" + defaultsFile, "-s", "client"},
+			[]string{"--defaults-file=" + defaultsFile, "client"},
+		}
+	}
 
 	var err error
 	var output []byte
