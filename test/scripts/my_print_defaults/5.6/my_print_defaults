@@ -1,0 +1,12 @@
+#!/bin/sh
+PASSWORD="*******"
+for i in "$@" ; do
+    if [ "$i" = "-s" ] ; then
+        PASSWORD="rootpwd"
+    fi
+done
+
+echo "--user=root5.6"
+echo "--password=${PASSWORD}"
+echo "--port=3306"
+echo "--socket=/var/run/mysqld/mysqld.sock"

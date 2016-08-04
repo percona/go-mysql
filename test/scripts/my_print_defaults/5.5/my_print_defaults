@@ -1,0 +1,12 @@
+#!/bin/sh
+for i in "$@" ; do
+    if [ "$i" = "-s" ] ; then
+        echo "unknow parameter -s"
+        exit 1;
+    fi
+done
+
+echo "--user=root5.5"
+echo "--password=rootpwd"
+echo "--port=3306"
+echo "--socket=/var/run/mysqld/mysqld.sock"
