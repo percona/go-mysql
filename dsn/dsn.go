@@ -117,14 +117,16 @@ func Defaults(defaultsFile string) (DSN, error) {
 	if defaultsFile != "" {
 		params = []string{
 			"--defaults-file=" + defaultsFile,
-			"--print-defaults", // --print-defaults must be last param
+			"-s",
+			"client",
 		}
 	} else {
 		params = []string{
-			"--print-defaults",
+			"-s",
+			"client",
 		}
 	}
-	cmd := exec.Command("mysql", params...)
+	cmd := exec.Command("my_print_defaults", params...)
 	output, err := cmd.Output()
 	if err != nil {
 		return DSN{}, err
@@ -214,41 +216,41 @@ func ParseMySQLDefaults(output string) DSN {
 	var result [][]string // Result of FindAllStringSubmatch
 	var dsn DSN
 
-	// Note: Since output of mysql --print-defaults
-	//       doesn't use quotation marks for values
-	//       then we use "space" as a separator
-	//       this implies that we are unable to properly detect
-	//       e.g. passwords with spaces
-	re = regexp.MustCompile("--user=([^ ]+)")
-	result = re.FindAllStringSubmatch(output, -1)
-	if result != nil {
-		dsn.Username = result[len(result)-1][1]
-	}
+	lines := strings.Split(output, "\n")
+	for _, line := range lines {
+		re = regexp.MustCompile("--user=(.*)")
+		result = re.FindAllStringSubmatch(line, -1)
+		if result != nil {
+			dsn.Username = result[len(result)-1][1]
+		}
 
-	re = regexp.MustCompile("--password=([^ ]+)")
-	result = re.FindAllStringSubmatch(output, -1)
-	if result != nil {
-		dsn.Password = result[len(result)-1][1]
-	}
+		re = regexp.MustCompile("--password=(.*)")
+		result = re.FindAllStringSubmatch(line, -1)
+		if result != nil {
+			dsn.Password = result[len(result)-1][1]
+		}
 
-	re = regexp.MustCompile("--socket=([^ ]+)")
-	result = re.FindAllStringSubmatch(output, -1)
-	if result != nil {
-		dsn.Socket = result[len(result)-1][1]
-	}
+		re = regexp.MustCompile("--socket=(.*)")
+		result = re.FindAllStringSubmatch(line, -1)
+		if result != nil {
+			dsn.Socket = result[len(result)-1][1]
+		}
 
-	if dsn.Socket == "" {
-		re = regexp.MustCompile("--host=([^ ]+)")
-		result = re.FindAllStringSubmatch(output, -1)
+		re = regexp.MustCompile("--host=(.*)")
+		result = re.FindAllStringSubmatch(line, -1)
 		if result != nil {
 			dsn.Hostname = result[len(result)-1][1]
 		}
 
-		re = regexp.MustCompile("--port=([^ ]+)")
-		result = re.FindAllStringSubmatch(output, -1)
+		re = regexp.MustCompile("--port=(.*)")
+		result = re.FindAllStringSubmatch(line, -1)
 		if result != nil {
 			dsn.Port = result[len(result)-1][1]
 		}
+	}
+	if dsn.Socket != "" { // Cannot have socket & host
+		dsn.Port = ""
+		dsn.Hostname = ""
 	}
 
 	// Hostname always defaults to localhost.  If localhost means 127.0.0.1 or socket
