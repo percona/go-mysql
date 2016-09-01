@@ -1056,7 +1056,7 @@ func (s *TestSuite) TestParserSlowLog013(t *C) {
 			Host:   "localhost",
 			Db:     "",
 			TimeMetrics: map[string]float64{
-				"Query_time": 94.38144,
+				"Query_time": 94.381439,
 				"Lock_time":  0.000174,
 			},
 			NumberMetrics: map[string]uint64{
@@ -1076,7 +1076,7 @@ func (s *TestSuite) TestParserSlowLog013(t *C) {
 			Host:   "localhost",
 			Db:     "db1",
 			TimeMetrics: map[string]float64{
-				"Query_time": 407.54025,
+				"Query_time": 407.540253,
 				"Lock_time":  0.122377,
 			},
 			NumberMetrics: map[string]uint64{
