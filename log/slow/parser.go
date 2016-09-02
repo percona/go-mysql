@@ -33,6 +33,7 @@ import (
 // Regular expressions to match important lines in slow log.
 var timeRe = regexp.MustCompile(`Time: (\S+\s{1,2}\S+)`)
 var userRe = regexp.MustCompile(`User@Host: ([^\[]+|\[[^[]+\]).*?@ (\S*) \[(.*)\]`)
+var schema = regexp.MustCompile(`Schema: +(.*?) +Last_errno:`)
 var headerRe = regexp.MustCompile(`^#\s+[A-Z]`)
 var metricsRe = regexp.MustCompile(`(\w+): (\S+|\z)`)
 var adminRe = regexp.MustCompile(`command: (.+)`)
@@ -234,6 +235,11 @@ func (p *SlowLogParser) parseHeader(line string) {
 		if p.opt.Debug {
 			l.Println("metrics")
 		}
+		submatch := schema.FindStringSubmatch(line)
+		if len(submatch) == 2 {
+			p.event.Db = submatch[1]
+		}
+
 		m := metricsRe.FindAllStringSubmatch(line, -1)
 		for _, smv := range m {
 			// [String, Metric, Value], e.g. ["Query_time: 2", "Query_time", "2"]
