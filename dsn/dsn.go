@@ -46,6 +46,8 @@ type DSN struct {
 
 const (
 	ParseTimeParam    = "parseTime=true"
+	TimezoneParam     = `time_zone='%2b00%3a00'`
+	LocationParam     = "loc=UTC"
 	OldPasswordsParam = "allowOldPasswords=true"
 	HiddenPassword    = "***"
 )
