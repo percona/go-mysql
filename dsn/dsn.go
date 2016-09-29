@@ -190,15 +190,19 @@ func (dsn DSN) Verify() error {
 	return nil
 }
 
-func HidePassword(dsnString string) string {
-	dsnParts := strings.Split(dsnString, "@")
-	userPart := dsnParts[0]
-	hostPart := ""
-	if len(dsnParts) > 1 {
-		hostPart = dsnParts[1]
+func HidePassword(dsn string) string {
+	dsn = strings.TrimRight(strings.Split(dsn, "?")[0], "/")
+	if strings.Index(dsn, "@") > 0 {
+		dsnParts := strings.Split(dsn, "@")
+		userPart := dsnParts[0]
+		hostPart := ""
+		if len(dsnParts) > 1 {
+			hostPart = dsnParts[len(dsnParts)-1]
+		}
+		userPasswordParts := strings.Split(userPart, ":")
+		dsn = fmt.Sprintf("%s:***@%s", userPasswordParts[0], hostPart)
 	}
-	userPasswordParts := strings.Split(userPart, ":")
-	return userPasswordParts[0] + ":" + HiddenPassword + "@" + hostPart
+	return dsn
 }
 
 func ParseSocketFromNetstat(out string) string {
