@@ -454,6 +454,20 @@ func (s *TestSuite) TestFingerprintTricky(t *C) {
 		Equals,
 		"insert into t () values()",
 	)
+
+	q = "SELECT * FROM table WHERE field = 'value' /*arbitrary/31*/ "
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select * from table where field = ?",
+	)
+
+	q = "SELECT * FROM table WHERE field = 'value' /*arbitrary31*/ "
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"select * from table where field = ?",
+	)
 }
 
 func (s *TestSuite) TestNumbersInFunctions(t *C) {
