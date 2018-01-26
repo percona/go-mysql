@@ -21,13 +21,14 @@ package slow
 import (
 	"bufio"
 	"fmt"
-	"github.com/percona/go-mysql/log"
 	"io"
 	l "log"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/percona/go-mysql/log"
 )
 
 // Regular expressions to match important lines in slow log.
@@ -245,7 +246,7 @@ func (p *SlowLogParser) parseHeader(line string) {
 			// [String, Metric, Value], e.g. ["Query_time: 2", "Query_time", "2"]
 			if strings.HasSuffix(smv[1], "_time") || strings.HasSuffix(smv[1], "_wait") {
 				// microsecond value
-				val, _ := strconv.ParseFloat(smv[2], 32)
+				val, _ := strconv.ParseFloat(smv[2], 64)
 				p.event.TimeMetrics[smv[1]] = float64(val)
 			} else if smv[2] == "Yes" || smv[2] == "No" {
 				// boolean value

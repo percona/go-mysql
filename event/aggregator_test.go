@@ -25,182 +25,161 @@ import (
 	"path"
 	"testing"
 	"time"
+	"strings"
 
-	. "github.com/go-test/test"
 	"github.com/percona/go-mysql/event"
-	log "github.com/percona/go-mysql/log"
+	"github.com/percona/go-mysql/log"
 	parser "github.com/percona/go-mysql/log/slow"
 	"github.com/percona/go-mysql/query"
-	. "gopkg.in/check.v1"
+	"github.com/percona/go-mysql/test"
+	"github.com/stretchr/testify/assert"
 )
 
-func Test(t *testing.T) { TestingT(t) }
+var (
+	rootDir = test.RootDir()
+	sample  = path.Join(rootDir, "test/slow-logs")
+	result  = path.Join(rootDir, "test/results")
+)
 
-type TestSuite struct {
-	sample   string
-	result   string
-	examples bool
-}
-
-var _ = Suite(&TestSuite{})
-
-func (s *TestSuite) SetUpSuite(t *C) {
-	rootDir := RootDir()
-	s.sample = path.Join(rootDir, "test/slow-logs")
-	s.result = path.Join(rootDir, "test/results")
-	s.examples = true
-}
-
-func (s *TestSuite) aggregateSlowLog(input, output string, utcOffset time.Duration) (got event.Result, expect event.Result) {
-	bytes, err := ioutil.ReadFile(path.Join(s.result, "/", output))
+func aggregateSlowLog(input, output string, utcOffset time.Duration, examples bool) (string, string) {
+	expectJson, err := ioutil.ReadFile(path.Join(result, "/", output))
 	if err != nil {
 		l.Fatal(err)
 	}
-	expect = event.Result{}
-	if err := json.Unmarshal(bytes, &expect); err != nil {
-		l.Fatal(err)
-	}
 
-	file, err := os.Open(path.Join(s.sample, "/", input))
+	file, err := os.Open(path.Join(sample, "/", input))
 	if err != nil {
 		l.Fatal(err)
 	}
 	p := parser.NewSlowLogParser(file, log.Options{})
-	if err != nil {
-		l.Fatal(err)
-	}
 	go p.Start()
-	a := event.NewAggregator(s.examples, utcOffset, 10)
+	a := event.NewAggregator(examples, utcOffset, 10)
 	for e := range p.EventChan() {
 		f := query.Fingerprint(e.Query)
 		id := query.Id(f)
 		a.AddEvent(e, id, f)
 	}
-	got = a.Finalize()
-	return got, expect
+	got := a.Finalize()
+	gotJson, err := json.Marshal(got)
+	if err != nil {
+		l.Fatal(err)
+	}
+
+	return string(gotJson), string(expectJson)
 }
 
 func zeroPercentiles(r *event.Result) {
 	for _, metrics := range r.Global.Metrics.TimeMetrics {
-		metrics.Med = 0
-		metrics.P95 = 0
+		metrics.Med = event.Float64(0)
+		metrics.P95 = event.Float64(0)
 	}
 	for _, metrics := range r.Global.Metrics.NumberMetrics {
-		metrics.Med = 0
-		metrics.P95 = 0
+		metrics.Med = event.Uint64(0)
+		metrics.P95 = event.Uint64(0)
 	}
 	for _, class := range r.Class {
 		for _, metrics := range class.Metrics.TimeMetrics {
-			metrics.Med = 0
-			metrics.P95 = 0
+			metrics.Med = event.Float64(0)
+			metrics.P95 = event.Float64(0)
 		}
 		for _, metrics := range class.Metrics.NumberMetrics {
-			metrics.Med = 0
-			metrics.P95 = 0
+			metrics.Med = event.Uint64(0)
+			metrics.P95 = event.Uint64(0)
 		}
 	}
 }
 
 // --------------------------------------------------------------------------
 
-func (s *TestSuite) TestSlow001(t *C) {
-	got, expect := s.aggregateSlowLog("slow001.log", "slow001.json", 0)
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+func TestSlow001(t *testing.T) {
+	got, expect := aggregateSlowLog("slow001.log", "slow001.json", 0, true)
+	assert.JSONEq(t, expect, got)
 }
 
-func (s *TestSuite) TestSlow001WithTzOffset(t *C) {
-	got, expect := s.aggregateSlowLog("slow001.log", "slow001.json", -1*time.Hour)
+func TestSlow001WithTzOffset(t *testing.T) {
+	got, expect := aggregateSlowLog("slow001.log", "slow001.json", -1*time.Hour, true)
 	// Use the same files as TestSlow001NoExamples but with a tz=-1
-	expect.Class["7F7D57ACDD8A346E"].Example.Ts = "2007-10-15 20:43:52"
-	expect.Class["3A99CC42AEDCCFCD"].Example.Ts = "2007-10-15 20:45:10"
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	expect = strings.Replace(expect, "2007-10-15 21:43:52", "2007-10-15 20:43:52", 1)
+	expect = strings.Replace(expect, "2007-10-15 21:45:10", "2007-10-15 20:45:10", 1)
+	assert.JSONEq(t, expect, got)
 }
 
-func (s *TestSuite) TestSlow001NoExamples(t *C) {
-	s.examples = false
-	defer func() { s.examples = true }()
-	got, expect := s.aggregateSlowLog("slow001.log", "slow001-no-examples.json", 0)
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+func TestSlow001NoExamples(t *testing.T) {
+	got, expect := aggregateSlowLog("slow001.log", "slow001-no-examples.json", 0, false)
+	assert.JSONEq(t, expect, got)
 }
 
 // Test p95 and median.
-func (s *TestSuite) TestSlow010(t *C) {
-	got, expect := s.aggregateSlowLog("slow010.log", "slow010.json", 0)
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+func TestSlow010(t *testing.T) {
+	got, expect := aggregateSlowLog("slow010.log", "slow010.json", 0, true)
+	assert.JSONEq(t, expect, got)
 }
 
-func (s *TestSuite) TestAddClassSlow001(t *C) {
-	expect, _ := s.aggregateSlowLog("slow001.log", "slow001.json", 0)
-	zeroPercentiles(&expect)
+func TestAddClassSlow001(t *testing.T) {
+	expect, _ := aggregateSlowLog("slow001.log", "slow001.json", 0, true)
+	expectEventResult := event.Result{}
+	if err := json.Unmarshal([]byte(expect), &expectEventResult); err != nil {
+		t.Fatal(err)
+	}
+	zeroPercentiles(&expectEventResult)
+
 	global := event.NewClass("", "", false)
-	for _, class := range expect.Class {
+	for _, class := range expectEventResult.Class {
 		global.AddClass(class)
 	}
-	if same, diff := IsDeeply(global, expect.Global); !same {
-		Dump(global)
-		t.Error(diff)
+	expectGlobalBytes, err := json.Marshal(expectEventResult.Global)
+	if err != nil {
+		t.Fatal(err)
 	}
+	gotGlobalBytes, err := json.Marshal(global)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.JSONEq(t, string(expectGlobalBytes), string(gotGlobalBytes))
 }
 
-func (s *TestSuite) TestAddClassSlow023(t *C) {
-	expect, _ := s.aggregateSlowLog("slow023.log", "slow018.json", 0)
-	zeroPercentiles(&expect)
+func TestAddClassSlow023(t *testing.T) {
+	expect, _ := aggregateSlowLog("slow023.log", "slow018.json", 0, true)
+	expectEventResult := event.Result{}
+	if err := json.Unmarshal([]byte(expect), &expectEventResult); err != nil {
+		t.Fatal(err)
+	}
+	zeroPercentiles(&expectEventResult)
+
 	global := event.NewClass("", "", false)
-	for _, class := range expect.Class {
+	for _, class := range expectEventResult.Class {
 		global.AddClass(class)
 	}
-	if same, diff := IsDeeply(global, expect.Global); !same {
-		Dump(global)
-		t.Error(diff)
+	expectGlobalBytes, err := json.Marshal(expectEventResult.Global)
+	if err != nil {
+		t.Fatal(err)
 	}
+	gotGlobalBytes, err := json.Marshal(global)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.JSONEq(t, string(expectGlobalBytes), string(gotGlobalBytes))
 }
 
-func (s *TestSuite) TestSlow018(t *C) {
-	got, expect := s.aggregateSlowLog("slow018.log", "slow018.json", 0)
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+func TestSlow018(t *testing.T) {
+	got, expect := aggregateSlowLog("slow018.log", "slow018.json", 0, true)
+	assert.JSONEq(t, expect, got)
 }
 
 // Tests for PCT-1006 & PCT-1085
-func (s *TestSuite) TestUseDb(t *C) {
+func TestUseDb(t *testing.T) {
 	// Test db is not inherited
-	got, expect := s.aggregateSlowLog("slow020.log", "slow020.json", 0)
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	got, expect := aggregateSlowLog("slow020.log", "slow020.json", 0, true)
+	assert.JSONEq(t, expect, got)
 	// Test "use" is not case sensitive
-	got, expect = s.aggregateSlowLog("slow021.log", "slow021.json", 0)
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	got, expect = aggregateSlowLog("slow021.log", "slow021.json", 0, true)
+	assert.JSONEq(t, expect, got)
 	// Test we are parsing db names in backticks
-	got, expect = s.aggregateSlowLog("slow022.log", "slow022.json", 0)
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	got, expect = aggregateSlowLog("slow022.log", "slow022.json", 0, true)
+	assert.JSONEq(t, expect, got)
 }
 
-func (s *TestSuite) TestOutlierSlow025(t *C) {
-	got, expect := s.aggregateSlowLog("slow025.log", "slow025.json", 0)
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+func TestOutlierSlow025(t *testing.T) {
+	got, expect := aggregateSlowLog("slow025.log", "slow025.json", 0, true)
+	assert.JSONEq(t, expect, got)
 }

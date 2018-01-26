@@ -100,7 +100,7 @@ func (c *Class) AddEvent(e *log.Event, outlier bool) {
 	}
 }
 
-// AddClass adds a Class to the current class. This is used with Perfomance
+// AddClass adds a Class to the current class. This is used with Performance
 // Schema which returns pre-aggregated classes instead of events.
 func (c *Class) AddClass(newClass *Class) {
 	c.UniqueQueries++
@@ -111,16 +111,14 @@ func (c *Class) AddClass(newClass *Class) {
 		stats, ok := c.Metrics.TimeMetrics[newMetric]
 		if !ok {
 			m := *newStats
-			m.Med = 0
-			m.P95 = 0
 			c.Metrics.TimeMetrics[newMetric] = &m
 		} else {
 			stats.Sum += newStats.Sum
-			stats.Avg = stats.Sum / float64(c.TotalQueries)
-			if newStats.Min < stats.Min {
+			stats.Avg = Float64(stats.Sum / float64(c.TotalQueries))
+			if Float64Value(newStats.Min) < Float64Value(stats.Min) {
 				stats.Min = newStats.Min
 			}
-			if newStats.Max > stats.Max {
+			if Float64Value(newStats.Max) > Float64Value(stats.Max) {
 				stats.Max = newStats.Max
 			}
 		}
@@ -130,16 +128,14 @@ func (c *Class) AddClass(newClass *Class) {
 		stats, ok := c.Metrics.NumberMetrics[newMetric]
 		if !ok {
 			m := *newStats
-			m.Med = 0
-			m.P95 = 0
 			c.Metrics.NumberMetrics[newMetric] = &m
 		} else {
 			stats.Sum += newStats.Sum
-			stats.Avg = stats.Sum / uint64(c.TotalQueries)
-			if newStats.Min < stats.Min {
+			stats.Avg = Uint64(stats.Sum / uint64(c.TotalQueries))
+			if Uint64Value(newStats.Min) < Uint64Value(stats.Min) {
 				stats.Min = newStats.Min
 			}
-			if newStats.Max > stats.Max {
+			if Uint64Value(newStats.Max) > Uint64Value(stats.Max) {
 				stats.Max = newStats.Max
 			}
 		}
@@ -162,8 +158,8 @@ func (c *Class) Finalize(rateLimit uint) {
 	if rateLimit == 0 {
 		rateLimit = 1
 	}
-	c.Metrics.Finalize(rateLimit)
 	c.TotalQueries = (c.TotalQueries * rateLimit) + c.outliers
+	c.Metrics.Finalize(rateLimit, c.TotalQueries)
 	if c.Example.QueryTime == 0 {
 		c.Example = nil
 	}

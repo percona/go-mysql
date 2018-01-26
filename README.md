@@ -19,9 +19,3 @@ test|Sample data
 ## Versioning
 
 Packages are not versioned. Interfaces, data structures, and overall usage are subject to change without notice.
-
-## Testing
-
-To test these packages locally, you'll need:
-* github.com/go-test/test
-* gopkg.in/check.v1

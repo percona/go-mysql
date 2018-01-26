@@ -18,35 +18,26 @@
 package slow_test
 
 import (
-	. "github.com/go-test/test"
-	"github.com/percona/go-mysql/log"
-	parser "github.com/percona/go-mysql/log/slow"
-	. "gopkg.in/check.v1"
 	l "log"
 	"os"
 	"path"
 	"testing"
+
+	"github.com/percona/go-mysql/log"
+	parser "github.com/percona/go-mysql/log/slow"
+	"github.com/percona/go-mysql/test"
+	"github.com/stretchr/testify/assert"
 )
 
-func Test(t *testing.T) { TestingT(t) }
-
-type TestSuite struct {
-	sample string
-	p      *parser.SlowLogParser
-	opt    log.Options
-}
-
-var _ = Suite(&TestSuite{})
-
-func (s *TestSuite) SetUpSuite(t *C) {
-	s.opt = log.Options{
-	//Debug: true,
+var (
+	sample = test.RootDir() + "/test/slow-logs"
+	opt    = log.Options{
+		Debug: false,
 	}
-	s.sample = RootDir() + "/test/slow-logs"
-}
+)
 
-func (s *TestSuite) parseSlowLog(filename string, o log.Options) []log.Event {
-	file, err := os.Open(path.Join(s.sample, "/", filename))
+func parseSlowLog(filename string, o log.Options) []log.Event {
+	file, err := os.Open(path.Join(sample, "/", filename))
 	if err != nil {
 		l.Fatal(err)
 	}
@@ -65,18 +56,15 @@ func (s *TestSuite) parseSlowLog(filename string, o log.Options) []log.Event {
 // --------------------------------------------------------------------------
 
 // No input, no events.
-func (s *TestSuite) TestParserEmptySlowLog(t *C) {
-	got := s.parseSlowLog("empty.log", s.opt)
+func TestParserEmptySlowLog(t *testing.T) {
+	got := parseSlowLog("empty.log", opt)
 	expect := []log.Event{}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	assert.EqualValues(t, expect, got)
 }
 
 // slow001 is a most basic basic, normal slow log--nothing exotic.
-func (s *TestSuite) TestParserSlowLog001(t *C) {
-	got := s.parseSlowLog("slow001.log", s.opt)
+func TestParserSlowLog001(t *testing.T) {
+	got := parseSlowLog("slow001.log", opt)
 	expect := []log.Event{
 		{
 			Ts:     "071015 21:43:52",
@@ -115,15 +103,12 @@ func (s *TestSuite) TestParserSlowLog001(t *C) {
 			BoolMetrics: map[string]bool{},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	assert.EqualValues(t, expect, got)
 }
 
 // slow002 is a basic slow log like slow001 but with more metrics, multi-line queries, etc.
-func (s *TestSuite) TestParseSlowLog002(t *C) {
-	got := s.parseSlowLog("slow002.log", s.opt)
+func TestParseSlowLog002(t *testing.T) {
+	got := parseSlowLog("slow002.log", opt)
 	expect := []log.Event{
 		{
 			Query:  "BEGIN",
@@ -382,15 +367,12 @@ SET    biz = '91848182522'`,
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	assert.EqualValues(t, expect, got)
 }
 
 // slow003 starts with a blank line.  I guess this once messed up SlowLogParser.pm?
-func (s *TestSuite) TestParserSlowLog003(t *C) {
-	got := s.parseSlowLog("slow003.log", s.opt)
+func TestParserSlowLog003(t *testing.T) {
+	got := parseSlowLog("slow003.log", opt)
 	expect := []log.Event{
 		{
 			Query:  "BEGIN",
@@ -420,15 +402,12 @@ func (s *TestSuite) TestParserSlowLog003(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	assert.EqualValues(t, expect, got)
 }
 
 // I don't know what's special about this slow004.
-func (s *TestSuite) TestParserSlowLog004(t *C) {
-	got := s.parseSlowLog("slow004.log", s.opt)
+func TestParserSlowLog004(t *testing.T) {
+	got := parseSlowLog("slow004.log", opt)
 	expect := []log.Event{
 		{
 			Query:       "select 12_13_foo from (select 12foo from 123_bar) as 123baz",
@@ -448,10 +427,7 @@ func (s *TestSuite) TestParserSlowLog004(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	assert.EqualValues(t, expect, got)
 }
 
 // slow005 has a multi-line query with tabs in it.  A pathological case that
@@ -461,8 +437,8 @@ func (s *TestSuite) TestParserSlowLog004(t *C) {
 //   " LIMIT 1;
 // There's no easy way to detect that "# Query_time" is part of the query and
 // not part of the next event's header.
-func (s *TestSuite) TestParserSlowLog005(t *C) {
-	got := s.parseSlowLog("slow005.log", s.opt)
+func TestParserSlowLog005(t *testing.T) {
+	got := parseSlowLog("slow005.log", opt)
 	expect := []log.Event{
 		{
 			Query:  "foo\nbar\n\t\t\t0 AS counter\nbaz",
@@ -492,16 +468,13 @@ func (s *TestSuite) TestParserSlowLog005(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	assert.EqualValues(t, expect, got)
 }
 
 // slow006 has the Schema: db metric _or_ use db; lines before the queries.
 // Schema value should be used for log.Event.Db is no use db; line is present.
-func (s *TestSuite) TestParserSlowLog006(t *C) {
-	got := s.parseSlowLog("slow006.log", s.opt)
+func TestParserSlowLog006(t *testing.T) {
+	got := parseSlowLog("slow006.log", opt)
 	expect := []log.Event{
 		{
 			Query:  "SELECT col FROM foo_tbl",
@@ -672,15 +645,12 @@ func (s *TestSuite) TestParserSlowLog006(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	assert.EqualValues(t, expect, got)
 }
 
 // slow007 has Schema: db1 _and_ use db2;.  db2 should be used.
-func (s *TestSuite) TestParserSlowLog007(t *C) {
-	got := s.parseSlowLog("slow007.log", s.opt)
+func TestParserSlowLog007(t *testing.T) {
+	got := parseSlowLog("slow007.log", opt)
 	expect := []log.Event{
 		{
 			Query:       "SELECT fruit FROM trees",
@@ -702,10 +672,7 @@ func (s *TestSuite) TestParserSlowLog007(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	assert.EqualValues(t, expect, got)
 }
 
 // slow008 has 4 interesting things (which makes it a poor test case since we're
@@ -714,8 +681,8 @@ func (s *TestSuite) TestParserSlowLog007(t *C) {
 //   2) a SET NAMES query; SET <certain vars> are ignored
 //   3) No Time metrics
 //   4) IPs in the host metric, but we don't currently support these
-func (s *TestSuite) TestParserSlowLog008(t *C) {
-	got := s.parseSlowLog("slow008.log", s.opt)
+func TestParserSlowLog008(t *testing.T) {
+	got := parseSlowLog("slow008.log", opt)
 	expect := []log.Event{
 		{
 			Query:       "Quit",
@@ -772,20 +739,17 @@ func (s *TestSuite) TestParserSlowLog008(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	assert.EqualValues(t, expect, got)
 }
 
 // Filter admin commands
-func (s *TestSuite) TestParserSlowLog009(t *C) {
+func TestParserSlowLog009(t *testing.T) {
 	opt := log.Options{
 		FilterAdminCommand: map[string]bool{
 			"Quit": true,
 		},
 	}
-	got := s.parseSlowLog("slow009.log", opt)
+	got := parseSlowLog("slow009.log", opt)
 	expect := []log.Event{
 		{
 			Query:  "Refresh",
@@ -800,7 +764,10 @@ func (s *TestSuite) TestParserSlowLog009(t *C) {
 				"Lock_time":  0.000000,
 			},
 			NumberMetrics: map[string]uint64{
+				"Merge_passes":  0,
+				"Rows_affected": 0,
 				"Rows_examined": 0,
+				"Rows_read":     0,
 				"Rows_sent":     0,
 				"Thread_id":     47,
 			},
@@ -815,15 +782,12 @@ func (s *TestSuite) TestParserSlowLog009(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	assert.EqualValues(t, expect, got)
 }
 
 // Rate limit
-func (s *TestSuite) TestParserSlowLog011(t *C) {
-	got := s.parseSlowLog("slow011.log", log.Options{})
+func TestParserSlowLog011(t *testing.T) {
+	got := parseSlowLog("slow011.log", log.Options{})
 	expect := []log.Event{
 		{
 			Offset:    0,
@@ -842,6 +806,9 @@ func (s *TestSuite) TestParserSlowLog011(t *C) {
 				"InnoDB_queue_wait":    0.000000,
 			},
 			NumberMetrics: map[string]uint64{
+				"InnoDB_trx_id":         0,
+				"Killed":                0,
+				"Last_errno":            0,
 				"Rows_sent":             1,
 				"Rows_examined":         1,
 				"Rows_affected":         0,
@@ -880,6 +847,9 @@ func (s *TestSuite) TestParserSlowLog011(t *C) {
 				"InnoDB_queue_wait":    0.000000,
 			},
 			NumberMetrics: map[string]uint64{
+				"InnoDB_trx_id":         0,
+				"Killed":                0,
+				"Last_errno":            0,
 				"Rows_sent":             1,
 				"Rows_examined":         1,
 				"Rows_affected":         0,
@@ -918,6 +888,9 @@ func (s *TestSuite) TestParserSlowLog011(t *C) {
 				"InnoDB_queue_wait":    0.000000,
 			},
 			NumberMetrics: map[string]uint64{
+				"InnoDB_trx_id":         0,
+				"Killed":                0,
+				"Last_errno":            0,
 				"Rows_sent":             5,
 				"Rows_examined":         10,
 				"Rows_affected":         0,
@@ -941,14 +914,11 @@ func (s *TestSuite) TestParserSlowLog011(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	assert.EqualValues(t, expect, got)
 }
 
-func (s *TestSuite) TestParserSlowLog012(t *C) {
-	got := s.parseSlowLog("slow012.log", s.opt)
+func TestParserSlowLog012(t *testing.T) {
+	got := parseSlowLog("slow012.log", opt)
 	expect := []log.Event{
 		{
 			Query:  "select * from mysql.user",
@@ -964,6 +934,7 @@ func (s *TestSuite) TestParserSlowLog012(t *C) {
 				"Rows_sent":     2,
 				"Rows_examined": 2,
 			},
+			BoolMetrics: map[string]bool{},
 		},
 		{
 			Query:  "Quit",
@@ -980,6 +951,7 @@ func (s *TestSuite) TestParserSlowLog012(t *C) {
 				"Rows_sent":     2,
 				"Rows_examined": 2,
 			},
+			BoolMetrics: map[string]bool{},
 		},
 		{
 			Query:  "SELECT @@max_allowed_packet",
@@ -996,17 +968,15 @@ func (s *TestSuite) TestParserSlowLog012(t *C) {
 				"Rows_sent":     1,
 				"Rows_examined": 0,
 			},
+			BoolMetrics: map[string]bool{},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	assert.EqualValues(t, expect, got)
 }
 
 // Stack overflow bug due to meta lines.
-func (s *TestSuite) TestParserSlowLog013(t *C) {
-	got := s.parseSlowLog("slow013.log", log.Options{Debug: false})
+func TestParserSlowLog013(t *testing.T) {
+	got := parseSlowLog("slow013.log", log.Options{Debug: false})
 	expect := []log.Event{
 		{
 			Offset: 0,
@@ -1027,6 +997,7 @@ func (s *TestSuite) TestParserSlowLog013(t *C) {
 				"Rows_examined": 1605306,
 				"Rows_sent":     1605306,
 			},
+			BoolMetrics: map[string]bool{},
 		},
 		{
 			Offset: 354,
@@ -1036,7 +1007,7 @@ func (s *TestSuite) TestParserSlowLog013(t *C) {
 			Host:   "localhost",
 			Db:     "db961",
 			TimeMetrics: map[string]float64{
-				"Query_time": 20.304537,
+				"Query_time": 20.304536,
 				"Lock_time":  0.103324,
 			},
 			NumberMetrics: map[string]uint64{
@@ -1047,6 +1018,7 @@ func (s *TestSuite) TestParserSlowLog013(t *C) {
 				"Rows_examined": 1197472,
 				"Rows_sent":     1197472,
 			},
+			BoolMetrics: map[string]bool{},
 		},
 		{
 			Offset: 6139,
@@ -1056,7 +1028,7 @@ func (s *TestSuite) TestParserSlowLog013(t *C) {
 			Host:   "localhost",
 			Db:     "",
 			TimeMetrics: map[string]float64{
-				"Query_time": 94.381439,
+				"Query_time": 94.38144,
 				"Lock_time":  0.000174,
 			},
 			NumberMetrics: map[string]uint64{
@@ -1067,6 +1039,7 @@ func (s *TestSuite) TestParserSlowLog013(t *C) {
 				"Rows_examined": 17799,
 				"Rows_sent":     0,
 			},
+			BoolMetrics: map[string]bool{},
 		},
 		{
 			Offset: 6667,
@@ -1076,7 +1049,7 @@ func (s *TestSuite) TestParserSlowLog013(t *C) {
 			Host:   "localhost",
 			Db:     "db1",
 			TimeMetrics: map[string]float64{
-				"Query_time": 407.540253,
+				"Query_time": 407.540262,
 				"Lock_time":  0.122377,
 			},
 			NumberMetrics: map[string]uint64{
@@ -1087,6 +1060,7 @@ func (s *TestSuite) TestParserSlowLog013(t *C) {
 				"Rows_examined": 34621308,
 				"Rows_sent":     34621308,
 			},
+			BoolMetrics: map[string]bool{},
 		},
 		{
 			Offset: 7015,
@@ -1107,17 +1081,15 @@ func (s *TestSuite) TestParserSlowLog013(t *C) {
 				"Rows_examined": 4937738,
 				"Rows_sent":     4937738,
 			},
+			BoolMetrics: map[string]bool{},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	assert.EqualValues(t, expect, got)
 }
 
 // Query line looks like header line.
-func (s *TestSuite) TestParserSlowLog014(t *C) {
-	got := s.parseSlowLog("slow014.log", s.opt)
+func TestParserSlowLog014(t *testing.T) {
+	got := parseSlowLog("slow014.log", opt)
 	expect := []log.Event{
 		{
 			Offset: 0,
@@ -1289,16 +1261,13 @@ func (s *TestSuite) TestParserSlowLog014(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	assert.EqualValues(t, expect, got)
 }
 
 // Correct event offsets when parsing starts/resumes at an offset.
-func (s *TestSuite) TestParserSlowLog001StartOffset(t *C) {
+func TestParserSlowLog001StartOffset(t *testing.T) {
 	// 359 is the first byte of the second (of 2) events.
-	got := s.parseSlowLog("slow001.log", log.Options{StartOffset: 359})
+	got := parseSlowLog("slow001.log", log.Options{StartOffset: 359})
 	expect := []log.Event{
 		{
 			Query:  `select sleep(2) from test.n`,
@@ -1317,22 +1286,19 @@ func (s *TestSuite) TestParserSlowLog001StartOffset(t *C) {
 			BoolMetrics: map[string]bool{},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	assert.EqualValues(t, expect, got)
 }
 
 // Line > bufio.MaxScanTokenSize = 64KiB
 // https://jira.percona.com/browse/PCT-552
-func (s *TestSuite) TestParserSlowLog015(t *C) {
-	got := s.parseSlowLog("slow015.log", log.Options{})
-	t.Check(got, HasLen, 2)
+func TestParserSlowLog015(t *testing.T) {
+	got := parseSlowLog("slow015.log", log.Options{})
+	assert.Len(t, got, 2)
 }
 
 // Start in header
-func (s *TestSuite) TestParseSlow016(t *C) {
-	got := s.parseSlowLog("slow016.log", log.Options{Debug: false})
+func TestParseSlow016(t *testing.T) {
+	got := parseSlowLog("slow016.log", log.Options{Debug: false})
 	expect := []log.Event{
 		{
 			Query:  `SHOW /*!50002 GLOBAL */ STATUS`,
@@ -1344,6 +1310,8 @@ func (s *TestSuite) TestParseSlow016(t *C) {
 				"Lock_time":  0.000059,
 			},
 			NumberMetrics: map[string]uint64{
+				"Killed":        0,
+				"Last_errno":    0,
 				"Rows_sent":     571,
 				"Rows_examined": 571,
 				"Rows_affected": 0,
@@ -1351,15 +1319,12 @@ func (s *TestSuite) TestParseSlow016(t *C) {
 			BoolMetrics: map[string]bool{},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	assert.EqualValues(t, expect, got)
 }
 
 // Start in query
-func (s *TestSuite) TestParseSlow017(t *C) {
-	got := s.parseSlowLog("slow017.log", log.Options{Debug: false})
+func TestParseSlow017(t *testing.T) {
+	got := parseSlowLog("slow017.log", opt)
 	expect := []log.Event{
 		{
 			Query:  `SHOW /*!50002 GLOBAL */ STATUS`,
@@ -1371,6 +1336,8 @@ func (s *TestSuite) TestParseSlow017(t *C) {
 				"Lock_time":  0.000059,
 			},
 			NumberMetrics: map[string]uint64{
+				"Killed":        0,
+				"Last_errno":    0,
 				"Rows_sent":     571,
 				"Rows_examined": 571,
 				"Rows_affected": 0,
@@ -1378,14 +1345,11 @@ func (s *TestSuite) TestParseSlow017(t *C) {
 			BoolMetrics: map[string]bool{},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	assert.EqualValues(t, expect, got)
 }
 
-func (s *TestSuite) TestParseSlow019(t *C) {
-	got := s.parseSlowLog("slow019.log", log.Options{Debug: false})
+func TestParseSlow019(t *testing.T) {
+	got := parseSlowLog("slow019.log", log.Options{Debug: false})
 	expect := []log.Event{
 		{
 			Query:  `SELECT TABLE_SCHEMA, TABLE_NAME, ROWS_READ, ROWS_CHANGED, ROWS_CHANGED_X_INDEXES FROM INFORMATION_SCHEMA.TABLE_STATISTICS`,
@@ -1529,15 +1493,12 @@ func (s *TestSuite) TestParseSlow019(t *C) {
 			},
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	assert.EqualValues(t, expect, got)
 }
 
 // Test db is not inherited and multiple "use" commands.
-func (s *TestSuite) TestParseSlow023(t *C) {
-	got := s.parseSlowLog("slow023.log", log.Options{Debug: false})
+func TestParseSlow023(t *testing.T) {
+	got := parseSlowLog("slow023.log", log.Options{Debug: false})
 	expect := []log.Event{
 		// Slice 0
 		{
@@ -1707,18 +1668,14 @@ func (s *TestSuite) TestParseSlow023(t *C) {
 			RateLimit:   0,
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		//Dump(expect)
-		t.Error(diff)
-	}
+	assert.EqualValues(t, expect, got)
 }
 
-func (s *TestSuite) TestParseSlow023A(t *C) {
+func TestParseSlow023A(t *testing.T) {
 	filename := "slow023.log"
 	o := log.Options{Debug: false}
 
-	file, err := os.Open(path.Join(s.sample, "/", filename))
+	file, err := os.Open(path.Join(sample, "/", filename))
 	if err != nil {
 		l.Fatal(err)
 	}
@@ -1740,8 +1697,8 @@ func (s *TestSuite) TestParseSlow023A(t *C) {
 /*
    Test header with invalid # Time or invalid # User lines
 */
-func (s *TestSuite) TestParseSlow024(t *C) {
-	got := s.parseSlowLog("slow024.log", log.Options{Debug: false})
+func TestParseSlow024(t *testing.T) {
+	got := parseSlowLog("slow024.log", log.Options{Debug: false})
 	expect := []log.Event{
 		{
 			Offset: 200,
@@ -1804,8 +1761,5 @@ func (s *TestSuite) TestParseSlow024(t *C) {
 			RateLimit:   0,
 		},
 	}
-	if same, diff := IsDeeply(got, expect); !same {
-		Dump(got)
-		t.Error(diff)
-	}
+	assert.EqualValues(t, expect, got)
 }

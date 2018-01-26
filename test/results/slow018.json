@@ -1,4 +1,6 @@
 {
+    "RateLimit": 0,
+    "Error": "",
     "Class": {
         "B2414E722E8A89DD": {
             "Example": {
@@ -12,38 +14,30 @@
             "Metrics": {
                 "BoolMetrics": {
                     "Filesort": {
-                        "Cnt": 4,
                         "Sum": 4
                     },
                     "Filesort_on_disk": {
-                        "Cnt": 4,
                         "Sum": 0
                     },
                     "Full_join": {
-                        "Cnt": 4,
                         "Sum": 0
                     },
                     "Full_scan": {
-                        "Cnt": 4,
                         "Sum": 1
                     },
                     "QC_Hit": {
-                        "Cnt": 4,
                         "Sum": 0
                     },
                     "Tmp_table": {
-                        "Cnt": 4,
                         "Sum": 2
                     },
                     "Tmp_table_on_disk": {
-                        "Cnt": 4,
                         "Sum": 0
                     }
                 },
                 "NumberMetrics": {
                     "Merge_passes": {
                         "Avg": 0,
-                        "Cnt": 4,
                         "Max": 0,
                         "Med": 0,
                         "Min": 0,
@@ -52,7 +46,6 @@
                     },
                     "Rows_examined": {
                         "Avg": 2,
-                        "Cnt": 4,
                         "Max": 4,
                         "Med": 3,
                         "Min": 1,
@@ -61,7 +54,6 @@
                     },
                     "Rows_sent": {
                         "Avg": 2,
-                        "Cnt": 4,
                         "Max": 4,
                         "Med": 3,
                         "Min": 1,
@@ -72,7 +64,6 @@
                 "TimeMetrics": {
                     "Lock_time": {
                         "Avg": 0,
-                        "Cnt": 4,
                         "Max": 0,
                         "Med": 0,
                         "Min": 0,
@@ -80,13 +71,12 @@
                         "Sum": 0
                     },
                     "Query_time": {
-                        "Avg": 0.225261,
-                        "Cnt": 4,
+                        "Avg": 0.22526100000000002,
                         "Max": 0.900001,
                         "Med": 0.00053,
                         "Min": 1e-06,
                         "P95": 0.900001,
-                        "Sum": 0.901044
+                        "Sum": 0.9010440000000001
                     }
                 }
             },
@@ -97,38 +87,30 @@
         "Metrics": {
             "BoolMetrics": {
                 "Filesort": {
-                    "Cnt": 4,
                     "Sum": 4
                 },
                 "Filesort_on_disk": {
-                    "Cnt": 4,
                     "Sum": 0
                 },
                 "Full_join": {
-                    "Cnt": 4,
                     "Sum": 0
                 },
                 "Full_scan": {
-                    "Cnt": 4,
                     "Sum": 1
                 },
                 "QC_Hit": {
-                    "Cnt": 4,
                     "Sum": 0
                 },
                 "Tmp_table": {
-                    "Cnt": 4,
                     "Sum": 2
                 },
                 "Tmp_table_on_disk": {
-                    "Cnt": 4,
                     "Sum": 0
                 }
             },
             "NumberMetrics": {
                 "Merge_passes": {
                     "Avg": 0,
-                    "Cnt": 4,
                     "Max": 0,
                     "Med": 0,
                     "Min": 0,
@@ -137,7 +119,6 @@
                 },
                 "Rows_examined": {
                     "Avg": 2,
-                    "Cnt": 4,
                     "Max": 4,
                     "Med": 3,
                     "Min": 1,
@@ -146,7 +127,6 @@
                 },
                 "Rows_sent": {
                     "Avg": 2,
-                    "Cnt": 4,
                     "Max": 4,
                     "Med": 3,
                     "Min": 1,
@@ -157,7 +137,6 @@
             "TimeMetrics": {
                 "Lock_time": {
                     "Avg": 0,
-                    "Cnt": 4,
                     "Max": 0,
                     "Med": 0,
                     "Min": 0,
@@ -165,16 +144,17 @@
                     "Sum": 0
                 },
                 "Query_time": {
-                    "Avg": 0.225261,
-                    "Cnt": 4,
+                    "Avg": 0.22526100000000002,
                     "Max": 0.900001,
                     "Med": 0.00053,
                     "Min": 1e-06,
                     "P95": 0.900001,
-                    "Sum": 0.901044
+                    "Sum": 0.9010440000000001
                 }
             }
         },
+        "Fingerprint": "",
+        "Id": "",
         "TotalQueries": 4,
         "UniqueQueries": 1
     }
