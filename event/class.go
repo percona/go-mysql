@@ -115,10 +115,10 @@ func (c *Class) AddClass(newClass *Class) {
 		} else {
 			stats.Sum += newStats.Sum
 			stats.Avg = Float64(stats.Sum / float64(c.TotalQueries))
-			if Float64Value(newStats.Min) < Float64Value(stats.Min) {
+			if Float64Value(newStats.Min) < Float64Value(stats.Min) || stats.Min == nil {
 				stats.Min = newStats.Min
 			}
-			if Float64Value(newStats.Max) > Float64Value(stats.Max) {
+			if Float64Value(newStats.Max) > Float64Value(stats.Max) || stats.Max == nil  {
 				stats.Max = newStats.Max
 			}
 		}
@@ -132,10 +132,10 @@ func (c *Class) AddClass(newClass *Class) {
 		} else {
 			stats.Sum += newStats.Sum
 			stats.Avg = Uint64(stats.Sum / uint64(c.TotalQueries))
-			if Uint64Value(newStats.Min) < Uint64Value(stats.Min) {
+			if Uint64Value(newStats.Min) < Uint64Value(stats.Min) || stats.Min == nil {
 				stats.Min = newStats.Min
 			}
-			if Uint64Value(newStats.Max) > Uint64Value(stats.Max) {
+			if Uint64Value(newStats.Max) > Uint64Value(stats.Max) || stats.Max == nil {
 				stats.Max = newStats.Max
 			}
 		}

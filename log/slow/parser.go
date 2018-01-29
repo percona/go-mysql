@@ -247,7 +247,7 @@ func (p *SlowLogParser) parseHeader(line string) {
 			if strings.HasSuffix(smv[1], "_time") || strings.HasSuffix(smv[1], "_wait") {
 				// microsecond value
 				val, _ := strconv.ParseFloat(smv[2], 64)
-				p.event.TimeMetrics[smv[1]] = float64(val)
+				p.event.TimeMetrics[smv[1]] = val
 			} else if smv[2] == "Yes" || smv[2] == "No" {
 				// boolean value
 				if smv[2] == "Yes" {
