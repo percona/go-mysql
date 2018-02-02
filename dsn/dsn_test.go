@@ -22,61 +22,54 @@ import (
 	"path"
 	"testing"
 
-	. "github.com/go-test/test"
-	. "gopkg.in/check.v1"
+	"github.com/percona/go-mysql/test"
+	"github.com/stretchr/testify/assert"
 )
 
-func Test(t *testing.T) { TestingT(t) }
-
-type TestSuite struct {
-}
-
-var _ = Suite(&TestSuite{})
-
-func (s *TestSuite) TestParseDefaults(t *C) {
+func TestParseDefaults(t *testing.T) {
 
 	input := "--user=root\n--password=rootpwd\n--port=3306\n--host=localhost\n--socket=/var/run/mysqld/mysqld.sock\n"
 	dsn := ParseMySQLDefaults(input)
-	t.Check(dsn.Username, Equals, "root")
-	t.Check(dsn.Password, Equals, "rootpwd")
-	t.Check(dsn.Hostname, Equals, "")
-	t.Check(dsn.Port, Equals, "")
-	t.Check(dsn.Socket, Equals, "/var/run/mysqld/mysqld.sock")
+	assert.Equal(t, "root", dsn.Username)
+	assert.Equal(t, "rootpwd", dsn.Password)
+	assert.Equal(t, "", dsn.Hostname)
+	assert.Equal(t, "", dsn.Port)
+	assert.Equal(t, "/var/run/mysqld/mysqld.sock", dsn.Socket)
 
 	input = "--user=root\n--password=rootpwd\n--port=3306\n--host=localhost"
 	dsn = ParseMySQLDefaults(input)
-	t.Check(dsn.Username, Equals, "root")
-	t.Check(dsn.Password, Equals, "rootpwd")
-	t.Check(dsn.Hostname, Equals, "localhost")
-	t.Check(dsn.Port, Equals, "3306")
-	t.Check(dsn.Socket, Equals, "")
+	assert.Equal(t, "root", dsn.Username)
+	assert.Equal(t, "rootpwd", dsn.Password)
+	assert.Equal(t, "localhost", dsn.Hostname)
+	assert.Equal(t, "3306", dsn.Port)
+	assert.Equal(t, "", dsn.Socket)
 
 }
 
-func (s *TestSuite) TestDefaults(t *C) {
+func TestDefaults(t *testing.T) {
 	originalPath := os.Getenv("PATH")
 
 	// Since we cannot install different versions of my_print_defaults, we are going
 	// to use 2 shell scripts to mock the behavior of the original programs.
 	// os.Exec (used in the Defaults func) search in the PATH for the program to run so,
 	// let's change the path to point to our mock scripts.
-	os.Setenv("PATH", path.Join(RootDir(), "test/scripts/my_print_defaults/5.5"))
+	os.Setenv("PATH", path.Join(test.RootDir(), "test/scripts/my_print_defaults/5.5"))
 	dsn, err := Defaults("a_fake_filename")
-	t.Check(err, IsNil)
-	t.Check(dsn.Username, Equals, "root5.5")
-	t.Check(dsn.Password, Equals, "rootpwd")
-	t.Check(dsn.Hostname, Equals, "")
-	t.Check(dsn.Port, Equals, "")
-	t.Check(dsn.Socket, Equals, "/var/run/mysqld/mysqld.sock")
+	assert.NoError(t, err)
+	assert.Equal(t, "root5.5", dsn.Username)
+	assert.Equal(t, "rootpwd", dsn.Password)
+	assert.Equal(t, "", dsn.Hostname)
+	assert.Equal(t, "", dsn.Port)
+	assert.Equal(t, "/var/run/mysqld/mysqld.sock", dsn.Socket)
 
-	os.Setenv("PATH", path.Join(RootDir(), "test/scripts/my_print_defaults/5.6"))
+	os.Setenv("PATH", path.Join(test.RootDir(), "test/scripts/my_print_defaults/5.6"))
 	dsn, err = Defaults("a_fake_filename")
-	t.Check(err, IsNil)
-	t.Check(dsn.Username, Equals, "root5.6")
-	t.Check(dsn.Password, Equals, "rootpwd")
-	t.Check(dsn.Hostname, Equals, "")
-	t.Check(dsn.Port, Equals, "")
-	t.Check(dsn.Socket, Equals, "/var/run/mysqld/mysqld.sock")
+	assert.NoError(t, err)
+	assert.Equal(t, "root5.6", dsn.Username)
+	assert.Equal(t, "rootpwd", dsn.Password)
+	assert.Equal(t, "", dsn.Hostname)
+	assert.Equal(t, "", dsn.Port)
+	assert.Equal(t, "/var/run/mysqld/mysqld.sock", dsn.Socket)
 
 	os.Setenv("PATH", originalPath)
 }

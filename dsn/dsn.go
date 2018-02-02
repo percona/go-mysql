@@ -26,8 +26,6 @@ import (
 	"path"
 	"regexp"
 	"strings"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 type DSN struct {
