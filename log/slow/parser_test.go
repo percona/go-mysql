@@ -1763,3 +1763,35 @@ func TestParseSlow024(t *testing.T) {
 	}
 	assert.EqualValues(t, expect, got)
 }
+
+// https://jira.percona.com/browse/PMM-1834
+func TestParseSlowMariaDBWithExplain(t *testing.T) {
+	got := parseSlowLog("mariadb102-with-explain.log", log.Options{Debug: false})
+	expect := []log.Event{
+		{
+			Offset: 206,
+			Ts:     "180214 16:18:07",
+			Admin:  false,
+			Query:  "#\n# explain: id\tselect_type\ttable\ttype\tpossible_keys\tkey\tkey_len\tref\trows\tr_rows\tfiltered\tr_filtered\tExtra\n# explain: 1\tSIMPLE\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNo tables used\n#\nSELECT 1",
+			User:   "root",
+			Host:   "localhost",
+			Db:     "",
+			TimeMetrics: map[string]float64{
+				"Lock_time":  0,
+				"Query_time": 0.000277,
+			},
+			NumberMetrics: map[string]uint64{
+				"Rows_affected": 0,
+				"Rows_examined": 0,
+				"Rows_sent":     1,
+				"Thread_id":     8,
+			},
+			BoolMetrics: map[string]bool{
+				"QC_hit": false,
+			},
+			RateType:    "",
+			RateLimit:   0,
+		},
+	}
+	assert.EqualValues(t, expect, got)
+}

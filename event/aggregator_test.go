@@ -190,7 +190,7 @@ func TestOutlierSlow025(t *testing.T) {
 	assert.JSONEq(t, expect, got)
 }
 
-func TestMariaDB102Explain(t *testing.T) {
-	got, expect := aggregateSlowLog("mariadb102_explain.log", "mariadb102_explain.json", 0, true)
+func TestMariaDB102WithExplain(t *testing.T) {
+	got, expect := aggregateSlowLog("mariadb102-with-explain.log", "mariadb102-with-explain.json", 0, true)
 	assert.JSONEq(t, expect, got)
 }
