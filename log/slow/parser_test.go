@@ -1772,7 +1772,7 @@ func TestParseSlowMariaDBWithExplain(t *testing.T) {
 			Offset: 206,
 			Ts:     "180214 16:18:07",
 			Admin:  false,
-			Query:  "#\n# explain: id\tselect_type\ttable\ttype\tpossible_keys\tkey\tkey_len\tref\trows\tr_rows\tfiltered\tr_filtered\tExtra\n# explain: 1\tSIMPLE\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNo tables used\n#\nSELECT 1",
+			Query:  "SELECT 1",
 			User:   "root",
 			Host:   "localhost",
 			Db:     "",

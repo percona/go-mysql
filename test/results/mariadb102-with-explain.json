@@ -132,7 +132,7 @@
       "Example": {
         "QueryTime": 0.000277,
         "Db": "",
-        "Query": "#\n# explain: id\tselect_type\ttable\ttype\tpossible_keys\tkey\tkey_len\tref\trows\tr_rows\tfiltered\tr_filtered\tExtra\n# explain: 1\tSIMPLE\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNo tables used\n#\nSELECT 1",
+        "Query": "SELECT 1",
         "Ts": "2018-02-14 16:18:07"
       }
     }
