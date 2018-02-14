@@ -1,26 +1,23 @@
 {
-  "RateLimit": 0,
   "Global": {
-    "Fingerprint": "",
     "Id": "",
-    "TotalQueries": 1,
-    "UniqueQueries": 1,
+    "Fingerprint": "",
     "Metrics": {
       "TimeMetrics": {
         "Lock_time": {
           "Sum": 0,
           "Min": 0,
           "Avg": 0,
-          "P95": 0,
           "Med": 0,
+          "P95": 0,
           "Max": 0
         },
         "Query_time": {
           "Sum": 2,
           "Min": 2,
           "Avg": 2,
-          "P95": 2,
           "Med": 2,
+          "P95": 2,
           "Max": 2
         }
       },
@@ -29,42 +26,43 @@
           "Sum": 0,
           "Min": 0,
           "Avg": 0,
-          "P95": 0,
           "Med": 0,
+          "P95": 0,
           "Max": 0
         },
         "Rows_sent": {
           "Sum": 1,
           "Min": 1,
           "Avg": 1,
-          "P95": 1,
           "Med": 1,
+          "P95": 1,
           "Max": 1
         }
       }
-    }
+    },
+    "TotalQueries": 1,
+    "UniqueQueries": 1
   },
   "Class": {
     "7F7D57ACDD8A346E": {
       "Id": "7F7D57ACDD8A346E",
       "Fingerprint": "select sleep(?) from n",
-      "UniqueQueries": 1,
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
             "Sum": 0,
             "Min": 0,
             "Avg": 0,
-            "P95": 0,
             "Med": 0,
+            "P95": 0,
             "Max": 0
           },
           "Query_time": {
             "Sum": 2,
             "Min": 2,
             "Avg": 2,
-            "P95": 2,
             "Med": 2,
+            "P95": 2,
             "Max": 2
           }
         },
@@ -73,21 +71,22 @@
             "Sum": 0,
             "Min": 0,
             "Avg": 0,
-            "P95": 0,
             "Med": 0,
+            "P95": 0,
             "Max": 0
           },
           "Rows_sent": {
             "Sum": 1,
             "Min": 1,
             "Avg": 1,
-            "P95": 1,
             "Med": 1,
+            "P95": 1,
             "Max": 1
           }
         }
       },
       "TotalQueries": 1,
+      "UniqueQueries": 1,
       "Example": {
         "QueryTime": 2,
         "Db": "test",
@@ -96,6 +95,6 @@
       }
     }
   },
+  "RateLimit": 0,
   "Error": ""
 }
-

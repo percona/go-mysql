@@ -42,11 +42,6 @@ var (
 )
 
 func aggregateSlowLog(input, output string, utcOffset time.Duration, examples bool) (string, string) {
-	expectJson, err := ioutil.ReadFile(path.Join(result, "/", output))
-	if err != nil {
-		l.Fatal(err)
-	}
-
 	file, err := os.Open(path.Join(sample, "/", input))
 	if err != nil {
 		l.Fatal(err)
@@ -60,7 +55,18 @@ func aggregateSlowLog(input, output string, utcOffset time.Duration, examples bo
 		a.AddEvent(e, id, f)
 	}
 	got := a.Finalize()
-	gotJson, err := json.Marshal(got)
+	gotJson, err := json.MarshalIndent(got, "", "  ")
+	if err != nil {
+		l.Fatal(err)
+	}
+
+	resultOutputPath := path.Join(result, "/", output)
+	if *test.Update {
+		if err := ioutil.WriteFile(resultOutputPath, gotJson, 0666); err != nil {
+			l.Fatal(err)
+		}
+	}
+	expectJson, err := ioutil.ReadFile(resultOutputPath)
 	if err != nil {
 		l.Fatal(err)
 	}
@@ -181,5 +187,10 @@ func TestUseDb(t *testing.T) {
 
 func TestOutlierSlow025(t *testing.T) {
 	got, expect := aggregateSlowLog("slow025.log", "slow025.json", 0, true)
+	assert.JSONEq(t, expect, got)
+}
+
+func TestMariaDB102Explain(t *testing.T) {
+	got, expect := aggregateSlowLog("mariadb102_explain.log", "mariadb102_explain.json", 0, true)
 	assert.JSONEq(t, expect, got)
 }

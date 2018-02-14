@@ -22,6 +22,7 @@ import (
 
 	"github.com/percona/go-mysql/query"
 	"github.com/stretchr/testify/assert"
+	_ "github.com/percona/go-mysql/test"
 )
 
 func TestFingerprintBasic(t *testing.T) {

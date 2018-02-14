@@ -4,7 +4,10 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"flag"
 )
+
+var Update = flag.Bool("update", false, "update .golden files")
 
 func RootDir() string {
 	_, filename, _, _ := runtime.Caller(1)

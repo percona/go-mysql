@@ -1,11 +1,7 @@
 {
-  "RateLimit": 1000,
-  "Error": "",
   "Global": {
-    "Fingerprint": "",
     "Id": "",
-    "TotalQueries": 2001,
-    "UniqueQueries": 1,
+    "Fingerprint": "",
     "Metrics": {
       "TimeMetrics": {
         "Lock_time": {
@@ -43,20 +39,14 @@
           "Max": 1
         }
       }
-    }
+    },
+    "TotalQueries": 2001,
+    "UniqueQueries": 1
   },
   "Class": {
     "FDE00DF974C61E9F": {
       "Id": "FDE00DF974C61E9F",
       "Fingerprint": "select c from t",
-      "TotalQueries": 2001,
-      "UniqueQueries": 1,
-      "Example": {
-        "Db": "",
-        "QueryTime": 20,
-        "Query": "select c from t",
-        "Ts": "2007-10-15 00:00:02"
-      },
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
@@ -94,7 +84,17 @@
             "Max": 1
           }
         }
+      },
+      "TotalQueries": 2001,
+      "UniqueQueries": 1,
+      "Example": {
+        "QueryTime": 20,
+        "Db": "",
+        "Query": "select c from t",
+        "Ts": "2007-10-15 00:00:02"
       }
     }
-  }
+  },
+  "RateLimit": 1000,
+  "Error": ""
 }
