@@ -95,7 +95,7 @@ const (
 	inMySQLCode              // /*! MySQL-specific code */
 )
 
-var stateName map[byte]string = map[byte]string{
+var stateName = map[byte]string{
 	0:  "unknown",
 	1:  "inWord",
 	2:  "inNumber",
@@ -119,7 +119,7 @@ var stateName map[byte]string = map[byte]string{
 }
 
 // Debug prints very verbose tracing information to STDOUT.
-var Debug bool = false
+var Debug = true
 
 // ReplaceNumbersInWords enables replacing numbers in words. For example:
 // `SELECT c FROM org235.t` -> `SELECT c FROM org?.t`. For more examples
@@ -131,7 +131,7 @@ var ReplaceNumbersInWords = false
 //   - Collapse whitespace
 //   - Remove comments
 //   - Lowercase everything
-// Additional trasnformations are performed which change the syntax of the
+// Additional transformations are performed which change the syntax of the
 // original query without affecting its performance characteristics. For
 // example, "ORDER BY col ASC" is the same as "ORDER BY col", so "ASC" in the
 // fingerprint is removed.

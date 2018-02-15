@@ -228,6 +228,7 @@ func TestFingerprintBasic(t *testing.T) {
 		"select * from prices.rt_5min where id=?",
 		query.Fingerprint(q),
 	)
+
 	// Fingerprint Insert into tables;
 	q = "insert into t3 values(2);"
 	assert.Equal(
