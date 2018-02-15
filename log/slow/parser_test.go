@@ -1789,8 +1789,8 @@ func TestParseSlowMariaDBWithExplain(t *testing.T) {
 			BoolMetrics: map[string]bool{
 				"QC_hit": false,
 			},
-			RateType:    "",
-			RateLimit:   0,
+			RateType:  "",
+			RateLimit: 0,
 		},
 	}
 	assert.EqualValues(t, expect, got)

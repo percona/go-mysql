@@ -1,10 +1,10 @@
 package test
 
 import (
+	"flag"
 	"os"
 	"path/filepath"
 	"runtime"
-	"flag"
 )
 
 var Update = flag.Bool("update", false, "update .golden files")
