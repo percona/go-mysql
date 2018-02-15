@@ -237,6 +237,13 @@ func TestFingerprintBasic(t *testing.T) {
 		query.Fingerprint(q),
 	)
 
+	q = "insert into foo (a) values(0)"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"insert into foo (a) values(?+)",
+	)
+
 	q = "INSERT INTO t (ts) VALUES (NOW())"
 	assert.Equal(
 		t,
