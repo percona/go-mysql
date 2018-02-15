@@ -1,11 +1,7 @@
 {
-  "RateLimit": 1000,
-  "Error": "",
   "Global": {
-    "Fingerprint": "",
     "Id": "",
-    "TotalQueries": 2001,
-    "UniqueQueries": 1,
+    "Fingerprint": "",
     "Metrics": {
       "TimeMetrics": {
         "Lock_time": {
@@ -17,12 +13,12 @@
           "Max": 0
         },
         "Query_time": {
-          "Sum": 320.00000000000006,
-          "Min": 0.1,
-          "Avg": 0.15992003998001003,
-          "Med": 0.2,
-          "P95": 20,
-          "Max": 20
+          "Sum": 2,
+          "Min": 2,
+          "Avg": 2,
+          "Med": 2,
+          "P95": 2,
+          "Max": 2
         }
       },
       "NumberMetrics": {
@@ -35,7 +31,7 @@
           "Max": 0
         },
         "Rows_sent": {
-          "Sum": 2001,
+          "Sum": 1,
           "Min": 1,
           "Avg": 1,
           "Med": 1,
@@ -43,20 +39,14 @@
           "Max": 1
         }
       }
-    }
+    },
+    "TotalQueries": 1,
+    "UniqueQueries": 1
   },
   "Class": {
-    "FDE00DF974C61E9F": {
-      "Id": "FDE00DF974C61E9F",
-      "Fingerprint": "select c from t",
-      "TotalQueries": 2001,
-      "UniqueQueries": 1,
-      "Example": {
-        "Db": "",
-        "QueryTime": 20,
-        "Query": "select c from t",
-        "Ts": "2007-10-15 00:00:02"
-      },
+    "7F7D57ACDD8A346E": {
+      "Id": "7F7D57ACDD8A346E",
+      "Fingerprint": "select sleep(?) from n",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
@@ -68,12 +58,12 @@
             "Max": 0
           },
           "Query_time": {
-            "Sum": 320.00000000000006,
-            "Min": 0.1,
-            "Avg": 0.15992003998001003,
-            "Med": 0.2,
-            "P95": 20,
-            "Max": 20
+            "Sum": 2,
+            "Min": 2,
+            "Avg": 2,
+            "Med": 2,
+            "P95": 2,
+            "Max": 2
           }
         },
         "NumberMetrics": {
@@ -86,7 +76,7 @@
             "Max": 0
           },
           "Rows_sent": {
-            "Sum": 2001,
+            "Sum": 1,
             "Min": 1,
             "Avg": 1,
             "Med": 1,
@@ -94,7 +84,17 @@
             "Max": 1
           }
         }
+      },
+      "TotalQueries": 1,
+      "UniqueQueries": 1,
+      "Example": {
+        "QueryTime": 2,
+        "Db": "test",
+        "Query": "select sleep(2) from n",
+        "Ts": "2007-10-15 21:43:52"
       }
     }
-  }
+  },
+  "RateLimit": 0,
+  "Error": ""
 }

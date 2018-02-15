@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/percona/go-mysql/query"
+	_ "github.com/percona/go-mysql/test"
 	"github.com/stretchr/testify/assert"
 )
 

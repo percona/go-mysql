@@ -1,10 +1,13 @@
 package test
 
 import (
+	"flag"
 	"os"
 	"path/filepath"
 	"runtime"
 )
+
+var Update = flag.Bool("update", false, "update .golden files")
 
 func RootDir() string {
 	_, filename, _, _ := runtime.Caller(1)

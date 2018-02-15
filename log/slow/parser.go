@@ -160,6 +160,11 @@ SCANNER_LOOP:
 			continue
 		}
 
+		// PMM-1834: Filter out empty comments and MariaDB explain:
+		if line == "#\n" || strings.HasPrefix(line, "# explain:") {
+			continue
+		}
+
 		// Remove \n.
 		line = line[0 : lineLen-1]
 

@@ -118,7 +118,7 @@ func (c *Class) AddClass(newClass *Class) {
 			if Float64Value(newStats.Min) < Float64Value(stats.Min) || stats.Min == nil {
 				stats.Min = newStats.Min
 			}
-			if Float64Value(newStats.Max) > Float64Value(stats.Max) || stats.Max == nil  {
+			if Float64Value(newStats.Max) > Float64Value(stats.Max) || stats.Max == nil {
 				stats.Max = newStats.Max
 			}
 		}

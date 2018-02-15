@@ -22,10 +22,11 @@ import (
 	"io/ioutil"
 	l "log"
 	"os"
-	"path"
+	"path/filepath"
+	"sort"
+	"strings"
 	"testing"
 	"time"
-	"strings"
 
 	"github.com/percona/go-mysql/event"
 	"github.com/percona/go-mysql/log"
@@ -37,17 +38,11 @@ import (
 
 var (
 	rootDir = test.RootDir()
-	sample  = path.Join(rootDir, "test/slow-logs")
-	result  = path.Join(rootDir, "test/results")
+	sample  = filepath.Join(rootDir, "test/slow-logs")
 )
 
 func aggregateSlowLog(input, output string, utcOffset time.Duration, examples bool) (string, string) {
-	expectJson, err := ioutil.ReadFile(path.Join(result, "/", output))
-	if err != nil {
-		l.Fatal(err)
-	}
-
-	file, err := os.Open(path.Join(sample, "/", input))
+	file, err := os.Open(filepath.Join(sample, input))
 	if err != nil {
 		l.Fatal(err)
 	}
@@ -60,7 +55,18 @@ func aggregateSlowLog(input, output string, utcOffset time.Duration, examples bo
 		a.AddEvent(e, id, f)
 	}
 	got := a.Finalize()
-	gotJson, err := json.Marshal(got)
+	gotJson, err := json.MarshalIndent(got, "", "  ")
+	if err != nil {
+		l.Fatal(err)
+	}
+
+	resultOutputPath := filepath.Join("testdata", output)
+	if *test.Update {
+		if err := ioutil.WriteFile(resultOutputPath, gotJson, 0666); err != nil {
+			l.Fatal(err)
+		}
+	}
+	expectJson, err := ioutil.ReadFile(resultOutputPath)
 	if err != nil {
 		l.Fatal(err)
 	}
@@ -89,15 +95,28 @@ func zeroPercentiles(r *event.Result) {
 	}
 }
 
+func ordered(in map[string]*event.Class) (out []*event.Class) {
+	var keys []string
+	for k := range in {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		out = append(out, in[k])
+	}
+
+	return out
+}
+
 // --------------------------------------------------------------------------
 
 func TestSlow001(t *testing.T) {
-	got, expect := aggregateSlowLog("slow001.log", "slow001.json", 0, true)
+	got, expect := aggregateSlowLog("slow001.log", "slow001.golden", 0, true)
 	assert.JSONEq(t, expect, got)
 }
 
 func TestSlow001WithTzOffset(t *testing.T) {
-	got, expect := aggregateSlowLog("slow001.log", "slow001.json", -1*time.Hour, true)
+	got, expect := aggregateSlowLog("slow001.log", "slow001.golden", -1*time.Hour, true)
 	// Use the same files as TestSlow001NoExamples but with a tz=-1
 	expect = strings.Replace(expect, "2007-10-15 21:43:52", "2007-10-15 20:43:52", 1)
 	expect = strings.Replace(expect, "2007-10-15 21:45:10", "2007-10-15 20:45:10", 1)
@@ -105,18 +124,18 @@ func TestSlow001WithTzOffset(t *testing.T) {
 }
 
 func TestSlow001NoExamples(t *testing.T) {
-	got, expect := aggregateSlowLog("slow001.log", "slow001-no-examples.json", 0, false)
+	got, expect := aggregateSlowLog("slow001.log", "slow001-no-examples.golden", 0, false)
 	assert.JSONEq(t, expect, got)
 }
 
 // Test p95 and median.
 func TestSlow010(t *testing.T) {
-	got, expect := aggregateSlowLog("slow010.log", "slow010.json", 0, true)
+	got, expect := aggregateSlowLog("slow010.log", "slow010.golden", 0, true)
 	assert.JSONEq(t, expect, got)
 }
 
 func TestAddClassSlow001(t *testing.T) {
-	expect, _ := aggregateSlowLog("slow001.log", "slow001.json", 0, true)
+	expect, _ := aggregateSlowLog("slow001.log", "slow001.golden", 0, true)
 	expectEventResult := event.Result{}
 	if err := json.Unmarshal([]byte(expect), &expectEventResult); err != nil {
 		t.Fatal(err)
@@ -139,7 +158,7 @@ func TestAddClassSlow001(t *testing.T) {
 }
 
 func TestAddClassSlow023(t *testing.T) {
-	expect, _ := aggregateSlowLog("slow023.log", "slow018.json", 0, true)
+	expect, _ := aggregateSlowLog("slow023.log", "slow023.golden", 0, true)
 	expectEventResult := event.Result{}
 	if err := json.Unmarshal([]byte(expect), &expectEventResult); err != nil {
 		t.Fatal(err)
@@ -147,7 +166,7 @@ func TestAddClassSlow023(t *testing.T) {
 	zeroPercentiles(&expectEventResult)
 
 	global := event.NewClass("", "", false)
-	for _, class := range expectEventResult.Class {
+	for _, class := range ordered(expectEventResult.Class) {
 		global.AddClass(class)
 	}
 	expectGlobalBytes, err := json.Marshal(expectEventResult.Global)
@@ -162,24 +181,29 @@ func TestAddClassSlow023(t *testing.T) {
 }
 
 func TestSlow018(t *testing.T) {
-	got, expect := aggregateSlowLog("slow018.log", "slow018.json", 0, true)
+	got, expect := aggregateSlowLog("slow018.log", "slow018.golden", 0, true)
 	assert.JSONEq(t, expect, got)
 }
 
 // Tests for PCT-1006 & PCT-1085
 func TestUseDb(t *testing.T) {
 	// Test db is not inherited
-	got, expect := aggregateSlowLog("slow020.log", "slow020.json", 0, true)
+	got, expect := aggregateSlowLog("slow020.log", "slow020.golden", 0, true)
 	assert.JSONEq(t, expect, got)
 	// Test "use" is not case sensitive
-	got, expect = aggregateSlowLog("slow021.log", "slow021.json", 0, true)
+	got, expect = aggregateSlowLog("slow021.log", "slow021.golden", 0, true)
 	assert.JSONEq(t, expect, got)
 	// Test we are parsing db names in backticks
-	got, expect = aggregateSlowLog("slow022.log", "slow022.json", 0, true)
+	got, expect = aggregateSlowLog("slow022.log", "slow022.golden", 0, true)
 	assert.JSONEq(t, expect, got)
 }
 
 func TestOutlierSlow025(t *testing.T) {
-	got, expect := aggregateSlowLog("slow025.log", "slow025.json", 0, true)
+	got, expect := aggregateSlowLog("slow025.log", "slow025.golden", 0, true)
+	assert.JSONEq(t, expect, got)
+}
+
+func TestMariaDB102WithExplain(t *testing.T) {
+	got, expect := aggregateSlowLog("mariadb102-with-explain.log", "mariadb102-with-explain.golden", 0, true)
 	assert.JSONEq(t, expect, got)
 }
