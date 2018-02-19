@@ -23,7 +23,7 @@ import (
 
 const (
 	// MaxExampleBytes defines to how many bytes truncate a query.
-	MaxExampleBytes = 1024 * 10
+	MaxExampleBytes = 2 * 1024 * 10
 
 	// TruncatedExampleSuffix is added to truncated query.
 	TruncatedExampleSuffix = "..."
