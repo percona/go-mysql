@@ -46,13 +46,13 @@ type Class struct {
 }
 
 // A Example is a real query and its database, timestamp, and Query_time.
-// If the query is larger than MaxExampleBytes, it is truncated and "..."
+// If the query is larger than MaxExampleBytes, it is truncated and TruncatedExampleSuffix
 // is appended.
 type Example struct {
 	QueryTime float64 // Query_time
 	Db        string  // Schema: <db> or USE <db>
 	Query     string  // truncated to MaxExampleBytes
-	Truncated bool    `json:",omitempty"` // true if Query is truncated to MaxExampleBytes
+	Size      int     `json:",omitempty"` // Original size of query.
 	Ts        string  `json:",omitempty"` // in MySQL time zone
 }
 
@@ -89,6 +89,7 @@ func (c *Class) AddEvent(e *log.Event, outlier bool) {
 		if n, ok := e.TimeMetrics["Query_time"]; ok {
 			if float64(n) > c.Example.QueryTime {
 				c.Example.QueryTime = float64(n)
+				c.Example.Size = len(e.Query)
 				if e.Db != "" {
 					c.Example.Db = e.Db
 				} else {
@@ -96,7 +97,6 @@ func (c *Class) AddEvent(e *log.Event, outlier bool) {
 				}
 				if len(e.Query) > MaxExampleBytes {
 					c.Example.Query = e.Query[0:MaxExampleBytes-len(TruncatedExampleSuffix)] + TruncatedExampleSuffix
-					c.Example.Truncated = true
 				} else {
 					c.Example.Query = e.Query
 				}
