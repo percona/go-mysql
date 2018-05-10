@@ -19,13 +19,15 @@ package dsn
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
-	"path"
 	"regexp"
 	"strings"
+
+	"github.com/pkg/errors"
+	"github.com/shirou/gopsutil/net"
+	"github.com/shirou/gopsutil/process"
 )
 
 type DSN struct {
@@ -96,16 +98,11 @@ func (dsn DSN) AutoDetect() (DSN, error) {
 		if defaults.Socket != "" {
 			dsn.Socket = defaults.Socket
 		} else {
-			// Try to auto-detect MySQL socket from netstat output.
-			out, err := exec.Command("netstat", "-anp").Output()
-			if err != nil {
-				return dsn, ErrNoSocket
+			if socket, err := GetSocketFromProcessLists(); err != nil {
+				return dsn, err
+			} else {
+				dsn.Socket = socket
 			}
-			socket := ParseSocketFromNetstat(string(out))
-			if socket == "" {
-				return dsn, ErrNoSocket
-			}
-			dsn.Socket = socket
 		}
 	}
 
@@ -203,18 +200,36 @@ func HidePassword(dsn string) string {
 	return dsn
 }
 
-func ParseSocketFromNetstat(out string) string {
-	lines := strings.Split(out, "\n")
-	for _, line := range lines {
-		if strings.HasPrefix(line, "unix") && strings.Contains(line, "mysql") {
-			fields := strings.Fields(line)
-			socket := fields[len(fields)-1]
-			if path.IsAbs(socket) {
-				return socket
+// GetSocketFromProcessLists will loop through the list of PIDs until it finds a process
+// named 'mysqld' and the it will try to get the socket by querying the open network
+// connections for that process.
+// Warning: this function returns the socket for the FIRST mysqld process it founds.
+// If there are more than one MySQL instance, only the first one will be detected.
+func GetSocketFromProcessLists() (string, error) {
+	pids, err := process.Pids()
+	if err != nil {
+		return "", errors.Wrap(err, "Cannot get the list of PIDs")
+	}
+	for _, pid := range pids {
+		proc, err := process.NewProcess(pid)
+		if err != nil {
+			continue
+		}
+		if procName, err := proc.Name(); err != nil {
+			continue
+		} else {
+			if procName == "mysqld" {
+				cons, err := net.ConnectionsPid("unix", pid)
+				if err != nil {
+					return "", errors.Wrapf(err, "Cannot get network connections for PID %d", pid)
+				}
+				if len(cons) > 0 {
+					return cons[0].Laddr.IP, nil
+				}
 			}
 		}
 	}
-	return ""
+	return "", ErrNoSocket
 }
 
 func ParseMySQLDefaults(output string) DSN {
