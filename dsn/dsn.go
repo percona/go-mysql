@@ -113,13 +113,13 @@ func (dsn DSN) AutoDetect() (DSN, error) {
 
 func Defaults(defaultsFile string) (DSN, error) {
 	versionParams := [][]string{
-		[]string{"-s", "client"},
-		[]string{"client"},
+		{"-s", "client"},
+		{"client"},
 	}
 	if defaultsFile != "" {
 		versionParams = [][]string{
-			[]string{"--defaults-file=" + defaultsFile, "-s", "client"},
-			[]string{"--defaults-file=" + defaultsFile, "client"},
+			{"--defaults-file=" + defaultsFile, "-s", "client"},
+			{"--defaults-file=" + defaultsFile, "client"},
 		}
 	}
 
