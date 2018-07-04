@@ -20,11 +20,11 @@ package dsn
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"regexp"
 	"strings"
-	"log"
 
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/net"
@@ -217,8 +217,8 @@ func GetSocketFromProcessLists() (string, error) {
 		if err != nil {
 			continue
 		}
-		procName, err := proc.Name();
-		if  err != nil {
+		procName, err := proc.Name()
+		if err != nil {
 			continue
 		}
 		if procName != "mysqld" {
