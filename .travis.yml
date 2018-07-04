@@ -16,6 +16,13 @@ install:
   - git diff --exit-code
 
 script:
+  - lsof -U
+  - lsof -U | grep mysql
+  - pgrep -x mysqld
+  - lsof -p $(pgrep -x mysqld) | grep unix
+  - netstat -anp
+  - netstat -anp | grep mysql
+  - mysql -uroot -e "SELECT @@socket"
   - make init
   - make test-travis
 
