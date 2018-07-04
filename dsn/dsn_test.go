@@ -73,3 +73,9 @@ func TestDefaults(t *testing.T) {
 
 	os.Setenv("PATH", originalPath)
 }
+
+func TestGetSocketFromProcessLists(t *testing.T) {
+	socket, err := GetSocketFromProcessLists()
+	assert.NoError(t, err)
+	assert.NotEmpty(t, socket)
+}

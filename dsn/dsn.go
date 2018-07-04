@@ -24,6 +24,7 @@ import (
 	"os/exec"
 	"regexp"
 	"strings"
+	"log"
 
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/net"
@@ -53,7 +54,7 @@ const (
 )
 
 var (
-	ErrNoSocket error = errors.New("cannot auto-detect MySQL socket")
+	ErrNoSocket = errors.New("cannot auto-detect MySQL socket")
 )
 
 func (dsn DSN) AutoDetect() (DSN, error) {
@@ -210,24 +211,39 @@ func GetSocketFromProcessLists() (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "Cannot get the list of PIDs")
 	}
+	sockets := []string{}
 	for _, pid := range pids {
 		proc, err := process.NewProcess(pid)
 		if err != nil {
 			continue
 		}
-		if procName, err := proc.Name(); err != nil {
+		procName, err := proc.Name();
+		if  err != nil {
 			continue
-		} else {
-			if procName == "mysqld" {
-				cons, err := net.ConnectionsPid("unix", pid)
-				if err != nil {
-					return "", errors.Wrapf(err, "Cannot get network connections for PID %d", pid)
-				}
-				if len(cons) > 0 {
-					return cons[0].Laddr.IP, nil
-				}
-			}
 		}
+		if procName != "mysqld" {
+			continue
+		}
+		cons, err := net.ConnectionsPid("unix", pid)
+		if err != nil {
+			return "", errors.Wrapf(err, "Cannot get network connections for PID %d", pid)
+		}
+		for i := range cons {
+			socket := cons[i].Laddr.IP
+			if strings.HasPrefix(socket, "->") {
+				continue
+			}
+			if strings.HasSuffix(socket, "/mysqlx.sock") {
+				continue
+			}
+			sockets = append(sockets, socket)
+		}
+	}
+	if len(sockets) > 1 {
+		log.Println("Multiple sockets detected, choosing first one:", strings.Join(sockets, ", "))
+	}
+	if len(sockets) > 0 {
+		return sockets[0], nil
 	}
 	return "", ErrNoSocket
 }
