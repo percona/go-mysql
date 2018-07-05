@@ -75,7 +75,7 @@ func TestDefaults(t *testing.T) {
 }
 
 func TestGetSocketFromProcessLists(t *testing.T) {
-	socket, err := GetSocketFromProcessLists()
+	socket, err := GetSocket()
 	assert.NoError(t, err)
 	assert.NotEmpty(t, socket)
 }

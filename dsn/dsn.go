@@ -101,14 +101,9 @@ func (dsn DSN) AutoDetect() (DSN, error) {
 		if defaults.Socket != "" {
 			dsn.Socket = defaults.Socket
 		} else {
-			var socket string
-			var err error
-			socket, err = GetSocketFromProcessLists()
+			socket, err := GetSocket()
 			if err != nil {
-				socket, err = GetSocketFromNetstat()
-				if err != nil {
-					return dsn, err
-				}
+				return dsn, err
 			}
 			dsn.Socket = socket
 		}
@@ -295,6 +290,17 @@ func GetSocketFromNetstat() (string, error) {
 		return sockets[0], nil
 	}
 	return "", ErrNoSocket
+}
+
+// GetSocket tries to detect and return path to the MySQL socket.
+func GetSocket() (string, error) {
+	var socket string
+	var err error
+	socket, err = GetSocketFromProcessLists()
+	if err != nil {
+		socket, err = GetSocketFromNetstat()
+	}
+	return socket, err
 }
 
 func ParseMySQLDefaults(output string) DSN {
