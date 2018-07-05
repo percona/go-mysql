@@ -101,7 +101,7 @@ func (dsn DSN) AutoDetect() (DSN, error) {
 		if defaults.Socket != "" {
 			dsn.Socket = defaults.Socket
 		} else {
-			socket, err := GetSocket()
+			socket, err := GetSocket(dsn.String())
 			if err != nil {
 				return dsn, err
 			}
@@ -203,6 +203,29 @@ func HidePassword(dsn string) string {
 	return dsn
 }
 
+// GetSocketFromTCPConnection will try to get socket path by connecting to MySQL localhost TCP port.
+// This is not reliable as TCP connections may be not allowed.
+func GetSocketFromTCPConnection(dsn string) (socket string, err error) {
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return "", ErrNoSocket
+	}
+	defer db.Close()
+
+	err = db.QueryRow("SELECT @@socket").Scan(socket)
+	if err != nil {
+		return "", ErrNoSocket
+	}
+	if !path.IsAbs(socket) {
+		return "", ErrNoSocket
+	}
+	if socket != "" {
+		return socket, nil
+	}
+
+	return "", ErrNoSocket
+}
+
 // GetSocketFromProcessLists will loop through the list of PIDs until it finds a process
 // named 'mysqld' and the it will try to get the socket by querying the open network
 // connections for that process.
@@ -296,12 +319,15 @@ func GetSocketFromNetstat() (string, error) {
 }
 
 // GetSocket tries to detect and return path to the MySQL socket.
-func GetSocket() (string, error) {
+func GetSocket(dsn string) (string, error) {
 	var socket string
 	var err error
-	socket, err = GetSocketFromProcessLists()
+	socket, err = GetSocketFromTCPConnection(dsn)
 	if err != nil {
-		socket, err = GetSocketFromNetstat()
+		socket, err = GetSocketFromProcessLists()
+		if err != nil {
+			socket, err = GetSocketFromNetstat()
+		}
 	}
 	return socket, err
 }
