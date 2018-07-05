@@ -27,8 +27,8 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/percona/go-mysql/dsn/lsof"
 	"github.com/pkg/errors"
-	"github.com/shirou/gopsutil/net"
 	"github.com/shirou/gopsutil/process"
 )
 
@@ -226,25 +226,28 @@ func GetSocketFromProcessLists() (string, error) {
 		if procName != "mysqld" {
 			continue
 		}
-		cons, err := net.ConnectionsPid("unix", pid)
+		cons, err := lsof.Socket(pid)
 		if err != nil {
 			return "", errors.Wrapf(err, "Cannot get network connections for PID %d", pid)
 		}
 		for i := range cons {
-			socket := cons[i].Laddr.IP
-			if strings.HasPrefix(socket, "->") {
-				continue
+			for j := range cons[i].FileDescriptors {
+				socket := cons[i].FileDescriptors[j].Name
+				if strings.HasPrefix(socket, "->") {
+					continue
+				}
+				if strings.HasSuffix(socket, "/mysqlx.sock") {
+					continue
+				}
+				sockets = append(sockets, socket)
 			}
-			if strings.HasSuffix(socket, "/mysqlx.sock") {
-				continue
-			}
-			sockets = append(sockets, socket)
 		}
 	}
 	if len(sockets) > 1 {
 		log.Println("lsof: multiple sockets detected, choosing first one:", strings.Join(sockets, ", "))
 	}
 	if len(sockets) > 0 {
+		fmt.Println(sockets[0])
 		return sockets[0], nil
 	}
 	return "", ErrNoSocket
