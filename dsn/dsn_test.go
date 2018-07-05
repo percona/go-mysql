@@ -73,3 +73,26 @@ func TestDefaults(t *testing.T) {
 
 	os.Setenv("PATH", originalPath)
 }
+
+func TestGetSocketFromProcessLists(t *testing.T) {
+	var err error
+	var socket string
+	dsn := DSN{}
+	socket, err = GetSocket(dsn.String())
+	assert.NoError(t, err)
+	assert.NotEmpty(t, socket)
+
+	// Each of below command may fail as result depends on OS.
+	socket, err = GetSocketFromTCPConnection(dsn.String())
+	if err == nil {
+		assert.NotEmpty(t, socket)
+	}
+	socket, err = GetSocketFromNetstat()
+	if err == nil {
+		assert.NotEmpty(t, socket)
+	}
+	socket, err = GetSocketFromProcessLists()
+	if err == nil {
+		assert.NotEmpty(t, socket)
+	}
+}
