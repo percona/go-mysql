@@ -23,6 +23,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path"
 	"regexp"
 	"strings"
 
@@ -100,11 +101,16 @@ func (dsn DSN) AutoDetect() (DSN, error) {
 		if defaults.Socket != "" {
 			dsn.Socket = defaults.Socket
 		} else {
-			if socket, err := GetSocketFromProcessLists(); err != nil {
-				return dsn, err
-			} else {
-				dsn.Socket = socket
+			var socket string
+			var err error
+			socket, err = GetSocketFromProcessLists()
+			if err != nil {
+				socket, err = GetSocketFromNetstat()
+				if err != nil {
+					return dsn, err
+				}
 			}
+			dsn.Socket = socket
 		}
 	}
 
@@ -241,7 +247,49 @@ func GetSocketFromProcessLists() (string, error) {
 		}
 	}
 	if len(sockets) > 1 {
-		log.Println("Multiple sockets detected, choosing first one:", strings.Join(sockets, ", "))
+		log.Println("lsof: multiple sockets detected, choosing first one:", strings.Join(sockets, ", "))
+	}
+	if len(sockets) > 0 {
+		return sockets[0], nil
+	}
+	return "", ErrNoSocket
+}
+
+// GetSocketFromNetstat will loop through list of open sockets
+// and try to find one matching `mysql` word.
+// Warning: this function returns the socket for the FIRST entry it founds.
+// If there are more sockets containing `mysql` word, only the first one will be detected.
+func GetSocketFromNetstat() (string, error) {
+	// Try to auto-detect MySQL socket from netstat output.
+	out, err := exec.Command("netstat", "-anp").Output()
+	if err != nil {
+		return "", ErrNoSocket
+	}
+
+	sockets := []string{}
+	lines := strings.Split(string(out), "\n")
+	for _, line := range lines {
+		if !strings.HasPrefix(line, "unix") {
+			continue
+		}
+		fields := strings.Fields(line)
+		if len(fields) == 0 {
+			continue
+		}
+		socket := fields[len(fields)-1]
+		if !path.IsAbs(socket) {
+			continue
+		}
+		if strings.HasSuffix(socket, "/mysqlx.sock") {
+			continue
+		}
+		if !strings.Contains(socket, "mysql") {
+			continue
+		}
+		sockets = append(sockets, socket)
+	}
+	if len(sockets) > 1 {
+		log.Println("netstat: multiple sockets detected, choosing first one:", strings.Join(sockets, ", "))
 	}
 	if len(sockets) > 0 {
 		return sockets[0], nil
