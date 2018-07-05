@@ -45,8 +45,7 @@
     "net",
     "process"
   ]
-  revision = "0f1554b34e83b6fe3ca8a29db7edc8d6ccc77d59"
-  source = "github.com/Percona-Lab/gopsutil"
+  revision = "63728fcf6b24475ecfea044e22242447666c2f52"
 
 [[projects]]
   branch = "master"
@@ -72,6 +71,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "aeac7b46e1028a20e22f324f5860f1074e57ce2fd9374602cef75a4208d9d809"
+  inputs-digest = "9381c640eea08ebf0859e45b609f15feaf5333d4aceec43eb826cbcd48e65d57"
   solver-name = "gps-cdcl"
   solver-version = 1
