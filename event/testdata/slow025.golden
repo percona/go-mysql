@@ -91,6 +91,7 @@
         "QueryTime": 20,
         "Db": "",
         "Query": "select c from t",
+        "Size": 15,
         "Ts": "2007-10-15 00:00:02"
       }
     }

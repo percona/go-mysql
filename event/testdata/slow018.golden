@@ -152,7 +152,8 @@
       "Example": {
         "QueryTime": 0.900001,
         "Db": "db1",
-        "Query": "select * from t where id in (10000,20000,30000)"
+        "Query": "select * from t where id in (10000,20000,30000)",
+        "Size": 47
       }
     }
   },

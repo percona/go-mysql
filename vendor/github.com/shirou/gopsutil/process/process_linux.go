@@ -7,7 +7,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"math"
@@ -23,10 +22,7 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-var (
-	ErrorNoChildren = errors.New("process does not have children")
-	PageSize        = uint64(os.Getpagesize())
-)
+var PageSize = uint64(os.Getpagesize())
 
 const (
 	PrioProcess = 0   // linux/resource.h
@@ -466,7 +462,7 @@ func (p *Process) Children() ([]*Process, error) {
 }
 
 func (p *Process) ChildrenWithContext(ctx context.Context) ([]*Process, error) {
-	pids, err := common.CallPgrep(invoke, p.Pid)
+	pids, err := common.CallPgrepWithContext(ctx, invoke, p.Pid)
 	if err != nil {
 		if pids == nil || len(pids) == 0 {
 			return nil, ErrorNoChildren
@@ -989,6 +985,8 @@ func (p *Process) fillFromStatusWithContext(ctx context.Context) error {
 					extendedName := filepath.Base(cmdlineSlice[0])
 					if strings.HasPrefix(extendedName, p.name) {
 						p.name = extendedName
+					} else {
+						p.name = cmdlineSlice[0]
 					}
 				}
 			}
@@ -1179,6 +1177,9 @@ func (p *Process) fillFromTIDStatWithContext(ctx context.Context, tid int32) (ui
 	createTime := int64(ctime * 1000)
 
 	rtpriority, err := strconv.ParseInt(fields[i+16], 10, 32)
+	if err != nil {
+		return 0, 0, nil, 0, 0, 0, err
+	}
 	if rtpriority < 0 {
 		rtpriority = rtpriority*-1 - 1
 	} else {

@@ -3,17 +3,10 @@ sudo: required
 language: go
 
 go:
-  - 1.8.x
-  - 1.9.x
   - 1.10.x
-  - master
-
-matrix:
-  allow_failures:
-    - go: master
 
 services:
-  - docker
+  - mysql
 
 install:
   # ensure that vendor/ is in sync with code and Gopkg.*
