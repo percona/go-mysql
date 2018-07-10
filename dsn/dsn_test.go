@@ -18,9 +18,11 @@
 package dsn
 
 import (
+	"context"
 	"os"
 	"path"
 	"testing"
+	"time"
 
 	"github.com/percona/go-mysql/test"
 	"github.com/stretchr/testify/assert"
@@ -78,20 +80,22 @@ func TestGetSocketFromProcessLists(t *testing.T) {
 	var err error
 	var socket string
 	dsn := DSN{}
-	socket, err = GetSocket(dsn.String())
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	socket, err = GetSocket(ctx, dsn.String())
 	assert.NoError(t, err)
 	assert.NotEmpty(t, socket)
 
 	// Each of below command may fail as result depends on OS.
-	socket, err = GetSocketFromTCPConnection(dsn.String())
+	socket, err = GetSocketFromTCPConnection(context.TODO(), dsn.String())
 	if err == nil {
 		assert.NotEmpty(t, socket)
 	}
-	socket, err = GetSocketFromNetstat()
+	socket, err = GetSocketFromNetstat(context.TODO())
 	if err == nil {
 		assert.NotEmpty(t, socket)
 	}
-	socket, err = GetSocketFromProcessLists()
+	socket, err = GetSocketFromProcessList(context.TODO())
 	if err == nil {
 		assert.NotEmpty(t, socket)
 	}
