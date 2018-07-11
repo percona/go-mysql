@@ -368,15 +368,33 @@ func parseLsofForSockets(output []byte) (sockets []string) {
 		// lsof on trusty:                 `/var/run/mysqld/mysqld.sock`
 		// lsof on xenial, artful, bionic: `/var/run/mysqld/mysqld.sock type=STREAM`
 		line = bytes.TrimSuffix(line, []byte("type=STREAM"))
-		line = bytes.TrimSuffix(line, []byte("type=DGRAM"))
 		line = bytes.TrimSpace(line)
 
 		// Skip empty lines.
 		if len(line) == 0 {
 			continue
 		}
+		socket := string(line)
 
-		sockets = append(sockets, string(line))
+		// @Nailya had a case on xenial where `lsof` returned `ntype=DGRAM` and `ntype=STREAM` without any path.
+		// I'm not sure what are those but we can try to avoid this by checking for absolute path.
+		// # lsof -a -n -P -U -F n -p $(pgrep -x mysqld | tr \\n ,)
+		// p952
+		// f3
+		// ntype=DGRAM
+		// f18
+		// ntype=STREAM
+		// f19
+		// ntype=STREAM
+		// f22
+		// n/var/run/mysqld/mysqld.sock type=STREAM
+		// f24
+		// n/var/run/mysqld/mysqlx.sock type=STREAM
+		if !path.IsAbs(socket) {
+			continue
+		}
+
+		sockets = append(sockets, socket)
 	}
 
 	return sockets
