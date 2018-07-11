@@ -365,6 +365,7 @@ func parseLsofForSockets(output []byte) (sockets []string) {
 		// lsof on trusty:                 `/var/run/mysqld/mysqld.sock`
 		// lsof on xenial, artful, bionic: `/var/run/mysqld/mysqld.sock type=STREAM`
 		line = bytes.TrimSuffix(line, []byte("type=STREAM"))
+		line = bytes.TrimSuffix(line, []byte("type=DGRAM"))
 		line = bytes.TrimSpace(line)
 
 		// Skip empty lines.
