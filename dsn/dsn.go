@@ -238,6 +238,7 @@ func GetSocketFromProcessList(ctx context.Context) (string, error) {
 		return "", errors.Wrap(err, "Cannot get the list of PIDs")
 	}
 	sockets := []string{}
+	mysqldPIDs := []string{}
 	for _, pid := range pids {
 		proc, err := process.NewProcess(pid)
 		if err != nil {
@@ -250,7 +251,9 @@ func GetSocketFromProcessList(ctx context.Context) (string, error) {
 		if procName != "mysqld" {
 			continue
 		}
-		socketsFromPID, err := GetSocketsFromPID(ctx, fmt.Sprintf("%d", pid))
+		mysqlPID := fmt.Sprintf("%d", pid)
+		mysqldPIDs = append(mysqldPIDs, mysqlPID)
+		socketsFromPID, err := GetSocketsFromPID(ctx, mysqlPID)
 		if err != nil {
 			return "", errors.Wrapf(err, "Cannot get network connections for PID %d", pid)
 		}
@@ -265,7 +268,7 @@ func GetSocketFromProcessList(ctx context.Context) (string, error) {
 		}
 	}
 	if len(sockets) > 1 {
-		log.Println("lsof: multiple sockets detected, choosing first one:", strings.Join(sockets, ", "))
+		log.Printf("lsof: multiple sockets detected for pid(s) %v, choosing first one: %s\n", mysqldPIDs, strings.Join(sockets, ", "))
 	}
 	if len(sockets) > 0 {
 		return sockets[0], nil
