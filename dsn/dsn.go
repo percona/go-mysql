@@ -238,6 +238,7 @@ func GetSocketFromProcessList(ctx context.Context) (string, error) {
 		return "", errors.Wrap(err, "Cannot get the list of PIDs")
 	}
 	sockets := []string{}
+	mysqldPIDs := []string{}
 	for _, pid := range pids {
 		proc, err := process.NewProcess(pid)
 		if err != nil {
@@ -250,7 +251,9 @@ func GetSocketFromProcessList(ctx context.Context) (string, error) {
 		if procName != "mysqld" {
 			continue
 		}
-		socketsFromPID, err := GetSocketsFromPID(ctx, fmt.Sprintf("%d", pid))
+		mysqlPID := fmt.Sprintf("%d", pid)
+		mysqldPIDs = append(mysqldPIDs, mysqlPID)
+		socketsFromPID, err := GetSocketsFromPID(ctx, mysqlPID)
 		if err != nil {
 			return "", errors.Wrapf(err, "Cannot get network connections for PID %d", pid)
 		}
@@ -265,7 +268,7 @@ func GetSocketFromProcessList(ctx context.Context) (string, error) {
 		}
 	}
 	if len(sockets) > 1 {
-		log.Println("lsof: multiple sockets detected, choosing first one:", strings.Join(sockets, ", "))
+		log.Printf("lsof: multiple sockets detected for pid(s) %v, choosing first one: %s\n", mysqldPIDs, strings.Join(sockets, ", "))
 	}
 	if len(sockets) > 0 {
 		return sockets[0], nil
@@ -371,8 +374,27 @@ func parseLsofForSockets(output []byte) (sockets []string) {
 		if len(line) == 0 {
 			continue
 		}
+		socket := string(line)
 
-		sockets = append(sockets, string(line))
+		// @Nailya had a case on xenial where `lsof` returned `ntype=DGRAM` and `ntype=STREAM` without any path.
+		// I'm not sure what are those but we can try to avoid this by checking for absolute path.
+		// # lsof -a -n -P -U -F n -p $(pgrep -x mysqld | tr \\n ,)
+		// p952
+		// f3
+		// ntype=DGRAM
+		// f18
+		// ntype=STREAM
+		// f19
+		// ntype=STREAM
+		// f22
+		// n/var/run/mysqld/mysqld.sock type=STREAM
+		// f24
+		// n/var/run/mysqld/mysqlx.sock type=STREAM
+		if !path.IsAbs(socket) {
+			continue
+		}
+
+		sockets = append(sockets, socket)
 	}
 
 	return sockets
