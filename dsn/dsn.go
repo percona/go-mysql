@@ -237,6 +237,7 @@ func GetSocketFromProcessList(ctx context.Context) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "Cannot get the list of PIDs")
 	}
+	socketsMap := map[string]struct{}{}
 	sockets := []string{}
 	mysqldPIDs := []string{}
 	for _, pid := range pids {
@@ -264,7 +265,10 @@ func GetSocketFromProcessList(ctx context.Context) (string, error) {
 			if strings.HasSuffix(socket, "/mysqlx.sock") {
 				continue
 			}
-			sockets = append(sockets, socket)
+			if _, exist := socketsMap[socket]; !exist {
+				socketsMap[socket] = struct{}{}
+				sockets = append(sockets, socket)
+			}
 		}
 	}
 	if len(sockets) > 1 {
@@ -287,6 +291,7 @@ func GetSocketFromNetstat(ctx context.Context) (string, error) {
 		return "", ErrNoSocket
 	}
 
+	socketsMap := map[string]struct{}{}
 	sockets := []string{}
 	lines := strings.Split(string(out), "\n")
 	for _, line := range lines {
@@ -307,7 +312,10 @@ func GetSocketFromNetstat(ctx context.Context) (string, error) {
 		if !strings.Contains(socket, "mysql") {
 			continue
 		}
-		sockets = append(sockets, socket)
+		if _, exist := socketsMap[socket]; !exist {
+			socketsMap[socket] = struct{}{}
+			sockets = append(sockets, socket)
+		}
 	}
 	if len(sockets) > 1 {
 		log.Println("netstat: multiple sockets detected, choosing first one:", strings.Join(sockets, ", "))
@@ -354,6 +362,7 @@ func GetSocketsFromPID(ctx context.Context, pid string) ([]string, error) {
 
 // parseLsofForSockets parses `lsof -F n -p <pid>` output for open UNIX domain socket files.
 func parseLsofForSockets(output []byte) (sockets []string) {
+	socketsMap := map[string]struct{}{}
 	lines := bytes.Split(output, []byte("\n"))
 	for _, line := range lines {
 		// `lsof -F n`
@@ -394,7 +403,10 @@ func parseLsofForSockets(output []byte) (sockets []string) {
 			continue
 		}
 
-		sockets = append(sockets, socket)
+		if _, exist := socketsMap[socket]; !exist {
+			socketsMap[socket] = struct{}{}
+			sockets = append(sockets, socket)
+		}
 	}
 
 	return sockets
