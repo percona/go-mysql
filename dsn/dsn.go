@@ -22,7 +22,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
+	//"log"
 	"os"
 	"os/exec"
 	"path"
@@ -271,9 +271,9 @@ func GetSocketFromProcessList(ctx context.Context) (string, error) {
 			}
 		}
 	}
-	if len(sockets) > 1 {
-		log.Printf("lsof: multiple sockets detected for pid(s) %v, choosing first one: %s\n", mysqldPIDs, strings.Join(sockets, ", "))
-	}
+	//if len(sockets) > 1 {
+	//	log.Printf("lsof: multiple sockets detected for pid(s) %v, choosing first one: %s\n", mysqldPIDs, strings.Join(sockets, ", "))
+	//}
 	if len(sockets) > 0 {
 		return sockets[0], nil
 	}
@@ -317,9 +317,9 @@ func GetSocketFromNetstat(ctx context.Context) (string, error) {
 			sockets = append(sockets, socket)
 		}
 	}
-	if len(sockets) > 1 {
-		log.Println("netstat: multiple sockets detected, choosing first one:", strings.Join(sockets, ", "))
-	}
+	//if len(sockets) > 1 {
+	//	log.Println("netstat: multiple sockets detected, choosing first one:", strings.Join(sockets, ", "))
+	//}
 	if len(sockets) > 0 {
 		return sockets[0], nil
 	}
