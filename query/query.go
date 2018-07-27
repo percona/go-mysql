@@ -388,10 +388,11 @@ func Fingerprint(q string) string {
 			if pr == '*' && r == '/' {
 				// /* foo */ -> (nothing)
 				if Debug {
-					fmt.Println("Multi-line comment end")
+					fmt.Printf("Multi-line comment end. pr: %s\n", string(pr))
 				}
 				s = unknown
 			} else {
+				pr = r
 				if Debug {
 					fmt.Println("Ignore multi-line comment content")
 				}

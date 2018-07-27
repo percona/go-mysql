@@ -18,16 +18,19 @@
 package dsn
 
 import (
+	"bytes"
+	"context"
 	"database/sql"
-	"errors"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path"
 	"regexp"
 	"strings"
 
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/pkg/errors"
+	"github.com/shirou/gopsutil/process"
 )
 
 type DSN struct {
@@ -53,10 +56,11 @@ const (
 )
 
 var (
-	ErrNoSocket error = errors.New("cannot auto-detect MySQL socket")
+	// ErrNoSocket is returned when GetSocketFromProcessLists can't locate socket.
+	ErrNoSocket = errors.New("cannot auto-detect MySQL socket")
 )
 
-func (dsn DSN) AutoDetect() (DSN, error) {
+func (dsn DSN) AutoDetect(ctx context.Context) (DSN, error) {
 	defaults, err := Defaults(dsn.DefaultsFile)
 	if err != nil {
 		return dsn, err
@@ -98,14 +102,9 @@ func (dsn DSN) AutoDetect() (DSN, error) {
 		if defaults.Socket != "" {
 			dsn.Socket = defaults.Socket
 		} else {
-			// Try to auto-detect MySQL socket from netstat output.
-			out, err := exec.Command("netstat", "-anp").Output()
+			socket, err := GetSocket(ctx, dsn.String())
 			if err != nil {
-				return dsn, ErrNoSocket
-			}
-			socket := ParseSocketFromNetstat(string(out))
-			if socket == "" {
-				return dsn, ErrNoSocket
+				return dsn, err
 			}
 			dsn.Socket = socket
 		}
@@ -116,13 +115,13 @@ func (dsn DSN) AutoDetect() (DSN, error) {
 
 func Defaults(defaultsFile string) (DSN, error) {
 	versionParams := [][]string{
-		[]string{"-s", "client"},
-		[]string{"client"},
+		{"-s", "client"},
+		{"client"},
 	}
 	if defaultsFile != "" {
 		versionParams = [][]string{
-			[]string{"--defaults-file=" + defaultsFile, "-s", "client"},
-			[]string{"--defaults-file=" + defaultsFile, "client"},
+			{"--defaults-file=" + defaultsFile, "-s", "client"},
+			{"--defaults-file=" + defaultsFile, "client"},
 		}
 	}
 
@@ -205,18 +204,212 @@ func HidePassword(dsn string) string {
 	return dsn
 }
 
-func ParseSocketFromNetstat(out string) string {
-	lines := strings.Split(out, "\n")
-	for _, line := range lines {
-		if strings.HasPrefix(line, "unix") && strings.Contains(line, "mysql") {
-			fields := strings.Fields(line)
-			socket := fields[len(fields)-1]
-			if path.IsAbs(socket) {
-				return socket
+// GetSocketFromTCPConnection will try to get socket path by connecting to MySQL localhost TCP port.
+// This is not reliable as TCP connections may be not allowed.
+func GetSocketFromTCPConnection(ctx context.Context, dsn string) (socket string, err error) {
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return "", ErrNoSocket
+	}
+	defer db.Close()
+
+	err = db.QueryRowContext(ctx, "SELECT @@socket").Scan(socket)
+	if err != nil {
+		return "", ErrNoSocket
+	}
+	if !path.IsAbs(socket) {
+		return "", ErrNoSocket
+	}
+	if socket != "" {
+		return socket, nil
+	}
+
+	return "", ErrNoSocket
+}
+
+// GetSocketFromProcessList will loop through the list of PIDs until it finds a process
+// named 'mysqld' and the it will try to get the socket by querying the open network
+// connections for that process.
+// Warning: this function returns the socket for the FIRST mysqld process it founds.
+// If there are more than one MySQL instance, only the first one will be detected.
+func GetSocketFromProcessList(ctx context.Context) (string, error) {
+	pids, err := process.Pids()
+	if err != nil {
+		return "", errors.Wrap(err, "Cannot get the list of PIDs")
+	}
+	socketsMap := map[string]struct{}{}
+	sockets := []string{}
+	mysqldPIDs := []string{}
+	for _, pid := range pids {
+		proc, err := process.NewProcess(pid)
+		if err != nil {
+			continue
+		}
+		procName, err := proc.Name()
+		if err != nil {
+			continue
+		}
+		if procName != "mysqld" {
+			continue
+		}
+		mysqlPID := fmt.Sprintf("%d", pid)
+		mysqldPIDs = append(mysqldPIDs, mysqlPID)
+		socketsFromPID, err := GetSocketsFromPID(ctx, mysqlPID)
+		if err != nil {
+			return "", errors.Wrapf(err, "Cannot get network connections for PID %d", pid)
+		}
+		for _, socket := range socketsFromPID {
+			if strings.HasPrefix(socket, "->") {
+				continue
+			}
+			if strings.HasSuffix(socket, "/mysqlx.sock") {
+				continue
+			}
+			if _, exist := socketsMap[socket]; !exist {
+				socketsMap[socket] = struct{}{}
+				sockets = append(sockets, socket)
 			}
 		}
 	}
-	return ""
+	if len(sockets) > 1 {
+		log.Printf("lsof: multiple sockets detected for pid(s) %v, choosing first one: %s\n", mysqldPIDs, strings.Join(sockets, ", "))
+	}
+	if len(sockets) > 0 {
+		return sockets[0], nil
+	}
+	return "", ErrNoSocket
+}
+
+// GetSocketFromNetstat will loop through list of open sockets
+// and try to find one matching `mysql` word.
+// Warning: this function returns the socket for the FIRST entry it founds.
+// If there are more sockets containing `mysql` word, only the first one will be detected.
+func GetSocketFromNetstat(ctx context.Context) (string, error) {
+	// Try to auto-detect MySQL socket from netstat output.
+	out, err := exec.CommandContext(ctx, "netstat", "-anp").Output()
+	if err != nil {
+		return "", ErrNoSocket
+	}
+
+	socketsMap := map[string]struct{}{}
+	sockets := []string{}
+	lines := strings.Split(string(out), "\n")
+	for _, line := range lines {
+		if !strings.HasPrefix(line, "unix") {
+			continue
+		}
+		fields := strings.Fields(line)
+		if len(fields) == 0 {
+			continue
+		}
+		socket := fields[len(fields)-1]
+		if !path.IsAbs(socket) {
+			continue
+		}
+		if strings.HasSuffix(socket, "/mysqlx.sock") {
+			continue
+		}
+		if !strings.Contains(socket, "mysql") {
+			continue
+		}
+		if _, exist := socketsMap[socket]; !exist {
+			socketsMap[socket] = struct{}{}
+			sockets = append(sockets, socket)
+		}
+	}
+	if len(sockets) > 1 {
+		log.Println("netstat: multiple sockets detected, choosing first one:", strings.Join(sockets, ", "))
+	}
+	if len(sockets) > 0 {
+		return sockets[0], nil
+	}
+	return "", ErrNoSocket
+}
+
+// GetSocket tries to detect and return path to the MySQL socket.
+func GetSocket(ctx context.Context, dsn string) (string, error) {
+	var socket string
+	var err error
+	socket, err = GetSocketFromTCPConnection(ctx, dsn)
+	if err != nil {
+		socket, err = GetSocketFromProcessList(ctx)
+		if err != nil {
+			socket, err = GetSocketFromNetstat(ctx)
+		}
+	}
+	return socket, err
+}
+
+// GetSocketsFromPID returns currently open UNIX domain socket files by process identifier (PID).
+func GetSocketsFromPID(ctx context.Context, pid string) ([]string, error) {
+	cmd := exec.CommandContext(
+		ctx,
+		"lsof",
+		"-a",
+		"-n",
+		"-P",
+		"-U",
+		"-F",
+		"n",
+		"-p", pid,
+	)
+	output, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
+	return parseLsofForSockets(output), nil
+}
+
+// parseLsofForSockets parses `lsof -F n -p <pid>` output for open UNIX domain socket files.
+func parseLsofForSockets(output []byte) (sockets []string) {
+	socketsMap := map[string]struct{}{}
+	lines := bytes.Split(output, []byte("\n"))
+	for _, line := range lines {
+		// `lsof -F n`
+		// When the -F option is specified, lsof produces output that is suitable for processing by another program
+		// - e.g, an awk or Perl script, or a C program.
+		// n    file name, comment, Internet address
+		if !bytes.HasPrefix(line, []byte("n")) {
+			continue
+		}
+		line = bytes.TrimPrefix(line, []byte("n"))
+
+		// lsof on trusty:                 `/var/run/mysqld/mysqld.sock`
+		// lsof on xenial, artful, bionic: `/var/run/mysqld/mysqld.sock type=STREAM`
+		line = bytes.TrimSuffix(line, []byte("type=STREAM"))
+		line = bytes.TrimSpace(line)
+
+		// Skip empty lines.
+		if len(line) == 0 {
+			continue
+		}
+		socket := string(line)
+
+		// @Nailya had a case on xenial where `lsof` returned `ntype=DGRAM` and `ntype=STREAM` without any path.
+		// I'm not sure what are those but we can try to avoid this by checking for absolute path.
+		// # lsof -a -n -P -U -F n -p $(pgrep -x mysqld | tr \\n ,)
+		// p952
+		// f3
+		// ntype=DGRAM
+		// f18
+		// ntype=STREAM
+		// f19
+		// ntype=STREAM
+		// f22
+		// n/var/run/mysqld/mysqld.sock type=STREAM
+		// f24
+		// n/var/run/mysqld/mysqlx.sock type=STREAM
+		if !path.IsAbs(socket) {
+			continue
+		}
+
+		if _, exist := socketsMap[socket]; !exist {
+			socketsMap[socket] = struct{}{}
+			sockets = append(sockets, socket)
+		}
+	}
+
+	return sockets
 }
 
 func ParseMySQLDefaults(output string) DSN {

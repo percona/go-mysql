@@ -45,6 +45,7 @@ type Aggregator struct {
 }
 
 // NewAggregator returns a new Aggregator.
+// outlierTime is https://www.percona.com/doc/percona-server/5.5/diagnostics/slow_extended_55.html#slow_query_log_always_write_time
 func NewAggregator(samples bool, utcOffset time.Duration, outlierTime float64) *Aggregator {
 	a := &Aggregator{
 		samples:     samples,

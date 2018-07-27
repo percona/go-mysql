@@ -18,8 +18,9 @@
 package event
 
 import (
-	"github.com/percona/go-mysql/log"
 	"sort"
+
+	"github.com/percona/go-mysql/log"
 )
 
 // Metrics encapsulate the metrics of an event like Query_time and Rows_sent.
@@ -33,11 +34,11 @@ type Metrics struct {
 type TimeStats struct {
 	vals       []float64 `json:"-"`
 	Sum        float64
-	Min        float64 `json:",omitempty"`
-	Avg        float64 `json:",omitempty"`
-	Med        float64 `json:",omitempty"` // median
-	P95        float64 `json:",omitempty"` // 95th percentile
-	Max        float64 `json:",omitempty"`
+	Min        *float64 `json:",omitempty"`
+	Avg        *float64 `json:",omitempty"`
+	Med        *float64 `json:",omitempty"` // median
+	P95        *float64 `json:",omitempty"` // 95th percentile
+	Max        *float64 `json:",omitempty"`
 	outlierSum float64
 }
 
@@ -45,11 +46,11 @@ type TimeStats struct {
 type NumberStats struct {
 	vals       []uint64 `json:"-"`
 	Sum        uint64
-	Min        uint64 `json:",omitempty"`
-	Avg        uint64 `json:",omitempty"`
-	Med        uint64 `json:",omitempty"` // median
-	P95        uint64 `json:",omitempty"` // 95th percentile
-	Max        uint64 `json:",omitempty"`
+	Min        *uint64 `json:",omitempty"`
+	Avg        *uint64 `json:",omitempty"`
+	Med        *uint64 `json:",omitempty"` // median
+	P95        *uint64 `json:",omitempty"` // 95th percentile
+	Max        *uint64 `json:",omitempty"`
 	outlierSum uint64
 }
 
@@ -130,7 +131,7 @@ func (a byUint64) Less(i, j int) bool {
 
 // Finalize calculates the statistics of the added metrics. Call this function
 // when done adding events.
-func (m *Metrics) Finalize(rateLimit uint) {
+func (m *Metrics) Finalize(rateLimit uint, totalQueries uint) {
 	if rateLimit == 0 {
 		rateLimit = 1
 	}
@@ -139,31 +140,55 @@ func (m *Metrics) Finalize(rateLimit uint) {
 		sort.Float64s(s.vals)
 		cnt := len(s.vals)
 
-		s.Min = s.vals[0]
-		s.Avg = (s.Sum + s.outlierSum) / float64(cnt)
-		s.Med = s.vals[(50*cnt)/100] // median = 50th percentile
-		s.P95 = s.vals[(95*cnt)/100]
-		s.Max = s.vals[cnt-1]
-
-		// Update sum last because avg ^ needs the original value.
+		s.Min = Float64(s.vals[0])
+		s.Med = Float64(s.vals[(50*cnt)/100]) // median = 50th percentile
+		s.P95 = Float64(s.vals[(95*cnt)/100])
+		s.Max = Float64(s.vals[cnt-1])
 		s.Sum = (s.Sum * float64(rateLimit)) + s.outlierSum
+		s.Avg = Float64(s.Sum / float64(totalQueries))
 	}
 
 	for _, s := range m.NumberMetrics {
 		sort.Sort(byUint64(s.vals))
 		cnt := len(s.vals)
 
-		s.Min = s.vals[0]
-		s.Avg = (s.Sum + s.outlierSum) / uint64(cnt)
-		s.Med = s.vals[(50*cnt)/100] // median = 50th percentile
-		s.P95 = s.vals[(95*cnt)/100]
-		s.Max = s.vals[cnt-1]
-
-		// Update sum last because avg ^ needs the original value.
+		s.Min = Uint64(s.vals[0])
+		s.Med = Uint64(s.vals[(50*cnt)/100]) // median = 50th percentile
+		s.P95 = Uint64(s.vals[(95*cnt)/100])
+		s.Max = Uint64(s.vals[cnt-1])
 		s.Sum = (s.Sum * uint64(rateLimit)) + s.outlierSum
+		s.Avg = Uint64(s.Sum / uint64(totalQueries))
 	}
 
 	for _, s := range m.BoolMetrics {
 		s.Sum = (s.Sum * uint64(rateLimit)) + s.outlierSum
 	}
+}
+
+// Float64 returns a pointer to the float64 value passed in.
+func Float64(v float64) *float64 {
+	return &v
+}
+
+// Float64Value returns the value of the float64 pointer passed in or
+// 0 if the pointer is nil.
+func Float64Value(v *float64) float64 {
+	if v != nil {
+		return *v
+	}
+	return 0
+}
+
+// Uint64 returns a pointer to the uint64 value passed in.
+func Uint64(v uint64) *uint64 {
+	return &v
+}
+
+// Uint64Value returns the value of the uint64 pointer passed in or
+// 0 if the pointer is nil.
+func Uint64Value(v *uint64) uint64 {
+	if v != nil {
+		return *v
+	}
+	return 0
 }

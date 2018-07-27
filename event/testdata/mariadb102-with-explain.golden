@@ -1,0 +1,143 @@
+{
+  "Global": {
+    "Id": "",
+    "Fingerprint": "",
+    "Metrics": {
+      "TimeMetrics": {
+        "Lock_time": {
+          "Sum": 0,
+          "Min": 0,
+          "Avg": 0,
+          "Med": 0,
+          "P95": 0,
+          "Max": 0
+        },
+        "Query_time": {
+          "Sum": 0.000277,
+          "Min": 0.000277,
+          "Avg": 0.000277,
+          "Med": 0.000277,
+          "P95": 0.000277,
+          "Max": 0.000277
+        }
+      },
+      "NumberMetrics": {
+        "Rows_affected": {
+          "Sum": 0,
+          "Min": 0,
+          "Avg": 0,
+          "Med": 0,
+          "P95": 0,
+          "Max": 0
+        },
+        "Rows_examined": {
+          "Sum": 0,
+          "Min": 0,
+          "Avg": 0,
+          "Med": 0,
+          "P95": 0,
+          "Max": 0
+        },
+        "Rows_sent": {
+          "Sum": 1,
+          "Min": 1,
+          "Avg": 1,
+          "Med": 1,
+          "P95": 1,
+          "Max": 1
+        },
+        "Thread_id": {
+          "Sum": 8,
+          "Min": 8,
+          "Avg": 8,
+          "Med": 8,
+          "P95": 8,
+          "Max": 8
+        }
+      },
+      "BoolMetrics": {
+        "QC_hit": {
+          "Sum": 0
+        }
+      }
+    },
+    "TotalQueries": 1,
+    "UniqueQueries": 1
+  },
+  "Class": {
+    "16219655761820A2": {
+      "Id": "16219655761820A2",
+      "Fingerprint": "select ?",
+      "Metrics": {
+        "TimeMetrics": {
+          "Lock_time": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          },
+          "Query_time": {
+            "Sum": 0.000277,
+            "Min": 0.000277,
+            "Avg": 0.000277,
+            "Med": 0.000277,
+            "P95": 0.000277,
+            "Max": 0.000277
+          }
+        },
+        "NumberMetrics": {
+          "Rows_affected": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          },
+          "Rows_examined": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          },
+          "Rows_sent": {
+            "Sum": 1,
+            "Min": 1,
+            "Avg": 1,
+            "Med": 1,
+            "P95": 1,
+            "Max": 1
+          },
+          "Thread_id": {
+            "Sum": 8,
+            "Min": 8,
+            "Avg": 8,
+            "Med": 8,
+            "P95": 8,
+            "Max": 8
+          }
+        },
+        "BoolMetrics": {
+          "QC_hit": {
+            "Sum": 0
+          }
+        }
+      },
+      "TotalQueries": 1,
+      "UniqueQueries": 1,
+      "Example": {
+        "QueryTime": 0.000277,
+        "Db": "",
+        "Query": "SELECT 1",
+        "Size": 8,
+        "Ts": "2018-02-14 16:18:07"
+      }
+    }
+  },
+  "RateLimit": 0,
+  "Error": ""
+}

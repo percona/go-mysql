@@ -1,0 +1,162 @@
+{
+  "Global": {
+    "Id": "",
+    "Fingerprint": "",
+    "Metrics": {
+      "TimeMetrics": {
+        "Lock_time": {
+          "Sum": 0,
+          "Min": 0,
+          "Avg": 0,
+          "Med": 0,
+          "P95": 0,
+          "Max": 0
+        },
+        "Query_time": {
+          "Sum": 0.9010440000000001,
+          "Min": 0.000001,
+          "Avg": 0.22526100000000002,
+          "Med": 0.00053,
+          "P95": 0.900001,
+          "Max": 0.900001
+        }
+      },
+      "NumberMetrics": {
+        "Merge_passes": {
+          "Sum": 0,
+          "Min": 0,
+          "Avg": 0,
+          "Med": 0,
+          "P95": 0,
+          "Max": 0
+        },
+        "Rows_examined": {
+          "Sum": 10,
+          "Min": 1,
+          "Avg": 2,
+          "Med": 3,
+          "P95": 4,
+          "Max": 4
+        },
+        "Rows_sent": {
+          "Sum": 10,
+          "Min": 1,
+          "Avg": 2,
+          "Med": 3,
+          "P95": 4,
+          "Max": 4
+        }
+      },
+      "BoolMetrics": {
+        "Filesort": {
+          "Sum": 4
+        },
+        "Filesort_on_disk": {
+          "Sum": 0
+        },
+        "Full_join": {
+          "Sum": 0
+        },
+        "Full_scan": {
+          "Sum": 1
+        },
+        "QC_Hit": {
+          "Sum": 0
+        },
+        "Tmp_table": {
+          "Sum": 2
+        },
+        "Tmp_table_on_disk": {
+          "Sum": 0
+        }
+      }
+    },
+    "TotalQueries": 4,
+    "UniqueQueries": 1
+  },
+  "Class": {
+    "B2414E722E8A89DD": {
+      "Id": "B2414E722E8A89DD",
+      "Fingerprint": "select * from t where id in(?+)",
+      "Metrics": {
+        "TimeMetrics": {
+          "Lock_time": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          },
+          "Query_time": {
+            "Sum": 0.9010440000000001,
+            "Min": 0.000001,
+            "Avg": 0.22526100000000002,
+            "Med": 0.00053,
+            "P95": 0.900001,
+            "Max": 0.900001
+          }
+        },
+        "NumberMetrics": {
+          "Merge_passes": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          },
+          "Rows_examined": {
+            "Sum": 10,
+            "Min": 1,
+            "Avg": 2,
+            "Med": 3,
+            "P95": 4,
+            "Max": 4
+          },
+          "Rows_sent": {
+            "Sum": 10,
+            "Min": 1,
+            "Avg": 2,
+            "Med": 3,
+            "P95": 4,
+            "Max": 4
+          }
+        },
+        "BoolMetrics": {
+          "Filesort": {
+            "Sum": 4
+          },
+          "Filesort_on_disk": {
+            "Sum": 0
+          },
+          "Full_join": {
+            "Sum": 0
+          },
+          "Full_scan": {
+            "Sum": 1
+          },
+          "QC_Hit": {
+            "Sum": 0
+          },
+          "Tmp_table": {
+            "Sum": 2
+          },
+          "Tmp_table_on_disk": {
+            "Sum": 0
+          }
+        }
+      },
+      "TotalQueries": 4,
+      "UniqueQueries": 1,
+      "Example": {
+        "QueryTime": 0.900001,
+        "Db": "db1",
+        "Query": "select * from t where id in (10000,20000,30000)",
+        "Size": 47
+      }
+    }
+  },
+  "RateLimit": 0,
+  "Error": ""
+}

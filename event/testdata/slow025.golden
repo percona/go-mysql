@@ -1,0 +1,101 @@
+{
+  "Global": {
+    "Id": "",
+    "Fingerprint": "",
+    "Metrics": {
+      "TimeMetrics": {
+        "Lock_time": {
+          "Sum": 0,
+          "Min": 0,
+          "Avg": 0,
+          "Med": 0,
+          "P95": 0,
+          "Max": 0
+        },
+        "Query_time": {
+          "Sum": 320.00000000000006,
+          "Min": 0.1,
+          "Avg": 0.15992003998001003,
+          "Med": 0.2,
+          "P95": 20,
+          "Max": 20
+        }
+      },
+      "NumberMetrics": {
+        "Rows_examined": {
+          "Sum": 0,
+          "Min": 0,
+          "Avg": 0,
+          "Med": 0,
+          "P95": 0,
+          "Max": 0
+        },
+        "Rows_sent": {
+          "Sum": 2001,
+          "Min": 1,
+          "Avg": 1,
+          "Med": 1,
+          "P95": 1,
+          "Max": 1
+        }
+      }
+    },
+    "TotalQueries": 2001,
+    "UniqueQueries": 1
+  },
+  "Class": {
+    "FDE00DF974C61E9F": {
+      "Id": "FDE00DF974C61E9F",
+      "Fingerprint": "select c from t",
+      "Metrics": {
+        "TimeMetrics": {
+          "Lock_time": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          },
+          "Query_time": {
+            "Sum": 320.00000000000006,
+            "Min": 0.1,
+            "Avg": 0.15992003998001003,
+            "Med": 0.2,
+            "P95": 20,
+            "Max": 20
+          }
+        },
+        "NumberMetrics": {
+          "Rows_examined": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          },
+          "Rows_sent": {
+            "Sum": 2001,
+            "Min": 1,
+            "Avg": 1,
+            "Med": 1,
+            "P95": 1,
+            "Max": 1
+          }
+        }
+      },
+      "TotalQueries": 2001,
+      "UniqueQueries": 1,
+      "Example": {
+        "QueryTime": 20,
+        "Db": "",
+        "Query": "select c from t",
+        "Size": 15,
+        "Ts": "2007-10-15 00:00:02"
+      }
+    }
+  },
+  "RateLimit": 1000,
+  "Error": ""
+}

@@ -1,0 +1,31 @@
+dist: trusty
+sudo: required
+language: go
+
+go:
+  - 1.10.x
+
+services:
+  - mysql
+
+install:
+  # ensure that vendor/ is in sync with code and Gopkg.*
+  - curl https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64 -L -o ~/dep && chmod +x ~/dep
+  - rm -fr vendor/
+  - ~/dep ensure -v
+  - git diff --exit-code
+
+script:
+  - make init
+  - make test-travis
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash) -X fix
+
+notifications:
+  email: false
+  slack:
+    on_success: change
+    on_failure: always
+    rooms:
+      secure: AysgwfvVB+5AAwhTn0+m3yGywVeEWsBwu2KOGDBBB16T+5ktXxiWK16qMkRHazzruQcYAiM6IXtDz3xT9PMeROr1VmsmnAGPgxE1KOilVioFBqTUAKqxtx0KY5W/RBYgbUueBy2ugC7y3vwuzMq9VkmvQWiGp9Bl5Nm55kExLRc=

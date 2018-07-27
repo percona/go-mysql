@@ -1,0 +1,450 @@
+{
+  "Global": {
+    "Id": "",
+    "Fingerprint": "",
+    "Metrics": {
+      "TimeMetrics": {
+        "Lock_time": {
+          "Sum": 0.000238,
+          "Min": 0,
+          "Avg": 0.00002975,
+          "Med": 0,
+          "P95": 0.000141,
+          "Max": 0.000141
+        },
+        "Query_time": {
+          "Sum": 0.8918539999999999,
+          "Min": 0.000037,
+          "Avg": 0.11148174999999999,
+          "Med": 0.000558,
+          "P95": 0.321092,
+          "Max": 0.321092
+        }
+      },
+      "NumberMetrics": {
+        "Rows_examined": {
+          "Sum": 2,
+          "Min": 0,
+          "Avg": 0,
+          "Med": 0,
+          "P95": 1,
+          "Max": 1
+        },
+        "Rows_sent": {
+          "Sum": 4,
+          "Min": 0,
+          "Avg": 0,
+          "Med": 1,
+          "P95": 1,
+          "Max": 1
+        }
+      }
+    },
+    "TotalQueries": 8,
+    "UniqueQueries": 8
+  },
+  "Class": {
+    "54FB1194093381DB": {
+      "Id": "54FB1194093381DB",
+      "Fingerprint": "set global slow_query_log=on",
+      "Metrics": {
+        "TimeMetrics": {
+          "Lock_time": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          },
+          "Query_time": {
+            "Sum": 0.31645,
+            "Min": 0.31645,
+            "Avg": 0.31645,
+            "Med": 0.31645,
+            "P95": 0.31645,
+            "Max": 0.31645
+          }
+        },
+        "NumberMetrics": {
+          "Rows_examined": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          },
+          "Rows_sent": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          }
+        }
+      },
+      "TotalQueries": 1,
+      "UniqueQueries": 1,
+      "Example": {
+        "QueryTime": 0.31645,
+        "Db": "",
+        "Query": "SET GLOBAL slow_query_log=ON",
+        "Size": 28
+      }
+    },
+    "6C099B0B73EA7633": {
+      "Id": "6C099B0B73EA7633",
+      "Fingerprint": "use ?",
+      "Metrics": {
+        "TimeMetrics": {
+          "Lock_time": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          },
+          "Query_time": {
+            "Sum": 0.000558,
+            "Min": 0.000558,
+            "Avg": 0.000558,
+            "Med": 0.000558,
+            "P95": 0.000558,
+            "Max": 0.000558
+          }
+        },
+        "NumberMetrics": {
+          "Rows_examined": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          },
+          "Rows_sent": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          }
+        }
+      },
+      "TotalQueries": 1,
+      "UniqueQueries": 1,
+      "Example": {
+        "QueryTime": 0.000558,
+        "Db": "dbnameb",
+        "Query": "use `dbnameb`",
+        "Size": 13
+      }
+    },
+    "7C1934E82086DF57": {
+      "Id": "7C1934E82086DF57",
+      "Fingerprint": "set names utf8",
+      "Metrics": {
+        "TimeMetrics": {
+          "Lock_time": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          },
+          "Query_time": {
+            "Sum": 0.253052,
+            "Min": 0.253052,
+            "Avg": 0.253052,
+            "Med": 0.253052,
+            "P95": 0.253052,
+            "Max": 0.253052
+          }
+        },
+        "NumberMetrics": {
+          "Rows_examined": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          },
+          "Rows_sent": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          }
+        }
+      },
+      "TotalQueries": 1,
+      "UniqueQueries": 1,
+      "Example": {
+        "QueryTime": 0.253052,
+        "Db": "",
+        "Query": "SET NAMES utf8",
+        "Size": 14
+      }
+    },
+    "83497A0046FCD7A7": {
+      "Id": "83497A0046FCD7A7",
+      "Fingerprint": "select field from table_a where some_other_field = ? limit ?",
+      "Metrics": {
+        "TimeMetrics": {
+          "Lock_time": {
+            "Sum": 0.000038,
+            "Min": 0.000038,
+            "Avg": 0.000038,
+            "Med": 0.000038,
+            "P95": 0.000038,
+            "Max": 0.000038
+          },
+          "Query_time": {
+            "Sum": 0.321092,
+            "Min": 0.321092,
+            "Avg": 0.321092,
+            "Med": 0.321092,
+            "P95": 0.321092,
+            "Max": 0.321092
+          }
+        },
+        "NumberMetrics": {
+          "Rows_examined": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          },
+          "Rows_sent": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          }
+        }
+      },
+      "TotalQueries": 1,
+      "UniqueQueries": 1,
+      "Example": {
+        "QueryTime": 0.321092,
+        "Db": "dbnamea",
+        "Query": "SELECT field FROM table_a WHERE some_other_field = 'yahoo' LIMIT 1",
+        "Size": 66
+      }
+    },
+    "9FD5245EAE433B90": {
+      "Id": "9FD5245EAE433B90",
+      "Fingerprint": "select another_field from table_c where a_third_field = ? and site_id = ?",
+      "Metrics": {
+        "TimeMetrics": {
+          "Lock_time": {
+            "Sum": 0.000059,
+            "Min": 0.000059,
+            "Avg": 0.000059,
+            "Med": 0.000059,
+            "P95": 0.000059,
+            "Max": 0.000059
+          },
+          "Query_time": {
+            "Sum": 0.000164,
+            "Min": 0.000164,
+            "Avg": 0.000164,
+            "Med": 0.000164,
+            "P95": 0.000164,
+            "Max": 0.000164
+          }
+        },
+        "NumberMetrics": {
+          "Rows_examined": {
+            "Sum": 1,
+            "Min": 1,
+            "Avg": 1,
+            "Med": 1,
+            "P95": 1,
+            "Max": 1
+          },
+          "Rows_sent": {
+            "Sum": 1,
+            "Min": 1,
+            "Avg": 1,
+            "Med": 1,
+            "P95": 1,
+            "Max": 1
+          }
+        }
+      },
+      "TotalQueries": 1,
+      "UniqueQueries": 1,
+      "Example": {
+        "QueryTime": 0.000164,
+        "Db": "",
+        "Query": "SELECT another_field FROM table_c WHERE a_third_field = 'tiruriru' AND site_id = 1",
+        "Size": 82
+      }
+    },
+    "AC5C18B304F9DE87": {
+      "Id": "AC5C18B304F9DE87",
+      "Fingerprint": "select @@collation_database",
+      "Metrics": {
+        "TimeMetrics": {
+          "Lock_time": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          },
+          "Query_time": {
+            "Sum": 0.000204,
+            "Min": 0.000204,
+            "Avg": 0.000204,
+            "Med": 0.000204,
+            "P95": 0.000204,
+            "Max": 0.000204
+          }
+        },
+        "NumberMetrics": {
+          "Rows_examined": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          },
+          "Rows_sent": {
+            "Sum": 1,
+            "Min": 1,
+            "Avg": 1,
+            "Med": 1,
+            "P95": 1,
+            "Max": 1
+          }
+        }
+      },
+      "TotalQueries": 1,
+      "UniqueQueries": 1,
+      "Example": {
+        "QueryTime": 0.000204,
+        "Db": "",
+        "Query": "select @@collation_database",
+        "Size": 27
+      }
+    },
+    "B98E038C9D12BDA1": {
+      "Id": "B98E038C9D12BDA1",
+      "Fingerprint": "select field from table_b where another_field = ? and site_id = ?",
+      "Metrics": {
+        "TimeMetrics": {
+          "Lock_time": {
+            "Sum": 0.000141,
+            "Min": 0.000141,
+            "Avg": 0.000141,
+            "Med": 0.000141,
+            "P95": 0.000141,
+            "Max": 0.000141
+          },
+          "Query_time": {
+            "Sum": 0.000297,
+            "Min": 0.000297,
+            "Avg": 0.000297,
+            "Med": 0.000297,
+            "P95": 0.000297,
+            "Max": 0.000297
+          }
+        },
+        "NumberMetrics": {
+          "Rows_examined": {
+            "Sum": 1,
+            "Min": 1,
+            "Avg": 1,
+            "Med": 1,
+            "P95": 1,
+            "Max": 1
+          },
+          "Rows_sent": {
+            "Sum": 1,
+            "Min": 1,
+            "Avg": 1,
+            "Med": 1,
+            "P95": 1,
+            "Max": 1
+          }
+        }
+      },
+      "TotalQueries": 1,
+      "UniqueQueries": 1,
+      "Example": {
+        "QueryTime": 0.000297,
+        "Db": "",
+        "Query": "SELECT field FROM table_b WHERE another_field = 'bazinga' AND site_id = 1",
+        "Size": 73
+      }
+    },
+    "F0265D81808CE240": {
+      "Id": "F0265D81808CE240",
+      "Fingerprint": "select @@session.sql_mode",
+      "Metrics": {
+        "TimeMetrics": {
+          "Lock_time": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          },
+          "Query_time": {
+            "Sum": 0.000037,
+            "Min": 0.000037,
+            "Avg": 0.000037,
+            "Med": 0.000037,
+            "P95": 0.000037,
+            "Max": 0.000037
+          }
+        },
+        "NumberMetrics": {
+          "Rows_examined": {
+            "Sum": 0,
+            "Min": 0,
+            "Avg": 0,
+            "Med": 0,
+            "P95": 0,
+            "Max": 0
+          },
+          "Rows_sent": {
+            "Sum": 1,
+            "Min": 1,
+            "Avg": 1,
+            "Med": 1,
+            "P95": 1,
+            "Max": 1
+          }
+        }
+      },
+      "TotalQueries": 1,
+      "UniqueQueries": 1,
+      "Example": {
+        "QueryTime": 0.000037,
+        "Db": "",
+        "Query": "SELECT @@SESSION.sql_mode",
+        "Size": 25
+      }
+    }
+  },
+  "RateLimit": 0,
+  "Error": ""
+}

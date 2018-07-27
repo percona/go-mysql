@@ -22,7 +22,11 @@ import (
 )
 
 const (
-	MAX_EXAMPLE_BYTES = 1024 * 10
+	// MaxExampleBytes defines to how many bytes truncate a query.
+	MaxExampleBytes = 2 * 1024 * 10
+
+	// TruncatedExampleSuffix is added to truncated query.
+	TruncatedExampleSuffix = "..."
 )
 
 // A Class represents all events with the same fingerprint and class ID.
@@ -42,12 +46,13 @@ type Class struct {
 }
 
 // A Example is a real query and its database, timestamp, and Query_time.
-// If the query is larger than MAX_EXAMPLE_BYTES, it is truncated and "..."
+// If the query is larger than MaxExampleBytes, it is truncated and TruncatedExampleSuffix
 // is appended.
 type Example struct {
 	QueryTime float64 // Query_time
 	Db        string  // Schema: <db> or USE <db>
-	Query     string  // truncated to MAX_EXAMPLE_BYTES
+	Query     string  // truncated to MaxExampleBytes
+	Size      int     `json:",omitempty"` // Original size of query.
 	Ts        string  `json:",omitempty"` // in MySQL time zone
 }
 
@@ -84,13 +89,14 @@ func (c *Class) AddEvent(e *log.Event, outlier bool) {
 		if n, ok := e.TimeMetrics["Query_time"]; ok {
 			if float64(n) > c.Example.QueryTime {
 				c.Example.QueryTime = float64(n)
+				c.Example.Size = len(e.Query)
 				if e.Db != "" {
 					c.Example.Db = e.Db
 				} else {
 					c.Example.Db = c.lastDb
 				}
-				if len(e.Query) > MAX_EXAMPLE_BYTES {
-					c.Example.Query = e.Query[0:MAX_EXAMPLE_BYTES-3] + "..."
+				if len(e.Query) > MaxExampleBytes {
+					c.Example.Query = e.Query[0:MaxExampleBytes-len(TruncatedExampleSuffix)] + TruncatedExampleSuffix
 				} else {
 					c.Example.Query = e.Query
 				}
@@ -100,7 +106,7 @@ func (c *Class) AddEvent(e *log.Event, outlier bool) {
 	}
 }
 
-// AddClass adds a Class to the current class. This is used with Perfomance
+// AddClass adds a Class to the current class. This is used with Performance
 // Schema which returns pre-aggregated classes instead of events.
 func (c *Class) AddClass(newClass *Class) {
 	c.UniqueQueries++
@@ -111,16 +117,14 @@ func (c *Class) AddClass(newClass *Class) {
 		stats, ok := c.Metrics.TimeMetrics[newMetric]
 		if !ok {
 			m := *newStats
-			m.Med = 0
-			m.P95 = 0
 			c.Metrics.TimeMetrics[newMetric] = &m
 		} else {
 			stats.Sum += newStats.Sum
-			stats.Avg = stats.Sum / float64(c.TotalQueries)
-			if newStats.Min < stats.Min {
+			stats.Avg = Float64(stats.Sum / float64(c.TotalQueries))
+			if Float64Value(newStats.Min) < Float64Value(stats.Min) || stats.Min == nil {
 				stats.Min = newStats.Min
 			}
-			if newStats.Max > stats.Max {
+			if Float64Value(newStats.Max) > Float64Value(stats.Max) || stats.Max == nil {
 				stats.Max = newStats.Max
 			}
 		}
@@ -130,16 +134,14 @@ func (c *Class) AddClass(newClass *Class) {
 		stats, ok := c.Metrics.NumberMetrics[newMetric]
 		if !ok {
 			m := *newStats
-			m.Med = 0
-			m.P95 = 0
 			c.Metrics.NumberMetrics[newMetric] = &m
 		} else {
 			stats.Sum += newStats.Sum
-			stats.Avg = stats.Sum / uint64(c.TotalQueries)
-			if newStats.Min < stats.Min {
+			stats.Avg = Uint64(stats.Sum / uint64(c.TotalQueries))
+			if Uint64Value(newStats.Min) < Uint64Value(stats.Min) || stats.Min == nil {
 				stats.Min = newStats.Min
 			}
-			if newStats.Max > stats.Max {
+			if Uint64Value(newStats.Max) > Uint64Value(stats.Max) || stats.Max == nil {
 				stats.Max = newStats.Max
 			}
 		}
@@ -162,8 +164,8 @@ func (c *Class) Finalize(rateLimit uint) {
 	if rateLimit == 0 {
 		rateLimit = 1
 	}
-	c.Metrics.Finalize(rateLimit)
 	c.TotalQueries = (c.TotalQueries * rateLimit) + c.outliers
+	c.Metrics.Finalize(rateLimit, c.TotalQueries)
 	if c.Example.QueryTime == 0 {
 		c.Example = nil
 	}
