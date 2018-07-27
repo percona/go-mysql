@@ -22,7 +22,11 @@ import (
 )
 
 const (
-	MAX_EXAMPLE_BYTES = 1024 * 10
+	// MaxExampleBytes defines to how many bytes truncate a query.
+	MaxExampleBytes = 2 * 1024 * 10
+
+	// TruncatedExampleSuffix is added to truncated query.
+	TruncatedExampleSuffix = "..."
 )
 
 // A Class represents all events with the same fingerprint and class ID.
@@ -42,12 +46,13 @@ type Class struct {
 }
 
 // A Example is a real query and its database, timestamp, and Query_time.
-// If the query is larger than MAX_EXAMPLE_BYTES, it is truncated and "..."
+// If the query is larger than MaxExampleBytes, it is truncated and TruncatedExampleSuffix
 // is appended.
 type Example struct {
 	QueryTime float64 // Query_time
 	Db        string  // Schema: <db> or USE <db>
-	Query     string  // truncated to MAX_EXAMPLE_BYTES
+	Query     string  // truncated to MaxExampleBytes
+	Size      int     `json:",omitempty"` // Original size of query.
 	Ts        string  `json:",omitempty"` // in MySQL time zone
 }
 
@@ -84,13 +89,14 @@ func (c *Class) AddEvent(e *log.Event, outlier bool) {
 		if n, ok := e.TimeMetrics["Query_time"]; ok {
 			if float64(n) > c.Example.QueryTime {
 				c.Example.QueryTime = float64(n)
+				c.Example.Size = len(e.Query)
 				if e.Db != "" {
 					c.Example.Db = e.Db
 				} else {
 					c.Example.Db = c.lastDb
 				}
-				if len(e.Query) > MAX_EXAMPLE_BYTES {
-					c.Example.Query = e.Query[0:MAX_EXAMPLE_BYTES-3] + "..."
+				if len(e.Query) > MaxExampleBytes {
+					c.Example.Query = e.Query[0:MaxExampleBytes-len(TruncatedExampleSuffix)] + TruncatedExampleSuffix
 				} else {
 					c.Example.Query = e.Query
 				}

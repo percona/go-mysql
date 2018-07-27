@@ -35,6 +35,7 @@
   version = "v1.0.0"
 
 [[projects]]
+  branch = "master"
   name = "github.com/shirou/gopsutil"
   packages = [
     "cpu",
@@ -44,8 +45,7 @@
     "net",
     "process"
   ]
-  revision = "5776ff9c7c5d063d574ef53d740f75c68b448e53"
-  version = "v2.18.02"
+  revision = "63728fcf6b24475ecfea044e22242447666c2f52"
 
 [[projects]]
   branch = "master"
@@ -71,6 +71,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f406be1456a5ce9a56b1ead456e63b25f0330cb7796ee2656675b5aad285fc5b"
+  inputs-digest = "9381c640eea08ebf0859e45b609f15feaf5333d4aceec43eb826cbcd48e65d57"
   solver-name = "gps-cdcl"
   solver-version = 1

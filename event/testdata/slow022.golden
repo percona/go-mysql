@@ -91,6 +91,7 @@
         "QueryTime": 2,
         "Db": "test",
         "Query": "select sleep(2) from n",
+        "Size": 22,
         "Ts": "2007-10-15 21:43:52"
       }
     }

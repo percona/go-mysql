@@ -90,7 +90,8 @@
       "Example": {
         "QueryTime": 0.31645,
         "Db": "",
-        "Query": "SET GLOBAL slow_query_log=ON"
+        "Query": "SET GLOBAL slow_query_log=ON",
+        "Size": 28
       }
     },
     "6C099B0B73EA7633": {
@@ -139,7 +140,8 @@
       "Example": {
         "QueryTime": 0.000558,
         "Db": "dbnameb",
-        "Query": "use `dbnameb`"
+        "Query": "use `dbnameb`",
+        "Size": 13
       }
     },
     "7C1934E82086DF57": {
@@ -188,7 +190,8 @@
       "Example": {
         "QueryTime": 0.253052,
         "Db": "",
-        "Query": "SET NAMES utf8"
+        "Query": "SET NAMES utf8",
+        "Size": 14
       }
     },
     "83497A0046FCD7A7": {
@@ -237,7 +240,8 @@
       "Example": {
         "QueryTime": 0.321092,
         "Db": "dbnamea",
-        "Query": "SELECT field FROM table_a WHERE some_other_field = 'yahoo' LIMIT 1"
+        "Query": "SELECT field FROM table_a WHERE some_other_field = 'yahoo' LIMIT 1",
+        "Size": 66
       }
     },
     "9FD5245EAE433B90": {
@@ -286,7 +290,8 @@
       "Example": {
         "QueryTime": 0.000164,
         "Db": "",
-        "Query": "SELECT another_field FROM table_c WHERE a_third_field = 'tiruriru' AND site_id = 1"
+        "Query": "SELECT another_field FROM table_c WHERE a_third_field = 'tiruriru' AND site_id = 1",
+        "Size": 82
       }
     },
     "AC5C18B304F9DE87": {
@@ -335,7 +340,8 @@
       "Example": {
         "QueryTime": 0.000204,
         "Db": "",
-        "Query": "select @@collation_database"
+        "Query": "select @@collation_database",
+        "Size": 27
       }
     },
     "B98E038C9D12BDA1": {
@@ -384,7 +390,8 @@
       "Example": {
         "QueryTime": 0.000297,
         "Db": "",
-        "Query": "SELECT field FROM table_b WHERE another_field = 'bazinga' AND site_id = 1"
+        "Query": "SELECT field FROM table_b WHERE another_field = 'bazinga' AND site_id = 1",
+        "Size": 73
       }
     },
     "F0265D81808CE240": {
@@ -433,7 +440,8 @@
       "Example": {
         "QueryTime": 0.000037,
         "Db": "",
-        "Query": "SELECT @@SESSION.sql_mode"
+        "Query": "SELECT @@SESSION.sql_mode",
+        "Size": 25
       }
     }
   },
