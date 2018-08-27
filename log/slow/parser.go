@@ -32,7 +32,7 @@ import (
 )
 
 // Regular expressions to match important lines in slow log.
-var timeRe = regexp.MustCompile(`Time: (\S+\s{1,2}\S+)`)
+var timeRe = regexp.MustCompile(`Time:\s+(\d{4}-\d{2}-\d{2}\S+)`)
 var userRe = regexp.MustCompile(`User@Host: ([^\[]+|\[[^[]+\]).*?@ (\S*) \[(.*)\]`)
 var idRe = regexp.MustCompile(`(Id|Thread_id): +([0-9]*)`)
 var schema = regexp.MustCompile(`Schema: +(.*?) +Last_errno:`)
@@ -41,6 +41,7 @@ var metricsRe = regexp.MustCompile(`(\w+): (\S+|\z)`)
 var adminRe = regexp.MustCompile(`command: (.+)`)
 var setRe = regexp.MustCompile(`^SET (?:last_insert_id|insert_id|timestamp)`)
 var useRe = regexp.MustCompile(`^(?i)use `)
+var lastBytesRead uint64
 
 // A SlowLogParser parses a MySQL slow log. It implements the LogParser interface.
 type SlowLogParser struct {
@@ -125,11 +126,14 @@ SCANNER_LOOP:
 		default:
 		}
 
+		lastBytesRead = p.bytesRead
 		line, err := r.ReadString('\n')
 		if err != nil {
 			if err != io.EOF {
 				return err
 			}
+
+			// p.event.Offset = p.bytesRead
 			break SCANNER_LOOP
 		}
 
@@ -172,6 +176,7 @@ SCANNER_LOOP:
 		if p.inHeader {
 			p.parseHeader(line)
 		} else if p.inQuery {
+			//			p.event.LastOffset = p.bytesRead
 			p.parseQuery(line)
 		} else if headerRe.MatchString(line) {
 			p.inHeader = true
@@ -382,6 +387,7 @@ func (p *SlowLogParser) sendEvent(inHeader bool, inQuery bool) {
 	}
 
 	// Clean up the event.
+	p.event.LastOffset = lastBytesRead
 	p.event.Db = strings.TrimSuffix(p.event.Db, ";\n")
 	p.event.Query = strings.TrimSuffix(p.event.Query, ";")
 
@@ -392,3 +398,4 @@ func (p *SlowLogParser) sendEvent(inHeader bool, inQuery bool) {
 		p.stopped = true
 	}
 }
+
