@@ -22,6 +22,7 @@ import (
 	"os"
 	"path"
 	"testing"
+	"time"
 
 	"github.com/percona/go-mysql/log"
 	parser "github.com/percona/go-mysql/log/slow"
@@ -67,13 +68,14 @@ func TestParserSlowLog001(t *testing.T) {
 	got := parseSlowLog("slow001.log", opt)
 	expect := []log.Event{
 		{
-			Ts:     "071015 21:43:52",
-			Admin:  false,
-			Query:  `select sleep(2) from n`,
-			User:   "root",
-			Host:   "localhost",
-			Db:     "test",
-			Offset: 200,
+			Ts:        time.Date(2007, 10, 15, 21, 43, 52, 0, time.UTC),
+			Admin:     false,
+			Query:     `select sleep(2) from n`,
+			User:      "root",
+			Host:      "localhost",
+			Db:        "test",
+			Offset:    199,
+			OffsetEnd: 358,
 			TimeMetrics: map[string]float64{
 				"Query_time": 2,
 				"Lock_time":  0,
@@ -85,13 +87,14 @@ func TestParserSlowLog001(t *testing.T) {
 			BoolMetrics: map[string]bool{},
 		},
 		{
-			Ts:     "071015 21:45:10",
-			Admin:  false,
-			Query:  `select sleep(2) from test.n`,
-			User:   "root",
-			Host:   "localhost",
-			Db:     "sakila",
-			Offset: 359,
+			Ts:        time.Date(2007, 10, 15, 21, 45, 10, 0, time.UTC),
+			Admin:     false,
+			Query:     `select sleep(2) from test.n`,
+			User:      "root",
+			Host:      "localhost",
+			Db:        "sakila",
+			Offset:    358,
+			OffsetEnd: 524,
 			TimeMetrics: map[string]float64{
 				"Query_time": 2,
 				"Lock_time":  0,
@@ -111,12 +114,13 @@ func TestParseSlowLog002(t *testing.T) {
 	got := parseSlowLog("slow002.log", opt)
 	expect := []log.Event{
 		{
-			Query:  "BEGIN",
-			Ts:     "071218 11:48:27",
-			Admin:  false,
-			User:   "[SQL_SLAVE]",
-			Host:   "",
-			Offset: 0,
+			Query:     "BEGIN",
+			Ts:        time.Date(2007, 12, 18, 11, 48, 27, 0, time.UTC),
+			Admin:     false,
+			User:      "[SQL_SLAVE]",
+			Host:      "",
+			Offset:    0,
+			OffsetEnd: 337,
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.000012,
 				"Lock_time":  0.000000,
@@ -142,10 +146,11 @@ func TestParseSlowLog002(t *testing.T) {
 			Query: `update db2.tuningdetail_21_265507 n
       inner join db1.gonzo a using(gonzo) 
       set n.column1 = a.column1, n.word3 = a.word3`,
-			Admin:  false,
-			User:   "[SQL_SLAVE]",
-			Host:   "",
-			Offset: 338,
+			Admin:     false,
+			User:      "[SQL_SLAVE]",
+			Host:      "",
+			Offset:    337,
+			OffsetEnd: 814,
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.726052,
 				"Lock_time":  0.000091,
@@ -169,10 +174,11 @@ func TestParseSlowLog002(t *testing.T) {
 		{
 			Query: `INSERT INTO db3.vendor11gonzo (makef, bizzle)
 VALUES ('', 'Exact')`,
-			Admin:  false,
-			User:   "[SQL_SLAVE]",
-			Host:   "",
-			Offset: 815,
+			Admin:     false,
+			User:      "[SQL_SLAVE]",
+			Host:      "",
+			Offset:    814,
+			OffsetEnd: 1333,
 			TimeMetrics: map[string]float64{
 				"InnoDB_queue_wait":    0.000000,
 				"Lock_time":            0.000077,
@@ -203,10 +209,11 @@ VALUES ('', 'Exact')`,
 			Query: `UPDATE db4.vab3concept1upload
 SET    vab3concept1id = '91848182522'
 WHERE  vab3concept1upload='6994465'`,
-			Admin:  false,
-			User:   "[SQL_SLAVE]",
-			Host:   "",
-			Offset: 1334,
+			Admin:     false,
+			User:      "[SQL_SLAVE]",
+			Host:      "",
+			Offset:    1333,
+			OffsetEnd: 1863,
 			TimeMetrics: map[string]float64{
 				"Query_time":           0.033384,
 				"InnoDB_IO_r_wait":     0.000000,
@@ -236,10 +243,11 @@ WHERE  vab3concept1upload='6994465'`,
 		{
 			Query: `INSERT INTO db1.conch (word3, vid83)
 VALUES ('211', '18')`,
-			Admin:  false,
-			User:   "[SQL_SLAVE]",
-			Host:   "",
-			Offset: 1864,
+			Admin:     false,
+			User:      "[SQL_SLAVE]",
+			Host:      "",
+			Offset:    1863,
+			OffsetEnd: 2392,
 			TimeMetrics: map[string]float64{
 				"InnoDB_queue_wait":    0.000000,
 				"Query_time":           0.000530,
@@ -269,10 +277,11 @@ VALUES ('211', '18')`,
 		{
 			Query: `UPDATE foo.bar
 SET    biz = '91848182522'`,
-			Admin:  false,
-			User:   "[SQL_SLAVE]",
-			Host:   "",
-			Offset: 2393,
+			Admin:     false,
+			User:      "[SQL_SLAVE]",
+			Host:      "",
+			Offset:    2392,
+			OffsetEnd: 2860,
 			TimeMetrics: map[string]float64{
 				"Lock_time":            0.000027,
 				"InnoDB_rec_lock_wait": 0.000000,
@@ -303,10 +312,11 @@ SET    biz = '91848182522'`,
 			Query: `UPDATE bizzle.bat
 SET    boop='bop: 899'
 WHERE  fillze='899'`,
-			Admin:  false,
-			User:   "[SQL_SLAVE]",
-			Host:   "",
-			Offset: 2861,
+			Admin:     false,
+			User:      "[SQL_SLAVE]",
+			Host:      "",
+			Offset:    2860,
+			OffsetEnd: 3373,
 			TimeMetrics: map[string]float64{
 				"Query_time":           0.000530,
 				"InnoDB_IO_r_wait":     0.000000,
@@ -336,10 +346,11 @@ WHERE  fillze='899'`,
 		{
 			Query: `UPDATE foo.bar
 SET    biz = '91848182522'`,
-			Admin:  false,
-			User:   "[SQL_SLAVE]",
-			Host:   "",
-			Offset: 3374,
+			Admin:     false,
+			User:      "[SQL_SLAVE]",
+			Host:      "",
+			Offset:    3373,
+			OffsetEnd: 3841,
 			TimeMetrics: map[string]float64{
 				"Query_time":           0.000530,
 				"Lock_time":            0.000027,
@@ -375,12 +386,13 @@ func TestParserSlowLog003(t *testing.T) {
 	got := parseSlowLog("slow003.log", opt)
 	expect := []log.Event{
 		{
-			Query:  "BEGIN",
-			Admin:  false,
-			Host:   "",
-			Ts:     "071218 11:48:27",
-			User:   "[SQL_SLAVE]",
-			Offset: 2,
+			Query:     "BEGIN",
+			Admin:     false,
+			Host:      "",
+			Ts:        time.Date(2007, 12, 18, 11, 48, 27, 0, time.UTC),
+			User:      "[SQL_SLAVE]",
+			Offset:    1,
+			OffsetEnd: 338,
 			BoolMetrics: map[string]bool{
 				"Filesort_on_disk":  false,
 				"Tmp_table_on_disk": false,
@@ -413,9 +425,10 @@ func TestParserSlowLog004(t *testing.T) {
 			Query:       "select 12_13_foo from (select 12foo from 123_bar) as 123baz",
 			Admin:       false,
 			Host:        "localhost",
-			Ts:          "071015 21:43:52",
+			Ts:          time.Date(2007, 10, 15, 21, 43, 52, 0, time.UTC),
 			User:        "root",
-			Offset:      200,
+			Offset:      199,
+			OffsetEnd:   385,
 			BoolMetrics: map[string]bool{},
 			TimeMetrics: map[string]float64{
 				"Lock_time":  0.000000,
@@ -441,12 +454,13 @@ func TestParserSlowLog005(t *testing.T) {
 	got := parseSlowLog("slow005.log", opt)
 	expect := []log.Event{
 		{
-			Query:  "foo\nbar\n\t\t\t0 AS counter\nbaz",
-			Admin:  false,
-			Host:   "",
-			Ts:     "071218 11:48:27",
-			User:   "[SQL_SLAVE]",
-			Offset: 0,
+			Query:     "foo\nbar\n\t\t\t0 AS counter\nbaz",
+			Admin:     false,
+			Host:      "",
+			Ts:        time.Date(2007, 12, 18, 11, 48, 27, 0, time.UTC),
+			User:      "[SQL_SLAVE]",
+			Offset:    0,
+			OffsetEnd: 359,
 			BoolMetrics: map[string]bool{
 				"Filesort_on_disk":  false,
 				"Tmp_table_on_disk": false,
@@ -477,13 +491,14 @@ func TestParserSlowLog006(t *testing.T) {
 	got := parseSlowLog("slow006.log", opt)
 	expect := []log.Event{
 		{
-			Query:  "SELECT col FROM foo_tbl",
-			Db:     "foo",
-			Admin:  false,
-			Host:   "",
-			Ts:     "071218 11:48:27",
-			User:   "[SQL_SLAVE]",
-			Offset: 0,
+			Query:     "SELECT col FROM foo_tbl",
+			Db:        "foo",
+			Admin:     false,
+			Host:      "",
+			Ts:        time.Date(2007, 12, 18, 11, 48, 27, 0, time.UTC),
+			User:      "[SQL_SLAVE]",
+			Offset:    0,
+			OffsetEnd: 368,
 			BoolMetrics: map[string]bool{
 				"Filesort_on_disk":  false,
 				"Tmp_table_on_disk": false,
@@ -505,13 +520,14 @@ func TestParserSlowLog006(t *testing.T) {
 			},
 		},
 		{
-			Query:  "SELECT col FROM foo_tbl",
-			Db:     "foo",
-			Admin:  false,
-			Host:   "",
-			Ts:     "071218 11:48:57",
-			User:   "[SQL_SLAVE]",
-			Offset: 369,
+			Query:     "SELECT col FROM foo_tbl",
+			Db:        "foo",
+			Admin:     false,
+			Host:      "",
+			Ts:        time.Date(2007, 12, 18, 11, 48, 57, 0, time.UTC),
+			User:      "[SQL_SLAVE]",
+			Offset:    368,
+			OffsetEnd: 736,
 			BoolMetrics: map[string]bool{
 				"Filesort_on_disk":  false,
 				"Tmp_table_on_disk": false,
@@ -533,13 +549,14 @@ func TestParserSlowLog006(t *testing.T) {
 			},
 		},
 		{
-			Query:  "SELECT col FROM bar_tbl",
-			Db:     "bar",
-			Admin:  false,
-			Host:   "",
-			Ts:     "071218 11:48:57",
-			User:   "[SQL_SLAVE]",
-			Offset: 737,
+			Query:     "SELECT col FROM bar_tbl",
+			Db:        "bar",
+			Admin:     false,
+			Host:      "",
+			Ts:        time.Date(2007, 12, 18, 11, 48, 57, 0, time.UTC),
+			User:      "[SQL_SLAVE]",
+			Offset:    736,
+			OffsetEnd: 1100,
 			BoolMetrics: map[string]bool{
 				"Filesort_on_disk":  false,
 				"Tmp_table_on_disk": false,
@@ -561,13 +578,14 @@ func TestParserSlowLog006(t *testing.T) {
 			},
 		},
 		{
-			Query:  "SELECT col FROM bar_tbl",
-			Db:     "bar",
-			Admin:  false,
-			Host:   "",
-			Ts:     "071218 11:49:05",
-			User:   "[SQL_SLAVE]",
-			Offset: 1101,
+			Query:     "SELECT col FROM bar_tbl",
+			Db:        "bar",
+			Admin:     false,
+			Host:      "",
+			Ts:        time.Date(2007, 12, 18, 11, 49, 05, 0, time.UTC),
+			User:      "[SQL_SLAVE]",
+			Offset:    1100,
+			OffsetEnd: 1468,
 			BoolMetrics: map[string]bool{
 				"Filesort_on_disk":  false,
 				"Tmp_table_on_disk": false,
@@ -589,13 +607,14 @@ func TestParserSlowLog006(t *testing.T) {
 			},
 		},
 		{
-			Query:  "SELECT col FROM bar_tbl",
-			Db:     "bar",
-			Admin:  false,
-			Host:   "",
-			Ts:     "071218 11:49:07",
-			User:   "[SQL_SLAVE]",
-			Offset: 1469,
+			Query:     "SELECT col FROM bar_tbl",
+			Db:        "bar",
+			Admin:     false,
+			Host:      "",
+			Ts:        time.Date(2007, 12, 18, 11, 49, 07, 0, time.UTC),
+			User:      "[SQL_SLAVE]",
+			Offset:    1468,
+			OffsetEnd: 1832,
 			BoolMetrics: map[string]bool{
 				"Filesort_on_disk":  false,
 				"Tmp_table_on_disk": false,
@@ -617,13 +636,14 @@ func TestParserSlowLog006(t *testing.T) {
 			},
 		},
 		{
-			Query:  "SELECT col FROM foo_tbl",
-			Db:     "foo",
-			Admin:  false,
-			Host:   "",
-			Ts:     "071218 11:49:30",
-			User:   "[SQL_SLAVE]",
-			Offset: 1833,
+			Query:     "SELECT col FROM foo_tbl",
+			Db:        "foo",
+			Admin:     false,
+			Host:      "",
+			Ts:        time.Date(2007, 12, 18, 11, 49, 30, 0, time.UTC),
+			User:      "[SQL_SLAVE]",
+			Offset:    1832,
+			OffsetEnd: 2200,
 			BoolMetrics: map[string]bool{
 				"Filesort_on_disk":  false,
 				"Tmp_table_on_disk": false,
@@ -657,9 +677,10 @@ func TestParserSlowLog007(t *testing.T) {
 			Db:          "db2",
 			Admin:       false,
 			Host:        "",
-			Ts:          "071218 11:48:27",
+			Ts:          time.Date(2007, 12, 18, 11, 48, 27, 0, time.UTC),
 			User:        "[SQL_SLAVE]",
 			Offset:      0,
+			OffsetEnd:   193,
 			BoolMetrics: map[string]bool{},
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.000012,
@@ -691,6 +712,7 @@ func TestParserSlowLog008(t *testing.T) {
 			Host:        "",
 			User:        "meow",
 			Offset:      0,
+			OffsetEnd:   220,
 			BoolMetrics: map[string]bool{},
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.000002,
@@ -708,7 +730,8 @@ func TestParserSlowLog008(t *testing.T) {
 			Admin:       false,
 			Host:        "",
 			User:        "meow",
-			Offset:      221,
+			Offset:      220,
+			OffsetEnd:   434,
 			BoolMetrics: map[string]bool{},
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.000899,
@@ -726,7 +749,8 @@ func TestParserSlowLog008(t *testing.T) {
 			Admin:       false,
 			Host:        "",
 			User:        "meow",
-			Offset:      435,
+			Offset:      434,
+			OffsetEnd:   656,
 			BoolMetrics: map[string]bool{},
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.018799,
@@ -752,13 +776,14 @@ func TestParserSlowLog009(t *testing.T) {
 	got := parseSlowLog("slow009.log", opt)
 	expect := []log.Event{
 		{
-			Query:  "Refresh",
-			Db:     "",
-			Admin:  true,
-			Host:   "localhost",
-			User:   "root",
-			Offset: 197,
-			Ts:     "090311 18:11:50",
+			Query:     "Refresh",
+			Db:        "",
+			Admin:     true,
+			Host:      "localhost",
+			User:      "root",
+			Offset:    196,
+			OffsetEnd: 562,
+			Ts:        time.Date(2009, 03, 11, 18, 11, 50, 0, time.UTC),
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.017850,
 				"Lock_time":  0.000000,
@@ -791,11 +816,12 @@ func TestParserSlowLog011(t *testing.T) {
 	expect := []log.Event{
 		{
 			Offset:    0,
+			OffsetEnd: 732,
 			Query:     "SELECT foo FROM bar WHERE id=1",
 			Db:        "maindb",
 			Host:      "localhost",
 			User:      "user1",
-			Ts:        "131128  1:05:31",
+			Ts:        time.Date(2013, 11, 28, 1, 05, 31, 0, time.UTC),
 			RateType:  "query",
 			RateLimit: 2,
 			TimeMetrics: map[string]float64{
@@ -832,7 +858,8 @@ func TestParserSlowLog011(t *testing.T) {
 			},
 		},
 		{
-			Offset:    733,
+			Offset:    732,
+			OffsetEnd: 1440,
 			Query:     "SELECT foo FROM bar WHERE id=2",
 			Db:        "maindb",
 			Host:      "localhost",
@@ -873,7 +900,8 @@ func TestParserSlowLog011(t *testing.T) {
 			},
 		},
 		{
-			Offset:    1441,
+			Offset:    1440,
+			OffsetEnd: 2152,
 			Query:     "INSERT INTO foo VALUES (NULL, 3)",
 			Db:        "maindb",
 			Host:      "localhost",
@@ -921,11 +949,12 @@ func TestParserSlowLog012(t *testing.T) {
 	got := parseSlowLog("slow012.log", opt)
 	expect := []log.Event{
 		{
-			Query:  "select * from mysql.user",
-			Db:     "",
-			Host:   "localhost",
-			User:   "msandbox",
-			Offset: 0,
+			Query:     "select * from mysql.user",
+			Db:        "",
+			Host:      "localhost",
+			User:      "msandbox",
+			Offset:    0,
+			OffsetEnd: 185,
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.000214,
 				"Lock_time":  0.000086,
@@ -937,12 +966,13 @@ func TestParserSlowLog012(t *testing.T) {
 			BoolMetrics: map[string]bool{},
 		},
 		{
-			Query:  "Quit",
-			Admin:  true,
-			Db:     "",
-			Host:   "localhost",
-			User:   "msandbox",
-			Offset: 186,
+			Query:     "Quit",
+			Admin:     true,
+			Db:        "",
+			Host:      "localhost",
+			User:      "msandbox",
+			Offset:    185,
+			OffsetEnd: 375,
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.000016,
 				"Lock_time":  0.000000,
@@ -954,12 +984,13 @@ func TestParserSlowLog012(t *testing.T) {
 			BoolMetrics: map[string]bool{},
 		},
 		{
-			Query:  "SELECT @@max_allowed_packet",
-			Db:     "dev_pct",
-			Host:   "localhost",
-			User:   "msandbox",
-			Offset: 376,
-			Ts:     "140413 19:34:13",
+			Query:     "SELECT @@max_allowed_packet",
+			Db:        "dev_pct",
+			Host:      "localhost",
+			User:      "msandbox",
+			Offset:    375,
+			OffsetEnd: 609,
+			Ts:        time.Date(2014, 04, 13, 19, 34, 13, 0, time.UTC),
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.000127,
 				"Lock_time":  0.000000,
@@ -979,12 +1010,13 @@ func TestParserSlowLog013(t *testing.T) {
 	got := parseSlowLog("slow013.log", log.Options{Debug: false})
 	expect := []log.Event{
 		{
-			Offset: 0,
-			Ts:     "140224 22:39:34",
-			Query:  "select 950,q.* from qcm q INTO OUTFILE '/mnt/pct/exp/qcm_db950.txt'",
-			User:   "root",
-			Host:   "localhost",
-			Db:     "db950",
+			Offset:    0,
+			OffsetEnd: 353,
+			Ts:        time.Date(2014, 02, 24, 22, 39, 34, 0, time.UTC),
+			Query:     "select 950,q.* from qcm q INTO OUTFILE '/mnt/pct/exp/qcm_db950.txt'",
+			User:      "root",
+			Host:      "localhost",
+			Db:        "db950",
 			TimeMetrics: map[string]float64{
 				"Query_time": 21.876617,
 				"Lock_time":  0.002991,
@@ -1000,12 +1032,13 @@ func TestParserSlowLog013(t *testing.T) {
 			BoolMetrics: map[string]bool{},
 		},
 		{
-			Offset: 354,
-			Ts:     "140224 22:39:59",
-			Query:  "select 961,q.* from qcm q INTO OUTFILE '/mnt/pct/exp/qcm_db961.txt'",
-			User:   "root",
-			Host:   "localhost",
-			Db:     "db961",
+			Offset:    353,
+			OffsetEnd: 6138,
+			Ts:        time.Date(2014, 02, 24, 22, 39, 59, 0, time.UTC),
+			Query:     "select 961,q.* from qcm q INTO OUTFILE '/mnt/pct/exp/qcm_db961.txt'",
+			User:      "root",
+			Host:      "localhost",
+			Db:        "db961",
 			TimeMetrics: map[string]float64{
 				"Query_time": 20.304536,
 				"Lock_time":  0.103324,
@@ -1021,12 +1054,13 @@ func TestParserSlowLog013(t *testing.T) {
 			BoolMetrics: map[string]bool{},
 		},
 		{
-			Offset: 6139,
-			Ts:     "140311 16:07:40",
-			Query:  "select count(*) into @discard from `information_schema`.`PARTITIONS`",
-			User:   "debian-sys-maint",
-			Host:   "localhost",
-			Db:     "",
+			Offset:    6138,
+			OffsetEnd: 6666,
+			Ts:        time.Date(2014, 03, 11, 16, 07, 40, 0, time.UTC),
+			Query:     "select count(*) into @discard from `information_schema`.`PARTITIONS`",
+			User:      "debian-sys-maint",
+			Host:      "localhost",
+			Db:        "",
 			TimeMetrics: map[string]float64{
 				"Query_time": 94.38144,
 				"Lock_time":  0.000174,
@@ -1042,12 +1076,13 @@ func TestParserSlowLog013(t *testing.T) {
 			BoolMetrics: map[string]bool{},
 		},
 		{
-			Offset: 6667,
-			Ts:     "140312 20:28:40",
-			Query:  "select 1,q.* from qcm q INTO OUTFILE '/mnt/pct/exp/qcm_db1.txt'",
-			User:   "root",
-			Host:   "localhost",
-			Db:     "db1",
+			Offset:    6666,
+			OffsetEnd: 7014,
+			Ts:        time.Date(2014, 03, 12, 20, 28, 40, 0, time.UTC),
+			Query:     "select 1,q.* from qcm q INTO OUTFILE '/mnt/pct/exp/qcm_db1.txt'",
+			User:      "root",
+			Host:      "localhost",
+			Db:        "db1",
 			TimeMetrics: map[string]float64{
 				"Query_time": 407.540262,
 				"Lock_time":  0.122377,
@@ -1063,12 +1098,13 @@ func TestParserSlowLog013(t *testing.T) {
 			BoolMetrics: map[string]bool{},
 		},
 		{
-			Offset: 7015,
-			Ts:     "140312 20:29:40",
-			Query:  "select 1006,q.* from qcm q INTO OUTFILE '/mnt/pct/exp/qcm_db1006.txt'",
-			User:   "root",
-			Host:   "localhost",
-			Db:     "db1006",
+			Offset:    7014,
+			OffsetEnd: 7370,
+			Ts:        time.Date(2014, 03, 12, 20, 29, 40, 0, time.UTC),
+			Query:     "select 1006,q.* from qcm q INTO OUTFILE '/mnt/pct/exp/qcm_db1006.txt'",
+			User:      "root",
+			Host:      "localhost",
+			Db:        "db1006",
 			TimeMetrics: map[string]float64{
 				"Query_time": 60.507698,
 				"Lock_time":  0.002719,
@@ -1092,12 +1128,13 @@ func TestParserSlowLog014(t *testing.T) {
 	got := parseSlowLog("slow014.log", opt)
 	expect := []log.Event{
 		{
-			Offset: 0,
-			Admin:  false,
-			Query:  "SELECT * FROM cache\n WHERE `cacheid` IN ('id15965')",
-			User:   "root",
-			Host:   "localhost",
-			Db:     "db1",
+			Offset:    0,
+			OffsetEnd: 690,
+			Admin:     false,
+			Query:     "SELECT * FROM cache\n WHERE `cacheid` IN ('id15965')",
+			User:      "root",
+			Host:      "localhost",
+			Db:        "db1",
 			TimeMetrics: map[string]float64{
 				"InnoDB_IO_r_wait":     0,
 				"InnoDB_queue_wait":    0,
@@ -1137,12 +1174,13 @@ func TestParserSlowLog014(t *testing.T) {
 			/**
 			 * Here it is:
 			 */
-			Offset: 691,
-			Admin:  false,
-			Query:  "### Channels ###\n\u0009\u0009\u0009\u0009\u0009SELECT sourcetable, IF(f.lastcontent = 0, f.lastupdate, f.lastcontent) AS lastactivity,\n\u0009\u0009\u0009\u0009\u0009f.totalcount AS activity, type.class AS type,\n\u0009\u0009\u0009\u0009\u0009(f.nodeoptions \u0026 512) AS noUnsubscribe\n\u0009\u0009\u0009\u0009\u0009FROM node AS f\n\u0009\u0009\u0009\u0009\u0009INNER JOIN contenttype AS type ON type.contenttypeid = f.contenttypeid \n\n\u0009\u0009\u0009\u0009\u0009INNER JOIN subscribed AS sd ON sd.did = f.nodeid AND sd.userid = 15965\n UNION  ALL \n\n\u0009\u0009\u0009\u0009\u0009### Users ###\n\u0009\u0009\u0009\u0009\u0009SELECT f.name AS title, f.userid AS keyval, 'user' AS sourcetable, IFNULL(f.lastpost, f.joindate) AS lastactivity,\n\u0009\u0009\u0009\u0009\u0009f.posts as activity, 'Member' AS type,\n\u0009\u0009\u0009\u0009\u00090 AS noUnsubscribe\n\u0009\u0009\u0009\u0009\u0009FROM user AS f\n\u0009\u0009\u0009\u0009\u0009INNER JOIN userlist AS ul ON ul.relationid = f.userid AND ul.userid = 15965\n\u0009\u0009\u0009\u0009\u0009WHERE ul.type = 'f' AND ul.aq = 'yes'\n ORDER BY title ASC LIMIT 100",
-			User:   "root",
-			Host:   "localhost",
-			Db:     "db1",
+			Offset:    690,
+			OffsetEnd: 2104,
+			Admin:     false,
+			Query:     "### Channels ###\n\u0009\u0009\u0009\u0009\u0009SELECT sourcetable, IF(f.lastcontent = 0, f.lastupdate, f.lastcontent) AS lastactivity,\n\u0009\u0009\u0009\u0009\u0009f.totalcount AS activity, type.class AS type,\n\u0009\u0009\u0009\u0009\u0009(f.nodeoptions \u0026 512) AS noUnsubscribe\n\u0009\u0009\u0009\u0009\u0009FROM node AS f\n\u0009\u0009\u0009\u0009\u0009INNER JOIN contenttype AS type ON type.contenttypeid = f.contenttypeid \n\n\u0009\u0009\u0009\u0009\u0009INNER JOIN subscribed AS sd ON sd.did = f.nodeid AND sd.userid = 15965\n UNION  ALL \n\n\u0009\u0009\u0009\u0009\u0009### Users ###\n\u0009\u0009\u0009\u0009\u0009SELECT f.name AS title, f.userid AS keyval, 'user' AS sourcetable, IFNULL(f.lastpost, f.joindate) AS lastactivity,\n\u0009\u0009\u0009\u0009\u0009f.posts as activity, 'Member' AS type,\n\u0009\u0009\u0009\u0009\u00090 AS noUnsubscribe\n\u0009\u0009\u0009\u0009\u0009FROM user AS f\n\u0009\u0009\u0009\u0009\u0009INNER JOIN userlist AS ul ON ul.relationid = f.userid AND ul.userid = 15965\n\u0009\u0009\u0009\u0009\u0009WHERE ul.type = 'f' AND ul.aq = 'yes'\n ORDER BY title ASC LIMIT 100",
+			User:      "root",
+			Host:      "localhost",
+			Db:        "db1",
 			TimeMetrics: map[string]float64{
 				"InnoDB_IO_r_wait":     0,
 				"InnoDB_queue_wait":    0,
@@ -1179,11 +1217,12 @@ func TestParserSlowLog014(t *testing.T) {
 			},
 		},
 		{
-			Offset: 2105,
-			Query:  "SELECT COUNT(userfing.keyval) AS total\n\u0009\u0009\u0009FROM\n\u0009\u0009\u0009((### All Content ###\n\u0009\u0009\u0009\u0009\u0009SELECT f.nodeid AS keyval\n\u0009\u0009\u0009\u0009\u0009FROM node AS f\n\u0009\u0009\u0009\u0009\u0009INNER JOIN subscribed AS sd ON sd.did = f.nodeid AND sd.userid = 15965) UNION ALL (\n\u0009\u0009\u0009\u0009\u0009### Users ###\n\u0009\u0009\u0009\u0009\u0009SELECT f.userid AS keyval\n\u0009\u0009\u0009\u0009\u0009FROM user AS f\n\u0009\u0009\u0009\u0009\u0009INNER JOIN userlist AS ul ON ul.relationid = f.userid AND ul.userid = 15965\n\u0009\u0009\u0009\u0009\u0009WHERE ul.type = 'f' AND ul.aq = 'yes')\n) AS userfing",
-			User:   "root",
-			Host:   "localhost",
-			Db:     "db1",
+			Offset:    2104,
+			OffsetEnd: 3163,
+			Query:     "SELECT COUNT(userfing.keyval) AS total\n\u0009\u0009\u0009FROM\n\u0009\u0009\u0009((### All Content ###\n\u0009\u0009\u0009\u0009\u0009SELECT f.nodeid AS keyval\n\u0009\u0009\u0009\u0009\u0009FROM node AS f\n\u0009\u0009\u0009\u0009\u0009INNER JOIN subscribed AS sd ON sd.did = f.nodeid AND sd.userid = 15965) UNION ALL (\n\u0009\u0009\u0009\u0009\u0009### Users ###\n\u0009\u0009\u0009\u0009\u0009SELECT f.userid AS keyval\n\u0009\u0009\u0009\u0009\u0009FROM user AS f\n\u0009\u0009\u0009\u0009\u0009INNER JOIN userlist AS ul ON ul.relationid = f.userid AND ul.userid = 15965\n\u0009\u0009\u0009\u0009\u0009WHERE ul.type = 'f' AND ul.aq = 'yes')\n) AS userfing",
+			User:      "root",
+			Host:      "localhost",
+			Db:        "db1",
 			TimeMetrics: map[string]float64{
 				"InnoDB_IO_r_wait":     0,
 				"InnoDB_queue_wait":    0,
@@ -1220,11 +1259,12 @@ func TestParserSlowLog014(t *testing.T) {
 			},
 		},
 		{
-			Offset: 3164,
-			Query:  "SELECT u.userid, u.name AS name, u.usergroupid AS usergroupid, IFNULL(u.lastactivity, u.joindate) as lastactivity,\n\u0009\u0009\u0009\u0009IFNULL((SELECT userid FROM userlist AS ul2 WHERE ul2.userid = 15965 AND ul2.relationid = u.userid AND ul2.type = 'f' AND ul2.aq = 'yes'), 0) as isFollowing,\n\u0009\u0009\u0009\u0009IFNULL((SELECT userid FROM userlist AS ul2 WHERE ul2.userid = 15965 AND ul2.relationid = u.userid AND ul2.type = 'f' AND ul2.aq = 'pending'), 0) as isPending\nFROM user AS u\n\u0009\u0009\u0009\u0009INNER JOIN userlist AS ul ON (u.userid = ul.userid AND ul.relationid = 15965)\n\n\u0009\u0009\u0009WHERE ul.type = 'f' AND ul.aq = 'yes'\nORDER BY name ASC\nLIMIT 0, 100",
-			User:   "root",
-			Host:   "localhost",
-			Db:     "db1",
+			Offset:    3163,
+			OffsetEnd: 4410,
+			Query:     "SELECT u.userid, u.name AS name, u.usergroupid AS usergroupid, IFNULL(u.lastactivity, u.joindate) as lastactivity,\n\u0009\u0009\u0009\u0009IFNULL((SELECT userid FROM userlist AS ul2 WHERE ul2.userid = 15965 AND ul2.relationid = u.userid AND ul2.type = 'f' AND ul2.aq = 'yes'), 0) as isFollowing,\n\u0009\u0009\u0009\u0009IFNULL((SELECT userid FROM userlist AS ul2 WHERE ul2.userid = 15965 AND ul2.relationid = u.userid AND ul2.type = 'f' AND ul2.aq = 'pending'), 0) as isPending\nFROM user AS u\n\u0009\u0009\u0009\u0009INNER JOIN userlist AS ul ON (u.userid = ul.userid AND ul.relationid = 15965)\n\n\u0009\u0009\u0009WHERE ul.type = 'f' AND ul.aq = 'yes'\nORDER BY name ASC\nLIMIT 0, 100",
+			User:      "root",
+			Host:      "localhost",
+			Db:        "db1",
 			TimeMetrics: map[string]float64{
 				"InnoDB_IO_r_wait":     0,
 				"InnoDB_queue_wait":    0,
@@ -1266,15 +1306,17 @@ func TestParserSlowLog014(t *testing.T) {
 
 // Correct event offsets when parsing starts/resumes at an offset.
 func TestParserSlowLog001StartOffset(t *testing.T) {
-	// 359 is the first byte of the second (of 2) events.
-	got := parseSlowLog("slow001.log", log.Options{StartOffset: 359})
+	// 358 is the first byte of the second (of 2) events.
+	got := parseSlowLog("slow001.log", log.Options{StartOffset: 358})
 	expect := []log.Event{
 		{
-			Query:  `select sleep(2) from test.n`,
-			User:   "root",
-			Host:   "localhost",
-			Db:     "sakila",
-			Offset: 383,
+			Ts:        time.Date(2007, 10, 15, 21, 45, 10, 0, time.UTC),
+			Query:     `select sleep(2) from test.n`,
+			User:      "root",
+			Host:      "localhost",
+			Db:        "sakila",
+			Offset:    358,
+			OffsetEnd: 524,
 			TimeMetrics: map[string]float64{
 				"Query_time": 2,
 				"Lock_time":  0,
@@ -1301,10 +1343,11 @@ func TestParseSlow016(t *testing.T) {
 	got := parseSlowLog("slow016.log", log.Options{Debug: false})
 	expect := []log.Event{
 		{
-			Query:  `SHOW /*!50002 GLOBAL */ STATUS`,
-			User:   "pt_agent",
-			Host:   "localhost",
-			Offset: 160,
+			Query:     `SHOW /*!50002 GLOBAL */ STATUS`,
+			User:      "pt_agent",
+			Host:      "localhost",
+			Offset:    159,
+			OffsetEnd: 413,
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.003953,
 				"Lock_time":  0.000059,
@@ -1327,10 +1370,11 @@ func TestParseSlow017(t *testing.T) {
 	got := parseSlowLog("slow017.log", opt)
 	expect := []log.Event{
 		{
-			Query:  `SHOW /*!50002 GLOBAL */ STATUS`,
-			User:   "pt_agent",
-			Host:   "localhost",
-			Offset: 27,
+			Query:     `SHOW /*!50002 GLOBAL */ STATUS`,
+			User:      "pt_agent",
+			Host:      "localhost",
+			Offset:    26,
+			OffsetEnd: 280,
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.003953,
 				"Lock_time":  0.000059,
@@ -1352,10 +1396,11 @@ func TestParseSlow019(t *testing.T) {
 	got := parseSlowLog("slow019.log", log.Options{Debug: false})
 	expect := []log.Event{
 		{
-			Query:  `SELECT TABLE_SCHEMA, TABLE_NAME, ROWS_READ, ROWS_CHANGED, ROWS_CHANGED_X_INDEXES FROM INFORMATION_SCHEMA.TABLE_STATISTICS`,
-			User:   "percona-agent",
-			Host:   "localhost",
-			Offset: 0,
+			Query:     `SELECT TABLE_SCHEMA, TABLE_NAME, ROWS_READ, ROWS_CHANGED, ROWS_CHANGED_X_INDEXES FROM INFORMATION_SCHEMA.TABLE_STATISTICS`,
+			User:      "percona-agent",
+			Host:      "localhost",
+			Offset:    0,
+			OffsetEnd: 641,
 			TimeMetrics: map[string]float64{
 				"Lock_time":  0.0001,
 				"Query_time": 0.004599,
@@ -1385,11 +1430,12 @@ func TestParseSlow019(t *testing.T) {
 			},
 		},
 		{
-			Query:  `SELECT cid, data, created, expire, serialized FROM cache_field WHERE cid IN ('field_info:bundle_extra:user:user')`,
-			User:   "root",
-			Host:   "localhost",
-			Offset: 642,
-			Db:     "cod7_plos15",
+			Query:     `SELECT cid, data, created, expire, serialized FROM cache_field WHERE cid IN ('field_info:bundle_extra:user:user')`,
+			User:      "root",
+			Host:      "localhost",
+			Offset:    641,
+			OffsetEnd: 1273,
+			Db:        "cod7_plos15",
 			TimeMetrics: map[string]float64{
 				"Lock_time":  0,
 				"Query_time": 2.2e-05,
@@ -1419,11 +1465,12 @@ func TestParseSlow019(t *testing.T) {
 			},
 		},
 		{
-			Query:  "UPDATE captcha_sessions SET timestamp='1413583348', solution='1'\nWHERE  (csid = '28439')",
-			User:   "root",
-			Host:   "localhost",
-			Offset: 1274,
-			Db:     "cod7_plos15",
+			Query:     "UPDATE captcha_sessions SET timestamp='1413583348', solution='1'\nWHERE  (csid = '28439')",
+			User:      "root",
+			Host:      "localhost",
+			Offset:    1273,
+			OffsetEnd: 2005,
+			Db:        "cod7_plos15",
 			TimeMetrics: map[string]float64{
 				"InnoDB_IO_r_wait":     0,
 				"InnoDB_queue_wait":    0,
@@ -1460,10 +1507,11 @@ func TestParseSlow019(t *testing.T) {
 			},
 		},
 		{
-			Query:  `SELECT TABLE_SCHEMA, TABLE_NAME, INDEX_NAME, ROWS_READ FROM INFORMATION_SCHEMA.INDEX_STATISTICS`,
-			User:   "percona-agent",
-			Host:   "localhost",
-			Offset: 2006,
+			Query:     `SELECT TABLE_SCHEMA, TABLE_NAME, INDEX_NAME, ROWS_READ FROM INFORMATION_SCHEMA.INDEX_STATISTICS`,
+			User:      "percona-agent",
+			Host:      "localhost",
+			Offset:    2005,
+			OffsetEnd: 2621,
 			TimeMetrics: map[string]float64{
 				"Lock_time":  0.000115,
 				"Query_time": 0.011565,
@@ -1502,13 +1550,13 @@ func TestParseSlow023(t *testing.T) {
 	expect := []log.Event{
 		// Slice 0
 		{
-			Offset: 177,
-			Ts:     "",
-			Admin:  false,
-			Query:  "SELECT field FROM table_a WHERE some_other_field = 'yahoo' LIMIT 1",
-			User:   "bookblogs",
-			Host:   "localhost",
-			Db:     "dbnamea",
+			Offset:    176,
+			OffsetEnd: 418,
+			Admin:     false,
+			Query:     "SELECT field FROM table_a WHERE some_other_field = 'yahoo' LIMIT 1",
+			User:      "bookblogs",
+			Host:      "localhost",
+			Db:        "dbnamea",
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.321092,
 				"Lock_time":  3.8e-05,
@@ -1523,13 +1571,13 @@ func TestParseSlow023(t *testing.T) {
 		},
 		// Slice 1
 		{
-			Offset: 419,
-			Ts:     "",
-			Admin:  false,
-			Query:  "SET NAMES utf8",
-			User:   "bookblogs",
-			Host:   "localhost",
-			Db:     "",
+			Offset:    418,
+			OffsetEnd: 595,
+			Admin:     false,
+			Query:     "SET NAMES utf8",
+			User:      "bookblogs",
+			Host:      "localhost",
+			Db:        "",
 			TimeMetrics: map[string]float64{
 				"Lock_time":  0,
 				"Query_time": 0.253052,
@@ -1544,13 +1592,13 @@ func TestParseSlow023(t *testing.T) {
 		},
 		// Slice 2
 		{
-			Offset: 596,
-			Ts:     "",
-			Admin:  false,
-			Query:  "SET GLOBAL slow_query_log=ON",
-			User:   "percona-agent",
-			Host:   "localhost",
-			Db:     "",
+			Offset:    595,
+			OffsetEnd: 794,
+			Admin:     false,
+			Query:     "SET GLOBAL slow_query_log=ON",
+			User:      "percona-agent",
+			Host:      "localhost",
+			Db:        "",
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.31645,
 				"Lock_time":  0,
@@ -1565,13 +1613,13 @@ func TestParseSlow023(t *testing.T) {
 		},
 		// Slice 3
 		{
-			Offset: 795,
-			Ts:     "",
-			Admin:  false,
-			Query:  "SELECT @@SESSION.sql_mode",
-			User:   "bookblogs",
-			Host:   "localhost",
-			Db:     "",
+			Offset:    794,
+			OffsetEnd: 982,
+			Admin:     false,
+			Query:     "SELECT @@SESSION.sql_mode",
+			User:      "bookblogs",
+			Host:      "localhost",
+			Db:        "",
 			TimeMetrics: map[string]float64{
 				"Query_time": 3.7e-05,
 				"Lock_time":  0,
@@ -1586,13 +1634,13 @@ func TestParseSlow023(t *testing.T) {
 		},
 		// Slice 4
 		{
-			Offset: 983,
-			Ts:     "",
-			Admin:  false,
-			Query:  "SELECT field FROM table_b WHERE another_field = 'bazinga' AND site_id = 1",
-			User:   "bookblogs",
-			Host:   "localhost",
-			Db:     "",
+			Offset:    982,
+			OffsetEnd: 1218,
+			Admin:     false,
+			Query:     "SELECT field FROM table_b WHERE another_field = 'bazinga' AND site_id = 1",
+			User:      "bookblogs",
+			Host:      "localhost",
+			Db:        "",
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.000297,
 				"Lock_time":  0.000141,
@@ -1606,13 +1654,13 @@ func TestParseSlow023(t *testing.T) {
 		},
 		// Slice 5
 		{
-			Offset: 1219,
-			Ts:     "",
-			Admin:  false,
-			Query:  "use `dbnameb`",
-			User:   "backup",
-			Host:   "localhost",
-			Db:     "dbnameb",
+			Offset:    1218,
+			OffsetEnd: 1388,
+			Admin:     false,
+			Query:     "use `dbnameb`",
+			User:      "backup",
+			Host:      "localhost",
+			Db:        "dbnameb",
 			TimeMetrics: map[string]float64{
 				"Lock_time":  0,
 				"Query_time": 0.000558,
@@ -1627,13 +1675,13 @@ func TestParseSlow023(t *testing.T) {
 		},
 		// Slice 6
 		{
-			Offset: 1389,
-			Ts:     "",
-			Admin:  false,
-			Query:  "select @@collation_database",
-			User:   "backup",
-			Host:   "localhost",
-			Db:     "",
+			Offset:    1388,
+			OffsetEnd: 1572,
+			Admin:     false,
+			Query:     "select @@collation_database",
+			User:      "backup",
+			Host:      "localhost",
+			Db:        "",
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.000204,
 				"Lock_time":  0,
@@ -1648,13 +1696,13 @@ func TestParseSlow023(t *testing.T) {
 		},
 		// Slice 7
 		{
-			Offset: 1573,
-			Ts:     "",
-			Admin:  false,
-			Query:  "SELECT another_field FROM table_c WHERE a_third_field = 'tiruriru' AND site_id = 1",
-			User:   "bookblogs",
-			Host:   "localhost",
-			Db:     "",
+			Offset:    1572,
+			OffsetEnd: 1817,
+			Admin:     false,
+			Query:     "SELECT another_field FROM table_c WHERE a_third_field = 'tiruriru' AND site_id = 1",
+			User:      "bookblogs",
+			Host:      "localhost",
+			Db:        "",
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.000164,
 				"Lock_time":  5.9e-05,
@@ -1701,13 +1749,14 @@ func TestParseSlow024(t *testing.T) {
 	got := parseSlowLog("slow024.log", log.Options{Debug: false})
 	expect := []log.Event{
 		{
-			Offset: 200,
-			Ts:     "071015 21:43:52",
-			Admin:  false,
-			Query:  "select sleep(1) from n",
-			User:   "root",
-			Host:   "localhost",
-			Db:     "test",
+			Offset:    199,
+			OffsetEnd: 361,
+			Ts:        time.Date(2007, 10, 15, 21, 43, 52, 0, time.UTC),
+			Admin:     false,
+			Query:     "select sleep(1) from n",
+			User:      "root",
+			Host:      "localhost",
+			Db:        "test",
 			TimeMetrics: map[string]float64{
 				"Lock_time":  0,
 				"Query_time": 2,
@@ -1721,13 +1770,13 @@ func TestParseSlow024(t *testing.T) {
 			RateLimit:   0,
 		},
 		{
-			Offset: 362,
-			Ts:     "",
-			Admin:  false,
-			Query:  "select sleep(2) from n",
-			User:   "root",
-			Host:   "localhost",
-			Db:     "test",
+			Offset:    361,
+			OffsetEnd: 507,
+			Admin:     false,
+			Query:     "select sleep(2) from n",
+			User:      "root",
+			Host:      "localhost",
+			Db:        "test",
 			TimeMetrics: map[string]float64{
 				"Lock_time":  0,
 				"Query_time": 2,
@@ -1741,13 +1790,14 @@ func TestParseSlow024(t *testing.T) {
 			RateLimit:   0,
 		},
 		{
-			Offset: 508,
-			Ts:     "071015 21:43:52",
-			Admin:  false,
-			Query:  "select sleep(3) from n",
-			User:   "",
-			Host:   "",
-			Db:     "test",
+			Offset:    507,
+			OffsetEnd: 644,
+			Ts:        time.Date(2007, 10, 15, 21, 43, 52, 0, time.UTC),
+			Admin:     false,
+			Query:     "select sleep(3) from n",
+			User:      "",
+			Host:      "",
+			Db:        "test",
 			TimeMetrics: map[string]float64{
 				"Lock_time":  0,
 				"Query_time": 2,
@@ -1769,13 +1819,14 @@ func TestParseSlowMariaDBWithExplain(t *testing.T) {
 	got := parseSlowLog("mariadb102-with-explain.log", log.Options{Debug: false})
 	expect := []log.Event{
 		{
-			Offset: 206,
-			Ts:     "180214 16:18:07",
-			Admin:  false,
-			Query:  "SELECT 1",
-			User:   "root",
-			Host:   "localhost",
-			Db:     "",
+			Offset:    205,
+			OffsetEnd: 630,
+			Ts:        time.Date(2018, 02, 14, 16, 18, 07, 0, time.UTC),
+			Admin:     false,
+			Query:     "SELECT 1",
+			User:      "root",
+			Host:      "localhost",
+			Db:        "",
 			TimeMetrics: map[string]float64{
 				"Lock_time":  0,
 				"Query_time": 0.000277,

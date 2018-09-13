@@ -27,12 +27,14 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/percona/go-mysql/log"
 )
 
 // Regular expressions to match important lines in slow log.
-var timeRe = regexp.MustCompile(`Time:\s+(\d{4}-\d{2}-\d{2}\S+)`)
+var timeRe = regexp.MustCompile(`Time: (\S+\s{1,2}\S+)`)
+var timeNewRe = regexp.MustCompile(`Time:\s+(\d{4}-\d{2}-\d{2}\S+)`)
 var userRe = regexp.MustCompile(`User@Host: ([^\[]+|\[[^[]+\]).*?@ (\S*) \[(.*)\]`)
 var schema = regexp.MustCompile(`Schema: +(.*?) +Last_errno:`)
 var headerRe = regexp.MustCompile(`^#\s+[A-Z]`)
@@ -40,7 +42,6 @@ var metricsRe = regexp.MustCompile(`(\w+): (\S+|\z)`)
 var adminRe = regexp.MustCompile(`command: (.+)`)
 var setRe = regexp.MustCompile(`^SET (?:last_insert_id|insert_id|timestamp)`)
 var useRe = regexp.MustCompile(`^(?i)use `)
-var lastBytesRead uint64
 
 // A SlowLogParser parses a MySQL slow log. It implements the LogParser interface.
 type SlowLogParser struct {
@@ -55,6 +56,7 @@ type SlowLogParser struct {
 	queryLines  uint64
 	bytesRead   uint64
 	lineOffset  uint64
+	endOffset   uint64
 	stopped     bool
 	event       *log.Event
 }
@@ -125,26 +127,17 @@ SCANNER_LOOP:
 		default:
 		}
 
-		lastBytesRead = p.bytesRead
 		line, err := r.ReadString('\n')
 		if err != nil {
 			if err != io.EOF {
 				return err
 			}
-
-			// p.event.Offset = p.bytesRead
 			break SCANNER_LOOP
 		}
 
 		lineLen := uint64(len(line))
 		p.bytesRead += lineLen
 		p.lineOffset = p.bytesRead - lineLen
-		if p.lineOffset != 0 {
-			// @todo Need to get clear on why this is needed;
-			// it does make the value correct; an off-by-one issue
-			p.lineOffset += 1
-		}
-
 		if p.opt.Debug {
 			fmt.Println()
 			l.Printf("+%d line: %s", p.lineOffset, line)
@@ -175,7 +168,6 @@ SCANNER_LOOP:
 		if p.inHeader {
 			p.parseHeader(line)
 		} else if p.inQuery {
-			//			p.event.LastOffset = p.bytesRead
 			p.parseQuery(line)
 		} else if headerRe.MatchString(line) {
 			p.inHeader = true
@@ -185,6 +177,7 @@ SCANNER_LOOP:
 	}
 
 	if !p.stopped && p.queryLines > 0 {
+		p.endOffset = p.bytesRead
 		p.sendEvent(false, false)
 	}
 
@@ -218,10 +211,17 @@ func (p *SlowLogParser) parseHeader(line string) {
 			l.Println("time")
 		}
 		m := timeRe.FindStringSubmatch(line)
-		if len(m) < 2 {
-			return
+		if len(m) == 2 {
+			p.event.Ts, _ = time.Parse("060102 15:04:05", m[1])
+		} else {
+			m = timeNewRe.FindStringSubmatch(line)
+			if len(m) == 2 {
+				p.event.Ts, _ = time.Parse(time.RFC3339Nano, m[1])
+			} else {
+				p.event.Ts = time.Time{}
+				return
+			}
 		}
-		p.event.Ts = m[1]
 		if userRe.MatchString(line) {
 			if p.opt.Debug {
 				l.Println("user (bad format)")
@@ -295,6 +295,7 @@ func (p *SlowLogParser) parseQuery(line string) {
 		}
 		p.inHeader = true
 		p.inQuery = false
+		p.endOffset = p.lineOffset
 		p.sendEvent(true, false)
 		p.parseHeader(line)
 		return
@@ -347,6 +348,7 @@ func (p *SlowLogParser) parseAdmin(line string) {
 		if p.opt.Debug {
 			l.Println("not filtered")
 		}
+		p.endOffset = p.bytesRead
 		p.sendEvent(false, false)
 	} else {
 		p.inHeader = false
@@ -358,6 +360,8 @@ func (p *SlowLogParser) sendEvent(inHeader bool, inQuery bool) {
 	if p.opt.Debug {
 		l.Println("send event")
 	}
+
+	p.event.OffsetEnd = p.endOffset
 
 	// Make a new event and reset our metadata.
 	defer func() {
@@ -377,7 +381,6 @@ func (p *SlowLogParser) sendEvent(inHeader bool, inQuery bool) {
 	}
 
 	// Clean up the event.
-	p.event.LastOffset = lastBytesRead
 	p.event.Db = strings.TrimSuffix(p.event.Db, ";\n")
 	p.event.Query = strings.TrimSuffix(p.event.Query, ";")
 
@@ -388,4 +391,3 @@ func (p *SlowLogParser) sendEvent(inHeader bool, inQuery bool) {
 		p.stopped = true
 	}
 }
-

@@ -20,6 +20,10 @@
 // like max Query_time. See also percona.com/go-mysql/event/.
 package log
 
+import (
+	"time"
+)
+
 // An event is a query like "SELECT col FROM t WHERE id = 1", some metrics like
 // Query_time (slow log) or SUM_TIMER_WAIT (Performance Schema), and other
 // metadata like default database, timestamp, etc. Metrics and metadata are not
@@ -27,10 +31,11 @@ package log
 // event is expected to define the query and Query_time metric. Other metrics
 // and metadata vary according to MySQL version, distro, and configuration.
 type Event struct {
-	Offset        uint64 // byte offset in file at which event starts
-	Ts            string // raw timestamp of event
-	Admin         bool   // true if Query is admin command
-	Query         string // SQL query or admin command
+	Offset        uint64    // byte offset in file at which event starts
+	OffsetEnd     uint64    // byte offset in file at which event ends
+	Ts            time.Time // timestamp of event
+	Admin         bool      // true if Query is admin command
+	Query         string    // SQL query or admin command
 	User          string
 	Host          string
 	Db            string
