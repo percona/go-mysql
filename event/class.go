@@ -100,9 +100,9 @@ func (c *Class) AddEvent(e *log.Event, outlier bool) {
 				} else {
 					c.Example.Query = e.Query
 				}
-				// todo use time.RFC3339Nano instead
 				if !e.Ts.IsZero() {
-					c.Example.Ts = e.Ts.Format("2006-01-02 15:04:05")
+					// todo use time.RFC3339Nano instead
+					c.Example.Ts = e.Ts.UTC().Format("2006-01-02 15:04:05")
 				}
 			}
 		}

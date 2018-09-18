@@ -33,7 +33,8 @@ import (
 var (
 	sample = test.RootDir() + "/test/slow-logs"
 	opt    = log.Options{
-		Debug: false,
+		Debug:           false,
+		DefaultLocation: time.UTC,
 	}
 )
 
@@ -768,10 +769,9 @@ func TestParserSlowLog008(t *testing.T) {
 
 // Filter admin commands
 func TestParserSlowLog009(t *testing.T) {
-	opt := log.Options{
-		FilterAdminCommand: map[string]bool{
-			"Quit": true,
-		},
+	opt := opt
+	opt.FilterAdminCommand = map[string]bool{
+		"Quit": true,
 	}
 	got := parseSlowLog("slow009.log", opt)
 	expect := []log.Event{
@@ -812,7 +812,7 @@ func TestParserSlowLog009(t *testing.T) {
 
 // Rate limit
 func TestParserSlowLog011(t *testing.T) {
-	got := parseSlowLog("slow011.log", log.Options{})
+	got := parseSlowLog("slow011.log", opt)
 	expect := []log.Event{
 		{
 			Offset:    0,
@@ -1007,7 +1007,7 @@ func TestParserSlowLog012(t *testing.T) {
 
 // Stack overflow bug due to meta lines.
 func TestParserSlowLog013(t *testing.T) {
-	got := parseSlowLog("slow013.log", log.Options{Debug: false})
+	got := parseSlowLog("slow013.log", opt)
 	expect := []log.Event{
 		{
 			Offset:    0,
@@ -1306,8 +1306,10 @@ func TestParserSlowLog014(t *testing.T) {
 
 // Correct event offsets when parsing starts/resumes at an offset.
 func TestParserSlowLog001StartOffset(t *testing.T) {
+	opt := opt
+	opt.StartOffset = 358
 	// 358 is the first byte of the second (of 2) events.
-	got := parseSlowLog("slow001.log", log.Options{StartOffset: 358})
+	got := parseSlowLog("slow001.log", opt)
 	expect := []log.Event{
 		{
 			Ts:        time.Date(2007, 10, 15, 21, 45, 10, 0, time.UTC),
@@ -1393,7 +1395,7 @@ func TestParseSlow017(t *testing.T) {
 }
 
 func TestParseSlow019(t *testing.T) {
-	got := parseSlowLog("slow019.log", log.Options{Debug: false})
+	got := parseSlowLog("slow019.log", opt)
 	expect := []log.Event{
 		{
 			Query:     `SELECT TABLE_SCHEMA, TABLE_NAME, ROWS_READ, ROWS_CHANGED, ROWS_CHANGED_X_INDEXES FROM INFORMATION_SCHEMA.TABLE_STATISTICS`,
@@ -1546,7 +1548,7 @@ func TestParseSlow019(t *testing.T) {
 
 // Test db is not inherited and multiple "use" commands.
 func TestParseSlow023(t *testing.T) {
-	got := parseSlowLog("slow023.log", log.Options{Debug: false})
+	got := parseSlowLog("slow023.log", opt)
 	expect := []log.Event{
 		// Slice 0
 		{
@@ -1746,7 +1748,7 @@ func TestParseSlow023A(t *testing.T) {
    Test header with invalid # Time or invalid # User lines
 */
 func TestParseSlow024(t *testing.T) {
-	got := parseSlowLog("slow024.log", log.Options{Debug: false})
+	got := parseSlowLog("slow024.log", opt)
 	expect := []log.Event{
 		{
 			Offset:    199,
@@ -1816,7 +1818,7 @@ func TestParseSlow024(t *testing.T) {
 
 // https://jira.percona.com/browse/PMM-1834
 func TestParseSlowMariaDBWithExplain(t *testing.T) {
-	got := parseSlowLog("mariadb102-with-explain.log", log.Options{Debug: false})
+	got := parseSlowLog("mariadb102-with-explain.log", opt)
 	expect := []log.Event{
 		{
 			Offset:    205,

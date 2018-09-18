@@ -66,7 +66,8 @@ type SlowLogParser struct {
 // NewSlowLogParser returns a new SlowLogParser that reads from the open file.
 func NewSlowLogParser(file *os.File, opt log.Options) *SlowLogParser {
 	if opt.DefaultLocation == nil {
-		opt.DefaultLocation = time.UTC
+		// Old MySQL format assumes time is taken from SYSTEM.
+		opt.DefaultLocation = time.Local
 	}
 	p := &SlowLogParser{
 		file: file,
@@ -223,7 +224,6 @@ func (p *SlowLogParser) parseHeader(line string) {
 			if len(m) == 2 {
 				p.event.Ts, _ = time.Parse(time.RFC3339Nano, m[1])
 			} else {
-				p.event.Ts = time.Time{}
 				return
 			}
 		}
