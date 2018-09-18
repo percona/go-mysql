@@ -222,7 +222,7 @@ func (p *SlowLogParser) parseHeader(line string) {
 		} else {
 			m = timeNewRe.FindStringSubmatch(line)
 			if len(m) == 2 {
-				p.event.Ts, _ = time.Parse(time.RFC3339Nano, m[1])
+				p.event.Ts, _ = time.ParseInLocation(time.RFC3339Nano, m[1], p.opt.DefaultLocation)
 			} else {
 				return
 			}
