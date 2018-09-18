@@ -1848,3 +1848,47 @@ func TestParseSlowMariaDBWithExplain(t *testing.T) {
 	}
 	assert.EqualValues(t, expect, got)
 }
+
+func TestParseSlow026(t *testing.T) {
+	got := parseSlowLog("slow026.log", opt)
+	expect := []log.Event{
+		{
+			Offset:    0,
+			OffsetEnd: 463,
+			Ts:        time.Date(2017, 12, 13, 02, 41, 18, 673330000, time.UTC),
+			Admin:     false,
+			Query:     "select 1",
+			User:      "test",
+			Host:      "",
+			Db:        "test",
+			TimeMetrics: map[string]float64{
+				"Lock_time":  0,
+				"Query_time": 1.000249,
+			},
+			NumberMetrics: map[string]uint64{
+				"Bytes_sent":      89,
+				"Killed":          0,
+				"Last_errno":      0,
+				"Merge_passes":    0,
+				"Rows_affected":   0,
+				"Rows_examined":   0,
+				"Rows_sent":       1,
+				"Tmp_disk_tables": 0,
+				"Tmp_table_sizes": 0,
+				"Tmp_tables":      0,
+			},
+			BoolMetrics: map[string]bool{
+				"Filesort":          false,
+				"Filesort_on_disk":  false,
+				"Full_join":         false,
+				"Full_scan":         false,
+				"QC_Hit":            false,
+				"Tmp_table":         false,
+				"Tmp_table_on_disk": false,
+			},
+			RateType:  "",
+			RateLimit: 0,
+		},
+	}
+	assert.EqualValues(t, expect, got)
+}
