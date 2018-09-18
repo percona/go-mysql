@@ -60,6 +60,7 @@ type Options struct {
 	StartOffset        uint64          // byte offset in file at which to start parsing
 	FilterAdminCommand map[string]bool // admin commands to ignore
 	Debug              bool            // print trace info to STDOUT
+	DefaultLocation    *time.Location  // DefaultLocation to assume for logs in MySQL < 5.7 format.
 }
 
 // A LogParser sends events to a channel.

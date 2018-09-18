@@ -33,15 +33,17 @@ import (
 )
 
 // Regular expressions to match important lines in slow log.
-var timeRe = regexp.MustCompile(`Time: (\S+\s{1,2}\S+)`)
-var timeNewRe = regexp.MustCompile(`Time:\s+(\d{4}-\d{2}-\d{2}\S+)`)
-var userRe = regexp.MustCompile(`User@Host: ([^\[]+|\[[^[]+\]).*?@ (\S*) \[(.*)\]`)
-var schema = regexp.MustCompile(`Schema: +(.*?) +Last_errno:`)
-var headerRe = regexp.MustCompile(`^#\s+[A-Z]`)
-var metricsRe = regexp.MustCompile(`(\w+): (\S+|\z)`)
-var adminRe = regexp.MustCompile(`command: (.+)`)
-var setRe = regexp.MustCompile(`^SET (?:last_insert_id|insert_id|timestamp)`)
-var useRe = regexp.MustCompile(`^(?i)use `)
+var (
+	timeRe    = regexp.MustCompile(`Time: (\S+\s{1,2}\S+)`)
+	timeNewRe = regexp.MustCompile(`Time:\s+(\d{4}-\d{2}-\d{2}\S+)`)
+	userRe    = regexp.MustCompile(`User@Host: ([^\[]+|\[[^[]+\]).*?@ (\S*) \[(.*)\]`)
+	schema    = regexp.MustCompile(`Schema: +(.*?) +Last_errno:`)
+	headerRe  = regexp.MustCompile(`^#\s+[A-Z]`)
+	metricsRe = regexp.MustCompile(`(\w+): (\S+|\z)`)
+	adminRe   = regexp.MustCompile(`command: (.+)`)
+	setRe     = regexp.MustCompile(`^SET (?:last_insert_id|insert_id|timestamp)`)
+	useRe     = regexp.MustCompile(`^(?i)use `)
+)
 
 // A SlowLogParser parses a MySQL slow log. It implements the LogParser interface.
 type SlowLogParser struct {
@@ -63,6 +65,9 @@ type SlowLogParser struct {
 
 // NewSlowLogParser returns a new SlowLogParser that reads from the open file.
 func NewSlowLogParser(file *os.File, opt log.Options) *SlowLogParser {
+	if opt.DefaultLocation == nil {
+		opt.DefaultLocation = time.UTC
+	}
 	p := &SlowLogParser{
 		file: file,
 		opt:  opt,
@@ -212,7 +217,7 @@ func (p *SlowLogParser) parseHeader(line string) {
 		}
 		m := timeRe.FindStringSubmatch(line)
 		if len(m) == 2 {
-			p.event.Ts, _ = time.Parse("060102 15:04:05", m[1])
+			p.event.Ts, _ = time.ParseInLocation("060102 15:04:05", m[1], p.opt.DefaultLocation)
 		} else {
 			m = timeNewRe.FindStringSubmatch(line)
 			if len(m) == 2 {
