@@ -134,14 +134,11 @@ SCANNER_LOOP:
 		default:
 		}
 
-		lastBytesRead = p.bytesRead
 		line, err := r.ReadString('\n')
 		if err != nil {
 			if err != io.EOF {
 				return err
 			}
-
-			// p.event.Offset = p.bytesRead
 			break SCANNER_LOOP
 		}
 
@@ -178,7 +175,6 @@ SCANNER_LOOP:
 		if p.inHeader {
 			p.parseHeader(line)
 		} else if p.inQuery {
-			//			p.event.LastOffset = p.bytesRead
 			p.parseQuery(line)
 		} else if headerRe.MatchString(line) {
 			p.inHeader = true
@@ -400,7 +396,6 @@ func (p *SlowLogParser) sendEvent(inHeader bool, inQuery bool) {
 	}
 
 	// Clean up the event.
-	p.event.LastOffset = lastBytesRead
 	p.event.Db = strings.TrimSuffix(p.event.Db, ";\n")
 	p.event.Query = strings.TrimSuffix(p.event.Query, ";")
 

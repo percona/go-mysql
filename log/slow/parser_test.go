@@ -145,7 +145,7 @@ func TestParseSlowLog002(t *testing.T) {
 		{
 			Db: "db1",
 			Query: `update db2.tuningdetail_21_265507 n
-      inner join db1.gonzo a using(gonzo)
+      inner join db1.gonzo a using(gonzo) 
       set n.column1 = a.column1, n.word3 = a.word3`,
 			Admin:     false,
 			User:      "[SQL_SLAVE]",
@@ -1882,6 +1882,7 @@ func TestParseSlow026(t *testing.T) {
 			User:      "test",
 			Host:      "",
 			Db:        "test",
+			ThreadID:  17,
 			TimeMetrics: map[string]float64{
 				"Lock_time":  0,
 				"Query_time": 1.000249,
