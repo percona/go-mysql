@@ -34,7 +34,7 @@ import (
 // Regular expressions to match important lines in slow log.
 var timeRe = regexp.MustCompile(`Time: (\S+\s{1,2}\S+)`)
 var userRe = regexp.MustCompile(`User@Host: ([^\[]+|\[[^[]+\]).*?@ (\S*) \[(.*)\]`)
-var idRe = regexp.MustCompile(`Id: +([0-9]*)`)
+var idRe = regexp.MustCompile(`(Id|Thread_id): +([0-9]*)`)
 var schema = regexp.MustCompile(`Schema: +(.*?) +Last_errno:`)
 var headerRe = regexp.MustCompile(`^#\s+[A-Z]`)
 var metricsRe = regexp.MustCompile(`(\w+): (\S+|\z)`)
@@ -230,19 +230,18 @@ func (p *SlowLogParser) parseHeader(line string) {
 		if p.opt.Debug {
 			l.Println("user")
 		}
-		m := userRe.FindStringSubmatch(line)
-		if len(m) < 3 {
-			return
-		}
-		p.event.User = m[1]
-		p.event.Host = m[2]
-		m1 := idRe.FindStringSubmatch(line)
-		if len(m1) < 2 {
-			return
-		}
-		val, _ := strconv.ParseUint(m1[1], 10, 64)
-		p.event.NumberMetrics["Thread_id"] = val
 
+		m := userRe.FindStringSubmatch(line)
+		if len(m) >= 3 {
+			p.event.User = m[1]
+			p.event.Host = m[2]
+		}
+
+		m1 := idRe.FindStringSubmatch(line)
+		if len(m1) >= 2 {
+			val, _ := strconv.ParseUint(m1[2], 10, 64)
+			p.event.ThreadId = val
+		}
 	} else if strings.HasPrefix(line, "# admin") {
 		p.parseAdmin(line)
 	} else {
@@ -275,6 +274,9 @@ func (p *SlowLogParser) parseHeader(line string) {
 			} else if smv[1] == "Log_slow_rate_limit" {
 				val, _ := strconv.ParseUint(smv[2], 10, 64)
 				p.event.RateLimit = uint(val)
+			} else if smv[1] == "Thread_id" {
+				val, _ := strconv.ParseUint(smv[2], 10, 64)
+				p.event.ThreadId = val
 			} else {
 				// integer value
 				val, _ := strconv.ParseUint(smv[2], 10, 64)

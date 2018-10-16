@@ -34,6 +34,7 @@ type Event struct {
 	User          string
 	Host          string
 	Db            string
+	ThreadId      uint64             // Thread_id of query
 	TimeMetrics   map[string]float64 // *_time and *_wait metrics
 	NumberMetrics map[string]uint64  // most metrics
 	BoolMetrics   map[string]bool    // yes/no metrics
