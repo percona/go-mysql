@@ -254,7 +254,7 @@ func (p *SlowLogParser) parseHeader(line string) {
 		m1 := idRe.FindStringSubmatch(line)
 		if len(m1) >= 2 {
 			val, _ := strconv.ParseUint(m1[2], 10, 64)
-			p.event.ThreadId = val
+			p.event.ThreadID = val
 		}
 	} else if strings.HasPrefix(line, "# admin") {
 		p.parseAdmin(line)
@@ -290,7 +290,7 @@ func (p *SlowLogParser) parseHeader(line string) {
 				p.event.RateLimit = uint(val)
 			} else if smv[1] == "Thread_id" {
 				val, _ := strconv.ParseUint(smv[2], 10, 64)
-				p.event.ThreadId = val
+				p.event.ThreadID = val
 			} else {
 				// integer value
 				val, _ := strconv.ParseUint(smv[2], 10, 64)
