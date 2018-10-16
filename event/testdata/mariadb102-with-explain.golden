@@ -45,14 +45,6 @@
           "Med": 1,
           "P95": 1,
           "Max": 1
-        },
-        "Thread_id": {
-          "Sum": 8,
-          "Min": 8,
-          "Avg": 8,
-          "Med": 8,
-          "P95": 8,
-          "Max": 8
         }
       },
       "BoolMetrics": {
@@ -111,14 +103,6 @@
             "Med": 1,
             "P95": 1,
             "Max": 1
-          },
-          "Thread_id": {
-            "Sum": 8,
-            "Min": 8,
-            "Avg": 8,
-            "Med": 8,
-            "P95": 8,
-            "Max": 8
           }
         },
         "BoolMetrics": {
