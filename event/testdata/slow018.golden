@@ -2,8 +2,8 @@
   "Global": {
     "Id": "",
     "Fingerprint": "",
-    "Ts_min": "0001-01-01T00:00:00Z",
-    "Ts_max": "0001-01-01T00:00:00Z",
+    "TsMin": "0001-01-01T00:00:00Z",
+    "TsMax": "0001-01-01T00:00:00Z",
     "Metrics": {
       "TimeMetrics": {
         "Lock_time": {
@@ -81,8 +81,8 @@
     "B2414E722E8A89DD": {
       "Id": "B2414E722E8A89DD",
       "Fingerprint": "select * from t where id in(?+)",
-      "Ts_min": "0001-01-01T00:00:00Z",
-      "Ts_max": "0001-01-01T00:00:00Z",
+      "TsMin": "0001-01-01T00:00:00Z",
+      "TsMax": "0001-01-01T00:00:00Z",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {

@@ -2,8 +2,8 @@
   "Global": {
     "Id": "",
     "Fingerprint": "",
-    "Ts_min": "2007-10-15T21:43:52Z",
-    "Ts_max": "2007-10-15T21:45:10Z",
+    "TsMin": "2007-10-15T21:43:52Z",
+    "TsMax": "2007-10-15T21:45:10Z",
     "Metrics": {
       "TimeMetrics": {
         "Lock_time": {
@@ -50,8 +50,8 @@
     "3A99CC42AEDCCFCD": {
       "Id": "3A99CC42AEDCCFCD",
       "Fingerprint": "select sleep(?) from test.n",
-      "Ts_min": "2007-10-15T21:45:10Z",
-      "Ts_max": "2007-10-15T21:45:10Z",
+      "TsMin": "2007-10-15T21:45:10Z",
+      "TsMax": "2007-10-15T21:45:10Z",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
@@ -104,8 +104,8 @@
     "7F7D57ACDD8A346E": {
       "Id": "7F7D57ACDD8A346E",
       "Fingerprint": "select sleep(?) from n",
-      "Ts_min": "2007-10-15T21:43:52Z",
-      "Ts_max": "2007-10-15T21:43:52Z",
+      "TsMin": "2007-10-15T21:43:52Z",
+      "TsMax": "2007-10-15T21:43:52Z",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {

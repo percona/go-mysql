@@ -149,8 +149,8 @@ func TestAddClassSlow001(t *testing.T) {
 	}
 
 	var emptyTime time.Time
-	expectEventResult.Global.Ts_min = emptyTime;
-	expectEventResult.Global.Ts_max = emptyTime;
+	expectEventResult.Global.TsMin = emptyTime;
+	expectEventResult.Global.TsMax = emptyTime;
 	expectEventResult.Global.LastThreadID = 0;
 	expectGlobalBytes, err := json.Marshal(expectEventResult.Global)
 	if err != nil {

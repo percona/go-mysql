@@ -2,8 +2,8 @@
   "Global": {
     "Id": "",
     "Fingerprint": "",
-    "Ts_min": "2018-02-14T16:18:07Z",
-    "Ts_max": "2018-02-14T16:18:07Z",
+    "TsMin": "2018-02-14T16:18:07Z",
+    "TsMax": "2018-02-14T16:18:07Z",
     "Metrics": {
       "TimeMetrics": {
         "Lock_time": {
@@ -63,8 +63,8 @@
     "16219655761820A2": {
       "Id": "16219655761820A2",
       "Fingerprint": "select ?",
-      "Ts_min": "2018-02-14T16:18:07Z",
-      "Ts_max": "2018-02-14T16:18:07Z",
+      "TsMin": "2018-02-14T16:18:07Z",
+      "TsMax": "2018-02-14T16:18:07Z",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {

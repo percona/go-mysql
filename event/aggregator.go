@@ -90,12 +90,12 @@ func (a *Aggregator) Finalize() Result {
 			a.global.LastThreadID = class.LastThreadID
 		}
 
-		if ! class.Ts_min.IsZero() && class.Ts_min.Before(a.global.Ts_min) {
-			a.global.Ts_min = class.Ts_min
+		if !class.TsMin.IsZero() && class.TsMin.Before(a.global.TsMin) {
+			a.global.TsMin = class.TsMin
 		}
 
-		if ! class.Ts_max.IsZero() && class.Ts_max.After(a.global.Ts_max) {
-			a.global.Ts_max = class.Ts_max
+		if !class.TsMax.IsZero() && class.TsMax.After(a.global.TsMax) {
+			a.global.TsMax = class.TsMax
 		}
 
 		class.Finalize(a.rateLimit)

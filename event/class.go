@@ -18,8 +18,9 @@
 package event
 
 import (
-	"github.com/percona/go-mysql/log"
 	"time"
+
+	"github.com/percona/go-mysql/log"
 )
 
 const (
@@ -36,17 +37,17 @@ const (
 type Class struct {
 	Id            string    // 32-character hex checksum of fingerprint
 	Fingerprint   string    // canonical form of query: values replaced with "?"
-	Ts_min        time.Time // timestamp of first event
-	Ts_max        time.Time // timestamp of last event
+	TsMin         time.Time // timestamp of first event
+	TsMax         time.Time // timestamp of last event
 	Metrics       *Metrics  // statistics for each metric, e.g. max Query_time
 	TotalQueries  uint      // total number of queries in class
 	UniqueQueries uint      // unique number of queries in class
-	Example       *Example `json:",omitempty"` // sample query with max Query_time
+	Example       *Example  `json:",omitempty"` // sample query with max Query_time
 	// --
-	LastThreadID  uint64    // Thread_id of query
-	outliers uint
-	lastDb   string
-	sample   bool
+	LastThreadID uint64 // Thread_id of query
+	outliers     uint
+	lastDb       string
+	sample       bool
 }
 
 // A Example is a real query and its database, timestamp, and Query_time.
@@ -88,11 +89,11 @@ func (c *Class) AddEvent(e *log.Event, outlier bool) {
 		c.LastThreadID = e.ThreadID
 	}
 
-	if ! e.Ts.IsZero() {
-		if c.Ts_min.IsZero() {
-			c.Ts_min = e.Ts
+	if !e.Ts.IsZero() {
+		if c.TsMin.IsZero() {
+			c.TsMin = e.Ts
 		}
-		c.Ts_max = e.Ts
+		c.TsMax = e.Ts
 	}
 
 	// Save last db seen for this query. This helps ensure the sample query

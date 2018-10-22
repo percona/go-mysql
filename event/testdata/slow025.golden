@@ -2,8 +2,8 @@
   "Global": {
     "Id": "",
     "Fingerprint": "",
-    "Ts_min": "2007-10-15T00:00:01Z",
-    "Ts_max": "2007-10-15T00:00:03Z",
+    "TsMin": "2007-10-15T00:00:01Z",
+    "TsMax": "2007-10-15T00:00:03Z",
     "Metrics": {
       "TimeMetrics": {
         "Lock_time": {
@@ -50,8 +50,8 @@
     "FDE00DF974C61E9F": {
       "Id": "FDE00DF974C61E9F",
       "Fingerprint": "select c from t",
-      "Ts_min": "2007-10-15T00:00:01Z",
-      "Ts_max": "2007-10-15T00:00:03Z",
+      "TsMin": "2007-10-15T00:00:01Z",
+      "TsMax": "2007-10-15T00:00:03Z",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
