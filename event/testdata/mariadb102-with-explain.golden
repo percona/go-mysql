@@ -2,6 +2,8 @@
   "Global": {
     "Id": "",
     "Fingerprint": "",
+    "Ts_min": "2018-02-14T16:18:07Z",
+    "Ts_max": "2018-02-14T16:18:07Z",
     "Metrics": {
       "TimeMetrics": {
         "Lock_time": {
@@ -54,12 +56,15 @@
       }
     },
     "TotalQueries": 1,
-    "UniqueQueries": 1
+    "UniqueQueries": 1,
+    "LastThreadID": 8
   },
   "Class": {
     "16219655761820A2": {
       "Id": "16219655761820A2",
       "Fingerprint": "select ?",
+      "Ts_min": "2018-02-14T16:18:07Z",
+      "Ts_max": "2018-02-14T16:18:07Z",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
@@ -119,7 +124,8 @@
         "Query": "SELECT 1",
         "Size": 8,
         "Ts": "2018-02-14 16:18:07"
-      }
+      },
+      "LastThreadID": 8
     }
   },
   "RateLimit": 0,

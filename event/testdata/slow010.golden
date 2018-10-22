@@ -2,6 +2,8 @@
   "Global": {
     "Id": "",
     "Fingerprint": "",
+    "Ts_min": "2007-12-18T11:48:27Z",
+    "Ts_max": "2007-12-18T11:48:27Z",
     "Metrics": {
       "TimeMetrics": {
         "Lock_time": {
@@ -33,12 +35,15 @@
       }
     },
     "TotalQueries": 36,
-    "UniqueQueries": 1
+    "UniqueQueries": 1,
+    "LastThreadID": 0
   },
   "Class": {
     "CB5621E548E5497F": {
       "Id": "CB5621E548E5497F",
       "Fingerprint": "select c from t where id=?",
+      "Ts_min": "2007-12-18T11:48:27Z",
+      "Ts_max": "2007-12-18T11:48:27Z",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
@@ -77,7 +82,8 @@
         "Query": "SELECT c FROM t WHERE id=1",
         "Size": 26,
         "Ts": "2007-12-18 11:48:27"
-      }
+      },
+      "LastThreadID": 0
     }
   },
   "RateLimit": 0,

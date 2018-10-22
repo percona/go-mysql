@@ -2,6 +2,8 @@
   "Global": {
     "Id": "",
     "Fingerprint": "",
+    "Ts_min": "0001-01-01T00:00:00Z",
+    "Ts_max": "0001-01-01T00:00:00Z",
     "Metrics": {
       "TimeMetrics": {
         "Lock_time": {
@@ -41,12 +43,15 @@
       }
     },
     "TotalQueries": 8,
-    "UniqueQueries": 8
+    "UniqueQueries": 8,
+    "LastThreadID": 56601
   },
   "Class": {
     "54FB1194093381DB": {
       "Id": "54FB1194093381DB",
       "Fingerprint": "set global slow_query_log=on",
+      "Ts_min": "0001-01-01T00:00:00Z",
+      "Ts_max": "0001-01-01T00:00:00Z",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
@@ -92,11 +97,14 @@
         "Db": "",
         "Query": "SET GLOBAL slow_query_log=ON",
         "Size": 28
-      }
+      },
+      "LastThreadID": 56603
     },
     "6C099B0B73EA7633": {
       "Id": "6C099B0B73EA7633",
       "Fingerprint": "use ?",
+      "Ts_min": "0001-01-01T00:00:00Z",
+      "Ts_max": "0001-01-01T00:00:00Z",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
@@ -142,11 +150,14 @@
         "Db": "dbnameb",
         "Query": "use `dbnameb`",
         "Size": 13
-      }
+      },
+      "LastThreadID": 56458
     },
     "7C1934E82086DF57": {
       "Id": "7C1934E82086DF57",
       "Fingerprint": "set names utf8",
+      "Ts_min": "0001-01-01T00:00:00Z",
+      "Ts_max": "0001-01-01T00:00:00Z",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
@@ -192,11 +203,14 @@
         "Db": "",
         "Query": "SET NAMES utf8",
         "Size": 14
-      }
+      },
+      "LastThreadID": 56604
     },
     "83497A0046FCD7A7": {
       "Id": "83497A0046FCD7A7",
       "Fingerprint": "select field from table_a where some_other_field = ? limit ?",
+      "Ts_min": "0001-01-01T00:00:00Z",
+      "Ts_max": "0001-01-01T00:00:00Z",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
@@ -242,11 +256,14 @@
         "Db": "dbnamea",
         "Query": "SELECT field FROM table_a WHERE some_other_field = 'yahoo' LIMIT 1",
         "Size": 66
-      }
+      },
+      "LastThreadID": 56601
     },
     "9FD5245EAE433B90": {
       "Id": "9FD5245EAE433B90",
       "Fingerprint": "select another_field from table_c where a_third_field = ? and site_id = ?",
+      "Ts_min": "0001-01-01T00:00:00Z",
+      "Ts_max": "0001-01-01T00:00:00Z",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
@@ -292,11 +309,14 @@
         "Db": "",
         "Query": "SELECT another_field FROM table_c WHERE a_third_field = 'tiruriru' AND site_id = 1",
         "Size": 82
-      }
+      },
+      "LastThreadID": 56601
     },
     "AC5C18B304F9DE87": {
       "Id": "AC5C18B304F9DE87",
       "Fingerprint": "select @@collation_database",
+      "Ts_min": "0001-01-01T00:00:00Z",
+      "Ts_max": "0001-01-01T00:00:00Z",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
@@ -342,11 +362,14 @@
         "Db": "",
         "Query": "select @@collation_database",
         "Size": 27
-      }
+      },
+      "LastThreadID": 56458
     },
     "B98E038C9D12BDA1": {
       "Id": "B98E038C9D12BDA1",
       "Fingerprint": "select field from table_b where another_field = ? and site_id = ?",
+      "Ts_min": "0001-01-01T00:00:00Z",
+      "Ts_max": "0001-01-01T00:00:00Z",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
@@ -392,11 +415,14 @@
         "Db": "",
         "Query": "SELECT field FROM table_b WHERE another_field = 'bazinga' AND site_id = 1",
         "Size": 73
-      }
+      },
+      "LastThreadID": 56601
     },
     "F0265D81808CE240": {
       "Id": "F0265D81808CE240",
       "Fingerprint": "select @@session.sql_mode",
+      "Ts_min": "0001-01-01T00:00:00Z",
+      "Ts_max": "0001-01-01T00:00:00Z",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
@@ -442,7 +468,8 @@
         "Db": "",
         "Query": "SELECT @@SESSION.sql_mode",
         "Size": 25
-      }
+      },
+      "LastThreadID": 56604
     }
   },
   "RateLimit": 0,

@@ -27,7 +27,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-
 	"github.com/percona/go-mysql/event"
 	"github.com/percona/go-mysql/log"
 	parser "github.com/percona/go-mysql/log/slow"
@@ -148,10 +147,16 @@ func TestAddClassSlow001(t *testing.T) {
 	for _, class := range expectEventResult.Class {
 		global.AddClass(class)
 	}
+
+	var emptyTime time.Time
+	expectEventResult.Global.Ts_min = emptyTime;
+	expectEventResult.Global.Ts_max = emptyTime;
+	expectEventResult.Global.LastThreadID = 0;
 	expectGlobalBytes, err := json.Marshal(expectEventResult.Global)
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	gotGlobalBytes, err := json.Marshal(global)
 	if err != nil {
 		t.Fatal(err)
@@ -171,6 +176,7 @@ func TestAddClassSlow023(t *testing.T) {
 	for _, class := range ordered(expectEventResult.Class) {
 		global.AddClass(class)
 	}
+	expectEventResult.Global.LastThreadID = 0;
 	expectGlobalBytes, err := json.Marshal(expectEventResult.Global)
 	if err != nil {
 		t.Fatal(err)
