@@ -35,7 +35,7 @@ const (
 // This is only enforced by convention, so be careful not to mix events from
 // different classes.
 type Class struct {
-	Id            string    // 32-character hex checksum of fingerprint
+	ID            string    // 32-character hex checksum of fingerprint
 	Fingerprint   string    // canonical form of query: values replaced with "?"
 	TsMin         time.Time // timestamp of first event
 	TsMax         time.Time // timestamp of last event
@@ -65,7 +65,7 @@ type Example struct {
 // If sample is true, the query with the greatest Query_time is saved.
 func NewClass(id, fingerprint string, sample bool) *Class {
 	class := &Class{
-		Id:           id,
+		ID:           id,
 		Fingerprint:  fingerprint,
 		Metrics:      NewMetrics(),
 		TotalQueries: 0,
