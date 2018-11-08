@@ -46,7 +46,9 @@ func aggregateSlowLog(input, output string, utcOffset time.Duration, examples bo
 	if err != nil {
 		l.Fatal(err)
 	}
-	p := parser.NewSlowLogParser(file, log.Options{})
+	opt := log.Options{}
+	opt.DefaultLocation = time.UTC
+	p := parser.NewSlowLogParser(file, opt)
 	go p.Start()
 	a := event.NewAggregator(examples, utcOffset, 10)
 	for e := range p.EventChan() {
