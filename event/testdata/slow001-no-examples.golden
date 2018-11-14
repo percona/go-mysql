@@ -1,6 +1,6 @@
 {
   "Global": {
-    "Id": "",
+    "ID": "",
     "Fingerprint": "",
     "TsMin": "2007-10-15T21:43:52Z",
     "TsMax": "2007-10-15T21:45:10Z",
@@ -48,7 +48,7 @@
   },
   "Class": {
     "3A99CC42AEDCCFCD": {
-      "Id": "3A99CC42AEDCCFCD",
+      "ID": "3A99CC42AEDCCFCD",
       "Fingerprint": "select sleep(?) from test.n",
       "TsMin": "2007-10-15T21:45:10Z",
       "TsMax": "2007-10-15T21:45:10Z",
@@ -95,7 +95,7 @@
       "LastThreadID": 0
     },
     "7F7D57ACDD8A346E": {
-      "Id": "7F7D57ACDD8A346E",
+      "ID": "7F7D57ACDD8A346E",
       "Fingerprint": "select sleep(?) from n",
       "TsMin": "2007-10-15T21:43:52Z",
       "TsMax": "2007-10-15T21:43:52Z",

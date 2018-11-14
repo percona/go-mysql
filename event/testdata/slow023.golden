@@ -1,6 +1,6 @@
 {
   "Global": {
-    "Id": "",
+    "ID": "",
     "Fingerprint": "",
     "TsMin": "0001-01-01T00:00:00Z",
     "TsMax": "0001-01-01T00:00:00Z",
@@ -48,7 +48,7 @@
   },
   "Class": {
     "54FB1194093381DB": {
-      "Id": "54FB1194093381DB",
+      "ID": "54FB1194093381DB",
       "Fingerprint": "set global slow_query_log=on",
       "TsMin": "0001-01-01T00:00:00Z",
       "TsMax": "0001-01-01T00:00:00Z",
@@ -101,7 +101,7 @@
       "LastThreadID": 56603
     },
     "6C099B0B73EA7633": {
-      "Id": "6C099B0B73EA7633",
+      "ID": "6C099B0B73EA7633",
       "Fingerprint": "use ?",
       "TsMin": "0001-01-01T00:00:00Z",
       "TsMax": "0001-01-01T00:00:00Z",
@@ -154,7 +154,7 @@
       "LastThreadID": 56458
     },
     "7C1934E82086DF57": {
-      "Id": "7C1934E82086DF57",
+      "ID": "7C1934E82086DF57",
       "Fingerprint": "set names utf8",
       "TsMin": "0001-01-01T00:00:00Z",
       "TsMax": "0001-01-01T00:00:00Z",
@@ -207,7 +207,7 @@
       "LastThreadID": 56604
     },
     "83497A0046FCD7A7": {
-      "Id": "83497A0046FCD7A7",
+      "ID": "83497A0046FCD7A7",
       "Fingerprint": "select field from table_a where some_other_field = ? limit ?",
       "TsMin": "0001-01-01T00:00:00Z",
       "TsMax": "0001-01-01T00:00:00Z",
@@ -260,7 +260,7 @@
       "LastThreadID": 56601
     },
     "9FD5245EAE433B90": {
-      "Id": "9FD5245EAE433B90",
+      "ID": "9FD5245EAE433B90",
       "Fingerprint": "select another_field from table_c where a_third_field = ? and site_id = ?",
       "TsMin": "0001-01-01T00:00:00Z",
       "TsMax": "0001-01-01T00:00:00Z",
@@ -313,7 +313,7 @@
       "LastThreadID": 56601
     },
     "AC5C18B304F9DE87": {
-      "Id": "AC5C18B304F9DE87",
+      "ID": "AC5C18B304F9DE87",
       "Fingerprint": "select @@collation_database",
       "TsMin": "0001-01-01T00:00:00Z",
       "TsMax": "0001-01-01T00:00:00Z",
@@ -366,7 +366,7 @@
       "LastThreadID": 56458
     },
     "B98E038C9D12BDA1": {
-      "Id": "B98E038C9D12BDA1",
+      "ID": "B98E038C9D12BDA1",
       "Fingerprint": "select field from table_b where another_field = ? and site_id = ?",
       "TsMin": "0001-01-01T00:00:00Z",
       "TsMax": "0001-01-01T00:00:00Z",
@@ -419,7 +419,7 @@
       "LastThreadID": 56601
     },
     "F0265D81808CE240": {
-      "Id": "F0265D81808CE240",
+      "ID": "F0265D81808CE240",
       "Fingerprint": "select @@session.sql_mode",
       "TsMin": "0001-01-01T00:00:00Z",
       "TsMax": "0001-01-01T00:00:00Z",

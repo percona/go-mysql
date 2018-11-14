@@ -1,6 +1,6 @@
 {
   "Global": {
-    "Id": "",
+    "ID": "",
     "Fingerprint": "",
     "TsMin": "2007-12-18T11:48:27Z",
     "TsMax": "2007-12-18T11:48:27Z",
@@ -40,7 +40,7 @@
   },
   "Class": {
     "CB5621E548E5497F": {
-      "Id": "CB5621E548E5497F",
+      "ID": "CB5621E548E5497F",
       "Fingerprint": "select c from t where id=?",
       "TsMin": "2007-12-18T11:48:27Z",
       "TsMax": "2007-12-18T11:48:27Z",
