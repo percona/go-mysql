@@ -54,7 +54,7 @@ func aggregateSlowLog(input, output string, utcOffset time.Duration, examples bo
 	for e := range p.EventChan() {
 		f := query.Fingerprint(e.Query)
 		id := query.Id(f)
-		a.AddEvent(e, id, f)
+		a.AddEvent(e, id, e.User, e.Host, e.Db, e.Server, f)
 	}
 	got := a.Finalize()
 	gotJson, err := json.MarshalIndent(got, "", "  ")
@@ -144,7 +144,7 @@ func TestAddClassSlow001(t *testing.T) {
 	}
 	zeroPercentiles(&expectEventResult)
 
-	global := event.NewClass("", "", false)
+	global := event.NewClass("", "", "", "", "", "", false)
 	for _, class := range expectEventResult.Class {
 		global.AddClass(class)
 	}
@@ -167,7 +167,7 @@ func TestAddClassSlow023(t *testing.T) {
 	}
 	zeroPercentiles(&expectEventResult)
 
-	global := event.NewClass("", "", false)
+	global := event.NewClass("", "", "", "", "", "", false)
 	for _, class := range ordered(expectEventResult.Class) {
 		global.AddClass(class)
 	}

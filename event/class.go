@@ -33,7 +33,11 @@ const (
 // This is only enforced by convention, so be careful not to mix events from
 // different classes.
 type Class struct {
-	Id            string   // 32-character hex checksum of fingerprint
+	Id            string // 32-character hex checksum of fingerprint
+	User          string
+	Host          string
+	Db            string
+	Server        string
 	Fingerprint   string   // canonical form of query: values replaced with "?"
 	Metrics       *Metrics // statistics for each metric, e.g. max Query_time
 	TotalQueries  uint     // total number of queries in class
@@ -58,9 +62,13 @@ type Example struct {
 
 // NewClass returns a new Class for the class ID and fingerprint.
 // If sample is true, the query with the greatest Query_time is saved.
-func NewClass(id, fingerprint string, sample bool) *Class {
+func NewClass(id, user, host, db, server, fingerprint string, sample bool) *Class {
 	class := &Class{
 		Id:           id,
+		User:         user,
+		Host:         host,
+		Db:           db,
+		Server:       server,
 		Fingerprint:  fingerprint,
 		Metrics:      NewMetrics(),
 		TotalQueries: 0,
