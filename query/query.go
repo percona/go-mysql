@@ -406,6 +406,10 @@ func Fingerprint(q string) string {
 				if Debug {
 					fmt.Println("Multi-line comment")
 				}
+                // Multi-line comment immediately followed by 'space' and '/'
+                if r == ' ' && pr == '*' {
+                    pr = r
+                }
 				s = inMLC
 				continue
 			} else {
