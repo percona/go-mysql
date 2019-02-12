@@ -407,6 +407,7 @@ func Fingerprint(q string) string {
 					fmt.Println("Multi-line comment")
 				}
 				s = inMLC
+				pr = r
 				continue
 			} else {
 				// /*![version] SQL_NO_CACHE */ -> /*![version] SQL_NO_CACHE */ (no change)

@@ -619,4 +619,11 @@ func TestFingerprintWithNumberInDbName(t *testing.T) {
 		"select 123foo from 123foo",
 		query.Fingerprint(q),
 	)
+
+	q = "/* /capped/releases/20190128232842/app/controllers/api/base_controller.rb:24:in `block in <class:BaseController>' */ SELECT `categories`.* FROM `categories` WHERE `categories`.`id` = 3 LIMIT 1"
+	assert.Equal(
+		t,
+		"select `categories`.* from `categories` where `categories`.`id` = ? limit ?",
+		query.Fingerprint(q),
+	)
 }
