@@ -38,6 +38,8 @@ type Class struct {
 	Host          string
 	Db            string
 	Server        string
+	LabelsKey     []string
+	LabelsValue   []string
 	Fingerprint   string   // canonical form of query: values replaced with "?"
 	Metrics       *Metrics // statistics for each metric, e.g. max Query_time
 	TotalQueries  uint     // total number of queries in class
@@ -69,6 +71,8 @@ func NewClass(id, user, host, db, server, fingerprint string, sample bool) *Clas
 		Host:         host,
 		Db:           db,
 		Server:       server,
+		LabelsKey:    []string{},
+		LabelsValue:  []string{},
 		Fingerprint:  fingerprint,
 		Metrics:      NewMetrics(),
 		TotalQueries: 0,
@@ -87,6 +91,10 @@ func (c *Class) AddEvent(e *log.Event, outlier bool) {
 	}
 
 	c.Metrics.AddEvent(e, outlier)
+
+	// Add labels
+	c.LabelsKey = append(c.LabelsKey, e.LabelsKey...)
+	c.LabelsValue = append(c.LabelsValue, e.LabelsValue...)
 
 	// Save last db seen for this query. This helps ensure the sample query
 	// has a db.
