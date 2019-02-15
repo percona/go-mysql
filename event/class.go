@@ -138,8 +138,8 @@ func (c *Class) AddClass(newClass *Class) {
 			m := *newStats
 			c.Metrics.TimeMetrics[newMetric] = &m
 		} else {
+			stats.Cnt++
 			stats.Sum += newStats.Sum
-			stats.Avg = Float64(stats.Sum / float64(c.TotalQueries))
 			if Float64Value(newStats.Min) < Float64Value(stats.Min) || stats.Min == nil {
 				stats.Min = newStats.Min
 			}
@@ -155,8 +155,8 @@ func (c *Class) AddClass(newClass *Class) {
 			m := *newStats
 			c.Metrics.NumberMetrics[newMetric] = &m
 		} else {
+			stats.Cnt++
 			stats.Sum += newStats.Sum
-			stats.Avg = Uint64(stats.Sum / uint64(c.TotalQueries))
 			if Uint64Value(newStats.Min) < Uint64Value(stats.Min) || stats.Min == nil {
 				stats.Min = newStats.Min
 			}
