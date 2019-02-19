@@ -172,6 +172,7 @@ func (c *Class) AddClass(newClass *Class) {
 			m := *newStats
 			c.Metrics.BoolMetrics[newMetric] = &m
 		} else {
+			stats.Cnt++
 			stats.Sum += newStats.Sum
 		}
 	}

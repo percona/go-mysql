@@ -54,6 +54,8 @@ type NumberStats struct {
 
 // BoolStats are boolean-based metrics like QC_Hit and Filesort.
 type BoolStats struct {
+	vals       []bool `json:"-"`
+	Cnt        uint64
 	Sum        uint64 // %true = Sum/Cnt
 	outlierSum uint64
 }
@@ -116,6 +118,7 @@ func (m *Metrics) AddEvent(e *log.Event, outlier bool) {
 				stats.Sum += 1
 			}
 		}
+		stats.vals = append(stats.vals, val)
 	}
 }
 
@@ -157,6 +160,8 @@ func (m *Metrics) Finalize(rateLimit uint, totalQueries uint) {
 	}
 
 	for _, s := range m.BoolMetrics {
+		cnt := len(s.vals)
+		s.Cnt = uint64(cnt)
 		s.Sum = (s.Sum * uint64(rateLimit)) + s.outlierSum
 	}
 }
