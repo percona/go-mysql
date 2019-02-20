@@ -370,8 +370,16 @@ func TestFingerprintOneLineComments(t *testing.T) {
 		query.Fingerprint(q),
 	)
 
-    // Removes multi-line comment immediately followed by 'space' and '/'
+    // Removes multi-line comment followed by 'space' and '/'
     q = "/* /e */ select * from table\n"
+    assert.Equal(
+        t,
+        "select * from table",
+        query.Fingerprint(q),
+    )
+
+    // Remove multi-line comment immediately followed by '/'
+    q = "/*/this/is/also/a/comment*/ select * from table\n"
     assert.Equal(
         t,
         "select * from table",
