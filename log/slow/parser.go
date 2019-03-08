@@ -37,7 +37,7 @@ var (
 	timeRe    = regexp.MustCompile(`Time: (\S+\s{1,2}\S+)`)
 	timeNewRe = regexp.MustCompile(`Time:\s+(\d{4}-\d{2}-\d{2}\S+)`)
 	userRe    = regexp.MustCompile(`User@Host: ([^\[]+|\[[^[]+\]).*?@ (\S*) \[(.*)\]`)
-	idRe      = regexp.MustCompile(`(Id|Thread_id): +([0-9]*)`)
+	idRe      = regexp.MustCompile(`(Id): +([0-9]*)`)
 	schema    = regexp.MustCompile(`Schema: +(.*?) +Last_errno:`)
 	headerRe  = regexp.MustCompile(`^#\s+[A-Z]`)
 	metricsRe = regexp.MustCompile(`(\w+): (\S+|\z)`)
