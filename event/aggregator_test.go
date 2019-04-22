@@ -126,7 +126,7 @@ func TestSlow001NoExamples(t *testing.T) {
 	assert.JSONEq(t, expect, got)
 }
 
-// Test p95 and median.
+// Test p99 and Cnt.
 func TestSlow010(t *testing.T) {
 	got, expect := aggregateSlowLog("slow010.log", "slow010.golden", 0, true)
 	assert.JSONEq(t, expect, got)
@@ -203,5 +203,10 @@ func TestOutlierSlow025(t *testing.T) {
 
 func TestMariaDB102WithExplain(t *testing.T) {
 	got, expect := aggregateSlowLog("mariadb102-with-explain.log", "mariadb102-with-explain.golden", 0, true)
+	assert.JSONEq(t, expect, got)
+}
+
+func TestSlow026(t *testing.T) {
+	got, expect := aggregateSlowLog("slow027.log", "slow027.golden", 0, true)
 	assert.JSONEq(t, expect, got)
 }
