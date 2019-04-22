@@ -78,21 +78,17 @@ func aggregateSlowLog(input, output string, utcOffset time.Duration, examples bo
 
 func zeroPercentiles(r *event.Result) {
 	for _, metrics := range r.Global.Metrics.TimeMetrics {
-		metrics.Med = event.Float64(0)
-		metrics.P95 = event.Float64(0)
+		metrics.P99 = event.Float64(0)
 	}
 	for _, metrics := range r.Global.Metrics.NumberMetrics {
-		metrics.Med = event.Uint64(0)
-		metrics.P95 = event.Uint64(0)
+		metrics.P99 = event.Uint64(0)
 	}
 	for _, class := range r.Class {
 		for _, metrics := range class.Metrics.TimeMetrics {
-			metrics.Med = event.Float64(0)
-			metrics.P95 = event.Float64(0)
+			metrics.P99 = event.Float64(0)
 		}
 		for _, metrics := range class.Metrics.NumberMetrics {
-			metrics.Med = event.Uint64(0)
-			metrics.P95 = event.Uint64(0)
+			metrics.P99 = event.Uint64(0)
 		}
 	}
 }

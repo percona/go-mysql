@@ -1,62 +1,63 @@
 {
   "Global": {
     "Id": "",
+    "User": "",
+    "Host": "",
+    "Db": "",
+    "Server": "",
+    "LabelsKey": [],
+    "LabelsValue": [],
     "Fingerprint": "",
     "Metrics": {
       "TimeMetrics": {
         "Lock_time": {
+          "Cnt": 1,
           "Sum": 0,
           "Min": 0,
-          "Avg": 0,
-          "Med": 0,
-          "P95": 0,
+          "P99": 0,
           "Max": 0
         },
         "Query_time": {
+          "Cnt": 1,
           "Sum": 0.000277,
           "Min": 0.000277,
-          "Avg": 0.000277,
-          "Med": 0.000277,
-          "P95": 0.000277,
+          "P99": 0.000277,
           "Max": 0.000277
         }
       },
       "NumberMetrics": {
         "Rows_affected": {
+          "Cnt": 1,
           "Sum": 0,
           "Min": 0,
-          "Avg": 0,
-          "Med": 0,
-          "P95": 0,
+          "P99": 0,
           "Max": 0
         },
         "Rows_examined": {
+          "Cnt": 1,
           "Sum": 0,
           "Min": 0,
-          "Avg": 0,
-          "Med": 0,
-          "P95": 0,
+          "P99": 0,
           "Max": 0
         },
         "Rows_sent": {
+          "Cnt": 1,
           "Sum": 1,
           "Min": 1,
-          "Avg": 1,
-          "Med": 1,
-          "P95": 1,
+          "P99": 1,
           "Max": 1
         },
         "Thread_id": {
+          "Cnt": 1,
           "Sum": 8,
           "Min": 8,
-          "Avg": 8,
-          "Med": 8,
-          "P95": 8,
+          "P99": 8,
           "Max": 8
         }
       },
       "BoolMetrics": {
         "QC_hit": {
+          "Cnt": 1,
           "Sum": 0
         }
       }
@@ -65,64 +66,65 @@
     "UniqueQueries": 1
   },
   "Class": {
-    "16219655761820A2": {
+    "16219655761820A2;root;localhost;;": {
       "Id": "16219655761820A2",
+      "User": "root",
+      "Host": "localhost",
+      "Db": "",
+      "Server": "",
+      "LabelsKey": [],
+      "LabelsValue": [],
       "Fingerprint": "select ?",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
+            "Cnt": 1,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           },
           "Query_time": {
+            "Cnt": 1,
             "Sum": 0.000277,
             "Min": 0.000277,
-            "Avg": 0.000277,
-            "Med": 0.000277,
-            "P95": 0.000277,
+            "P99": 0.000277,
             "Max": 0.000277
           }
         },
         "NumberMetrics": {
           "Rows_affected": {
+            "Cnt": 1,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           },
           "Rows_examined": {
+            "Cnt": 1,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           },
           "Rows_sent": {
+            "Cnt": 1,
             "Sum": 1,
             "Min": 1,
-            "Avg": 1,
-            "Med": 1,
-            "P95": 1,
+            "P99": 1,
             "Max": 1
           },
           "Thread_id": {
+            "Cnt": 1,
             "Sum": 8,
             "Min": 8,
-            "Avg": 8,
-            "Med": 8,
-            "P95": 8,
+            "P99": 8,
             "Max": 8
           }
         },
         "BoolMetrics": {
           "QC_hit": {
+            "Cnt": 1,
             "Sum": 0
           }
         }
