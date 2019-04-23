@@ -1,41 +1,43 @@
 {
   "Global": {
     "Id": "",
+    "User": "",
+    "Host": "",
+    "Db": "",
+    "Server": "",
+    "LabelsKey": [],
+    "LabelsValue": [],
     "Fingerprint": "",
     "Metrics": {
       "TimeMetrics": {
         "Lock_time": {
+          "Cnt": 8,
           "Sum": 0.000238,
           "Min": 0,
-          "Avg": 0.00002975,
-          "Med": 0,
-          "P95": 0.000141,
+          "P99": 0.000141,
           "Max": 0.000141
         },
         "Query_time": {
+          "Cnt": 8,
           "Sum": 0.8918539999999999,
           "Min": 0.000037,
-          "Avg": 0.11148174999999999,
-          "Med": 0.000558,
-          "P95": 0.321092,
+          "P99": 0.321092,
           "Max": 0.321092
         }
       },
       "NumberMetrics": {
         "Rows_examined": {
+          "Cnt": 8,
           "Sum": 2,
           "Min": 0,
-          "Avg": 0,
-          "Med": 0,
-          "P95": 1,
+          "P99": 1,
           "Max": 1
         },
         "Rows_sent": {
+          "Cnt": 8,
           "Sum": 4,
           "Min": 0,
-          "Avg": 0,
-          "Med": 1,
-          "P95": 1,
+          "P99": 1,
           "Max": 1
         }
       }
@@ -44,43 +46,45 @@
     "UniqueQueries": 8
   },
   "Class": {
-    "54FB1194093381DB": {
+    "54FB1194093381DB;percona-agent;localhost;;": {
       "Id": "54FB1194093381DB",
+      "User": "percona-agent",
+      "Host": "localhost",
+      "Db": "",
+      "Server": "",
+      "LabelsKey": [],
+      "LabelsValue": [],
       "Fingerprint": "set global slow_query_log=on",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
+            "Cnt": 1,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           },
           "Query_time": {
+            "Cnt": 1,
             "Sum": 0.31645,
             "Min": 0.31645,
-            "Avg": 0.31645,
-            "Med": 0.31645,
-            "P95": 0.31645,
+            "P99": 0.31645,
             "Max": 0.31645
           }
         },
         "NumberMetrics": {
           "Rows_examined": {
+            "Cnt": 1,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           },
           "Rows_sent": {
+            "Cnt": 1,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           }
         }
@@ -94,43 +98,45 @@
         "Size": 28
       }
     },
-    "6C099B0B73EA7633": {
+    "6C099B0B73EA7633;backup;localhost;dbnameb;": {
       "Id": "6C099B0B73EA7633",
+      "User": "backup",
+      "Host": "localhost",
+      "Db": "dbnameb",
+      "Server": "",
+      "LabelsKey": [],
+      "LabelsValue": [],
       "Fingerprint": "use ?",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
+            "Cnt": 1,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           },
           "Query_time": {
+            "Cnt": 1,
             "Sum": 0.000558,
             "Min": 0.000558,
-            "Avg": 0.000558,
-            "Med": 0.000558,
-            "P95": 0.000558,
+            "P99": 0.000558,
             "Max": 0.000558
           }
         },
         "NumberMetrics": {
           "Rows_examined": {
+            "Cnt": 1,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           },
           "Rows_sent": {
+            "Cnt": 1,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           }
         }
@@ -144,43 +150,45 @@
         "Size": 13
       }
     },
-    "7C1934E82086DF57": {
+    "7C1934E82086DF57;bookblogs;localhost;;": {
       "Id": "7C1934E82086DF57",
+      "User": "bookblogs",
+      "Host": "localhost",
+      "Db": "",
+      "Server": "",
+      "LabelsKey": [],
+      "LabelsValue": [],
       "Fingerprint": "set names utf8",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
+            "Cnt": 1,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           },
           "Query_time": {
+            "Cnt": 1,
             "Sum": 0.253052,
             "Min": 0.253052,
-            "Avg": 0.253052,
-            "Med": 0.253052,
-            "P95": 0.253052,
+            "P99": 0.253052,
             "Max": 0.253052
           }
         },
         "NumberMetrics": {
           "Rows_examined": {
+            "Cnt": 1,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           },
           "Rows_sent": {
+            "Cnt": 1,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           }
         }
@@ -194,43 +202,45 @@
         "Size": 14
       }
     },
-    "83497A0046FCD7A7": {
+    "83497A0046FCD7A7;bookblogs;localhost;dbnamea;": {
       "Id": "83497A0046FCD7A7",
+      "User": "bookblogs",
+      "Host": "localhost",
+      "Db": "dbnamea",
+      "Server": "",
+      "LabelsKey": [],
+      "LabelsValue": [],
       "Fingerprint": "select field from table_a where some_other_field = ? limit ?",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
+            "Cnt": 1,
             "Sum": 0.000038,
             "Min": 0.000038,
-            "Avg": 0.000038,
-            "Med": 0.000038,
-            "P95": 0.000038,
+            "P99": 0.000038,
             "Max": 0.000038
           },
           "Query_time": {
+            "Cnt": 1,
             "Sum": 0.321092,
             "Min": 0.321092,
-            "Avg": 0.321092,
-            "Med": 0.321092,
-            "P95": 0.321092,
+            "P99": 0.321092,
             "Max": 0.321092
           }
         },
         "NumberMetrics": {
           "Rows_examined": {
+            "Cnt": 1,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           },
           "Rows_sent": {
+            "Cnt": 1,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           }
         }
@@ -244,43 +254,45 @@
         "Size": 66
       }
     },
-    "9FD5245EAE433B90": {
+    "9FD5245EAE433B90;bookblogs;localhost;;": {
       "Id": "9FD5245EAE433B90",
+      "User": "bookblogs",
+      "Host": "localhost",
+      "Db": "",
+      "Server": "",
+      "LabelsKey": [],
+      "LabelsValue": [],
       "Fingerprint": "select another_field from table_c where a_third_field = ? and site_id = ?",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
+            "Cnt": 1,
             "Sum": 0.000059,
             "Min": 0.000059,
-            "Avg": 0.000059,
-            "Med": 0.000059,
-            "P95": 0.000059,
+            "P99": 0.000059,
             "Max": 0.000059
           },
           "Query_time": {
+            "Cnt": 1,
             "Sum": 0.000164,
             "Min": 0.000164,
-            "Avg": 0.000164,
-            "Med": 0.000164,
-            "P95": 0.000164,
+            "P99": 0.000164,
             "Max": 0.000164
           }
         },
         "NumberMetrics": {
           "Rows_examined": {
+            "Cnt": 1,
             "Sum": 1,
             "Min": 1,
-            "Avg": 1,
-            "Med": 1,
-            "P95": 1,
+            "P99": 1,
             "Max": 1
           },
           "Rows_sent": {
+            "Cnt": 1,
             "Sum": 1,
             "Min": 1,
-            "Avg": 1,
-            "Med": 1,
-            "P95": 1,
+            "P99": 1,
             "Max": 1
           }
         }
@@ -294,43 +306,45 @@
         "Size": 82
       }
     },
-    "AC5C18B304F9DE87": {
+    "AC5C18B304F9DE87;backup;localhost;;": {
       "Id": "AC5C18B304F9DE87",
+      "User": "backup",
+      "Host": "localhost",
+      "Db": "",
+      "Server": "",
+      "LabelsKey": [],
+      "LabelsValue": [],
       "Fingerprint": "select @@collation_database",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
+            "Cnt": 1,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           },
           "Query_time": {
+            "Cnt": 1,
             "Sum": 0.000204,
             "Min": 0.000204,
-            "Avg": 0.000204,
-            "Med": 0.000204,
-            "P95": 0.000204,
+            "P99": 0.000204,
             "Max": 0.000204
           }
         },
         "NumberMetrics": {
           "Rows_examined": {
+            "Cnt": 1,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           },
           "Rows_sent": {
+            "Cnt": 1,
             "Sum": 1,
             "Min": 1,
-            "Avg": 1,
-            "Med": 1,
-            "P95": 1,
+            "P99": 1,
             "Max": 1
           }
         }
@@ -344,43 +358,45 @@
         "Size": 27
       }
     },
-    "B98E038C9D12BDA1": {
+    "B98E038C9D12BDA1;bookblogs;localhost;;": {
       "Id": "B98E038C9D12BDA1",
+      "User": "bookblogs",
+      "Host": "localhost",
+      "Db": "",
+      "Server": "",
+      "LabelsKey": [],
+      "LabelsValue": [],
       "Fingerprint": "select field from table_b where another_field = ? and site_id = ?",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
+            "Cnt": 1,
             "Sum": 0.000141,
             "Min": 0.000141,
-            "Avg": 0.000141,
-            "Med": 0.000141,
-            "P95": 0.000141,
+            "P99": 0.000141,
             "Max": 0.000141
           },
           "Query_time": {
+            "Cnt": 1,
             "Sum": 0.000297,
             "Min": 0.000297,
-            "Avg": 0.000297,
-            "Med": 0.000297,
-            "P95": 0.000297,
+            "P99": 0.000297,
             "Max": 0.000297
           }
         },
         "NumberMetrics": {
           "Rows_examined": {
+            "Cnt": 1,
             "Sum": 1,
             "Min": 1,
-            "Avg": 1,
-            "Med": 1,
-            "P95": 1,
+            "P99": 1,
             "Max": 1
           },
           "Rows_sent": {
+            "Cnt": 1,
             "Sum": 1,
             "Min": 1,
-            "Avg": 1,
-            "Med": 1,
-            "P95": 1,
+            "P99": 1,
             "Max": 1
           }
         }
@@ -394,43 +410,45 @@
         "Size": 73
       }
     },
-    "F0265D81808CE240": {
+    "F0265D81808CE240;bookblogs;localhost;;": {
       "Id": "F0265D81808CE240",
+      "User": "bookblogs",
+      "Host": "localhost",
+      "Db": "",
+      "Server": "",
+      "LabelsKey": [],
+      "LabelsValue": [],
       "Fingerprint": "select @@session.sql_mode",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
+            "Cnt": 1,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           },
           "Query_time": {
+            "Cnt": 1,
             "Sum": 0.000037,
             "Min": 0.000037,
-            "Avg": 0.000037,
-            "Med": 0.000037,
-            "P95": 0.000037,
+            "P99": 0.000037,
             "Max": 0.000037
           }
         },
         "NumberMetrics": {
           "Rows_examined": {
+            "Cnt": 1,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           },
           "Rows_sent": {
+            "Cnt": 1,
             "Sum": 1,
             "Min": 1,
-            "Avg": 1,
-            "Med": 1,
-            "P95": 1,
+            "P99": 1,
             "Max": 1
           }
         }

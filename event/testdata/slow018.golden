@@ -1,159 +1,264 @@
 {
   "Global": {
     "Id": "",
+    "User": "",
+    "Host": "",
+    "Db": "",
+    "Server": "",
+    "LabelsKey": [],
+    "LabelsValue": [],
     "Fingerprint": "",
     "Metrics": {
       "TimeMetrics": {
         "Lock_time": {
+          "Cnt": 4,
           "Sum": 0,
           "Min": 0,
-          "Avg": 0,
-          "Med": 0,
-          "P95": 0,
+          "P99": 0,
           "Max": 0
         },
         "Query_time": {
+          "Cnt": 4,
           "Sum": 0.9010440000000001,
           "Min": 0.000001,
-          "Avg": 0.22526100000000002,
-          "Med": 0.00053,
-          "P95": 0.900001,
+          "P99": 0.900001,
           "Max": 0.900001
         }
       },
       "NumberMetrics": {
         "Merge_passes": {
+          "Cnt": 4,
           "Sum": 0,
           "Min": 0,
-          "Avg": 0,
-          "Med": 0,
-          "P95": 0,
+          "P99": 0,
           "Max": 0
         },
         "Rows_examined": {
+          "Cnt": 4,
           "Sum": 10,
           "Min": 1,
-          "Avg": 2,
-          "Med": 3,
-          "P95": 4,
+          "P99": 4,
           "Max": 4
         },
         "Rows_sent": {
+          "Cnt": 4,
           "Sum": 10,
           "Min": 1,
-          "Avg": 2,
-          "Med": 3,
-          "P95": 4,
+          "P99": 4,
           "Max": 4
         }
       },
       "BoolMetrics": {
         "Filesort": {
+          "Cnt": 4,
           "Sum": 4
         },
         "Filesort_on_disk": {
+          "Cnt": 4,
           "Sum": 0
         },
         "Full_join": {
+          "Cnt": 4,
           "Sum": 0
         },
         "Full_scan": {
+          "Cnt": 4,
           "Sum": 1
         },
         "QC_Hit": {
+          "Cnt": 4,
           "Sum": 0
         },
         "Tmp_table": {
+          "Cnt": 4,
           "Sum": 2
         },
         "Tmp_table_on_disk": {
+          "Cnt": 4,
           "Sum": 0
         }
       }
     },
     "TotalQueries": 4,
-    "UniqueQueries": 1
+    "UniqueQueries": 2
   },
   "Class": {
-    "B2414E722E8A89DD": {
+    "B2414E722E8A89DD;[SQL_SLAVE];;;": {
       "Id": "B2414E722E8A89DD",
+      "User": "[SQL_SLAVE]",
+      "Host": "",
+      "Db": "",
+      "Server": "",
+      "LabelsKey": [],
+      "LabelsValue": [],
       "Fingerprint": "select * from t where id in(?+)",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
+            "Cnt": 3,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           },
           "Query_time": {
-            "Sum": 0.9010440000000001,
-            "Min": 0.000001,
-            "Avg": 0.22526100000000002,
-            "Med": 0.00053,
-            "P95": 0.900001,
+            "Cnt": 3,
+            "Sum": 0.901043,
+            "Min": 0.000512,
+            "P99": 0.900001,
             "Max": 0.900001
           }
         },
         "NumberMetrics": {
           "Merge_passes": {
+            "Cnt": 3,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           },
           "Rows_examined": {
-            "Sum": 10,
-            "Min": 1,
-            "Avg": 2,
-            "Med": 3,
-            "P95": 4,
+            "Cnt": 3,
+            "Sum": 9,
+            "Min": 2,
+            "P99": 4,
             "Max": 4
           },
           "Rows_sent": {
-            "Sum": 10,
-            "Min": 1,
-            "Avg": 2,
-            "Med": 3,
-            "P95": 4,
+            "Cnt": 3,
+            "Sum": 9,
+            "Min": 2,
+            "P99": 4,
             "Max": 4
           }
         },
         "BoolMetrics": {
           "Filesort": {
-            "Sum": 4
+            "Cnt": 3,
+            "Sum": 3
           },
           "Filesort_on_disk": {
+            "Cnt": 3,
             "Sum": 0
           },
           "Full_join": {
+            "Cnt": 3,
             "Sum": 0
           },
           "Full_scan": {
-            "Sum": 1
+            "Cnt": 3,
+            "Sum": 0
           },
           "QC_Hit": {
+            "Cnt": 3,
             "Sum": 0
           },
           "Tmp_table": {
-            "Sum": 2
+            "Cnt": 3,
+            "Sum": 1
           },
           "Tmp_table_on_disk": {
+            "Cnt": 3,
             "Sum": 0
           }
         }
       },
-      "TotalQueries": 4,
+      "TotalQueries": 3,
       "UniqueQueries": 1,
       "Example": {
         "QueryTime": 0.900001,
-        "Db": "db1",
+        "Db": "",
         "Query": "select * from t where id in (10000,20000,30000)",
         "Size": 47
+      }
+    },
+    "B2414E722E8A89DD;[SQL_SLAVE];;db1;": {
+      "Id": "B2414E722E8A89DD",
+      "User": "[SQL_SLAVE]",
+      "Host": "",
+      "Db": "db1",
+      "Server": "",
+      "LabelsKey": [],
+      "LabelsValue": [],
+      "Fingerprint": "select * from t where id in(?+)",
+      "Metrics": {
+        "TimeMetrics": {
+          "Lock_time": {
+            "Cnt": 1,
+            "Sum": 0,
+            "Min": 0,
+            "P99": 0,
+            "Max": 0
+          },
+          "Query_time": {
+            "Cnt": 1,
+            "Sum": 0.000001,
+            "Min": 0.000001,
+            "P99": 0.000001,
+            "Max": 0.000001
+          }
+        },
+        "NumberMetrics": {
+          "Merge_passes": {
+            "Cnt": 1,
+            "Sum": 0,
+            "Min": 0,
+            "P99": 0,
+            "Max": 0
+          },
+          "Rows_examined": {
+            "Cnt": 1,
+            "Sum": 1,
+            "Min": 1,
+            "P99": 1,
+            "Max": 1
+          },
+          "Rows_sent": {
+            "Cnt": 1,
+            "Sum": 1,
+            "Min": 1,
+            "P99": 1,
+            "Max": 1
+          }
+        },
+        "BoolMetrics": {
+          "Filesort": {
+            "Cnt": 1,
+            "Sum": 1
+          },
+          "Filesort_on_disk": {
+            "Cnt": 1,
+            "Sum": 0
+          },
+          "Full_join": {
+            "Cnt": 1,
+            "Sum": 0
+          },
+          "Full_scan": {
+            "Cnt": 1,
+            "Sum": 1
+          },
+          "QC_Hit": {
+            "Cnt": 1,
+            "Sum": 0
+          },
+          "Tmp_table": {
+            "Cnt": 1,
+            "Sum": 1
+          },
+          "Tmp_table_on_disk": {
+            "Cnt": 1,
+            "Sum": 0
+          }
+        }
+      },
+      "TotalQueries": 1,
+      "UniqueQueries": 1,
+      "Example": {
+        "QueryTime": 0.000001,
+        "Db": "db1",
+        "Query": "select * from t where id in (1,2,3)",
+        "Size": 35
       }
     }
   },

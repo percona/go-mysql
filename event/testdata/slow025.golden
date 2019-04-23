@@ -1,41 +1,43 @@
 {
   "Global": {
     "Id": "",
+    "User": "",
+    "Host": "",
+    "Db": "",
+    "Server": "",
+    "LabelsKey": [],
+    "LabelsValue": [],
     "Fingerprint": "",
     "Metrics": {
       "TimeMetrics": {
         "Lock_time": {
+          "Cnt": 3,
           "Sum": 0,
           "Min": 0,
-          "Avg": 0,
-          "Med": 0,
-          "P95": 0,
+          "P99": 0,
           "Max": 0
         },
         "Query_time": {
+          "Cnt": 3,
           "Sum": 320.00000000000006,
           "Min": 0.1,
-          "Avg": 0.15992003998001003,
-          "Med": 0.2,
-          "P95": 20,
+          "P99": 20,
           "Max": 20
         }
       },
       "NumberMetrics": {
         "Rows_examined": {
+          "Cnt": 3,
           "Sum": 0,
           "Min": 0,
-          "Avg": 0,
-          "Med": 0,
-          "P95": 0,
+          "P99": 0,
           "Max": 0
         },
         "Rows_sent": {
+          "Cnt": 3,
           "Sum": 2001,
           "Min": 1,
-          "Avg": 1,
-          "Med": 1,
-          "P95": 1,
+          "P99": 1,
           "Max": 1
         }
       }
@@ -44,43 +46,45 @@
     "UniqueQueries": 1
   },
   "Class": {
-    "FDE00DF974C61E9F": {
+    "FDE00DF974C61E9F;root;localhost;;": {
       "Id": "FDE00DF974C61E9F",
+      "User": "root",
+      "Host": "localhost",
+      "Db": "",
+      "Server": "",
+      "LabelsKey": [],
+      "LabelsValue": [],
       "Fingerprint": "select c from t",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
+            "Cnt": 3,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           },
           "Query_time": {
+            "Cnt": 3,
             "Sum": 320.00000000000006,
             "Min": 0.1,
-            "Avg": 0.15992003998001003,
-            "Med": 0.2,
-            "P95": 20,
+            "P99": 20,
             "Max": 20
           }
         },
         "NumberMetrics": {
           "Rows_examined": {
+            "Cnt": 3,
             "Sum": 0,
             "Min": 0,
-            "Avg": 0,
-            "Med": 0,
-            "P95": 0,
+            "P99": 0,
             "Max": 0
           },
           "Rows_sent": {
+            "Cnt": 3,
             "Sum": 2001,
             "Min": 1,
-            "Avg": 1,
-            "Med": 1,
-            "P95": 1,
+            "P99": 1,
             "Max": 1
           }
         }
