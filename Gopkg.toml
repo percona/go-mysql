@@ -1,8 +1,4 @@
 [prune]
-  go-tests = true
   non-go = true
-
-[[constraint]]
-  name = "github.com/shirou/gopsutil"
-  branch = "master"
-
+  go-tests = true
+  unused-packages = true
