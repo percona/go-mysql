@@ -28,12 +28,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/percona/go-mysql/event"
 	"github.com/percona/go-mysql/log"
 	parser "github.com/percona/go-mysql/log/slow"
 	"github.com/percona/go-mysql/query"
 	"github.com/percona/go-mysql/test"
-	"github.com/stretchr/testify/assert"
 )
 
 var (
