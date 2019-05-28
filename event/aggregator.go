@@ -86,6 +86,18 @@ func (a *Aggregator) Finalize() Result {
 	a.global.Finalize(a.rateLimit)
 	a.global.UniqueQueries = uint(len(a.classes))
 	for _, class := range a.classes {
+		if class.LastThreadID != 0 {
+			a.global.LastThreadID = class.LastThreadID
+		}
+
+		if !class.TsMin.IsZero() && class.TsMin.Before(a.global.TsMin) {
+			a.global.TsMin = class.TsMin
+		}
+
+		if !class.TsMax.IsZero() && class.TsMax.After(a.global.TsMax) {
+			a.global.TsMax = class.TsMax
+		}
+
 		class.Finalize(a.rateLimit)
 		class.UniqueQueries = 1
 		if class.Example != nil && class.Example.Ts != "" {

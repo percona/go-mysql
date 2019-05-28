@@ -1,7 +1,9 @@
 {
   "Global": {
-    "Id": "",
+    "ID": "",
     "Fingerprint": "",
+    "TsMin": "2007-10-15T21:43:52Z",
+    "TsMax": "2007-10-15T21:45:10Z",
     "Metrics": {
       "TimeMetrics": {
         "Lock_time": {
@@ -41,12 +43,15 @@
       }
     },
     "TotalQueries": 2,
-    "UniqueQueries": 2
+    "UniqueQueries": 2,
+    "LastThreadID": 0
   },
   "Class": {
     "3A99CC42AEDCCFCD": {
-      "Id": "3A99CC42AEDCCFCD",
+      "ID": "3A99CC42AEDCCFCD",
       "Fingerprint": "select sleep(?) from test.n",
+      "TsMin": "2007-10-15T21:45:10Z",
+      "TsMax": "2007-10-15T21:45:10Z",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
@@ -93,11 +98,14 @@
         "Query": "select sleep(2) from test.n",
         "Size": 27,
         "Ts": "2007-10-15 21:45:10"
-      }
+      },
+      "LastThreadID": 0
     },
     "7F7D57ACDD8A346E": {
-      "Id": "7F7D57ACDD8A346E",
+      "ID": "7F7D57ACDD8A346E",
       "Fingerprint": "select sleep(?) from n",
+      "TsMin": "2007-10-15T21:43:52Z",
+      "TsMax": "2007-10-15T21:43:52Z",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
@@ -144,7 +152,8 @@
         "Query": "select sleep(2) from n",
         "Size": 22,
         "Ts": "2007-10-15 21:43:52"
-      }
+      },
+      "LastThreadID": 0
     }
   },
   "RateLimit": 0,

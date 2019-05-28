@@ -1,7 +1,9 @@
 {
   "Global": {
-    "Id": "",
+    "ID": "",
     "Fingerprint": "",
+    "TsMin": "2018-02-14T16:18:07Z",
+    "TsMax": "2018-02-14T16:18:07Z",
     "Metrics": {
       "TimeMetrics": {
         "Lock_time": {
@@ -45,14 +47,6 @@
           "Med": 1,
           "P95": 1,
           "Max": 1
-        },
-        "Thread_id": {
-          "Sum": 8,
-          "Min": 8,
-          "Avg": 8,
-          "Med": 8,
-          "P95": 8,
-          "Max": 8
         }
       },
       "BoolMetrics": {
@@ -62,12 +56,15 @@
       }
     },
     "TotalQueries": 1,
-    "UniqueQueries": 1
+    "UniqueQueries": 1,
+    "LastThreadID": 8
   },
   "Class": {
     "16219655761820A2": {
-      "Id": "16219655761820A2",
+      "ID": "16219655761820A2",
       "Fingerprint": "select ?",
+      "TsMin": "2018-02-14T16:18:07Z",
+      "TsMax": "2018-02-14T16:18:07Z",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
@@ -111,14 +108,6 @@
             "Med": 1,
             "P95": 1,
             "Max": 1
-          },
-          "Thread_id": {
-            "Sum": 8,
-            "Min": 8,
-            "Avg": 8,
-            "Med": 8,
-            "P95": 8,
-            "Max": 8
           }
         },
         "BoolMetrics": {
@@ -135,7 +124,8 @@
         "Query": "SELECT 1",
         "Size": 8,
         "Ts": "2018-02-14 16:18:07"
-      }
+      },
+      "LastThreadID": 8
     }
   },
   "RateLimit": 0,

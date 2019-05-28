@@ -122,13 +122,13 @@ func TestParseSlowLog002(t *testing.T) {
 			Host:      "",
 			Offset:    0,
 			OffsetEnd: 337,
+			ThreadID:  10,
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.000012,
 				"Lock_time":  0.000000,
 			},
 			NumberMetrics: map[string]uint64{
 				"Merge_passes":  0,
-				"Thread_id":     10,
 				"Rows_examined": 0,
 				"Rows_sent":     0,
 			},
@@ -152,13 +152,13 @@ func TestParseSlowLog002(t *testing.T) {
 			Host:      "",
 			Offset:    337,
 			OffsetEnd: 814,
+			ThreadID:  10,
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.726052,
 				"Lock_time":  0.000091,
 			},
 			NumberMetrics: map[string]uint64{
 				"Merge_passes":  0,
-				"Thread_id":     10,
 				"Rows_examined": 62951,
 				"Rows_sent":     0,
 			},
@@ -180,6 +180,7 @@ VALUES ('', 'Exact')`,
 			Host:      "",
 			Offset:    814,
 			OffsetEnd: 1333,
+			ThreadID:  10,
 			TimeMetrics: map[string]float64{
 				"InnoDB_queue_wait":    0.000000,
 				"Lock_time":            0.000077,
@@ -192,7 +193,6 @@ VALUES ('', 'Exact')`,
 				"Merge_passes":          0,
 				"InnoDB_pages_distinct": 24,
 				"Rows_sent":             0,
-				"Thread_id":             10,
 				"Rows_examined":         0,
 				"InnoDB_IO_r_ops":       0,
 			},
@@ -210,6 +210,7 @@ VALUES ('', 'Exact')`,
 			Query: `UPDATE db4.vab3concept1upload
 SET    vab3concept1id = '91848182522'
 WHERE  vab3concept1upload='6994465'`,
+			ThreadID:  10,
 			Admin:     false,
 			User:      "[SQL_SLAVE]",
 			Host:      "",
@@ -227,7 +228,6 @@ WHERE  vab3concept1upload='6994465'`,
 				"Merge_passes":          0,
 				"InnoDB_pages_distinct": 11,
 				"Rows_sent":             0,
-				"Thread_id":             10,
 				"Rows_examined":         0,
 				"InnoDB_IO_r_ops":       0,
 			},
@@ -244,6 +244,7 @@ WHERE  vab3concept1upload='6994465'`,
 		{
 			Query: `INSERT INTO db1.conch (word3, vid83)
 VALUES ('211', '18')`,
+			ThreadID:  10,
 			Admin:     false,
 			User:      "[SQL_SLAVE]",
 			Host:      "",
@@ -261,7 +262,6 @@ VALUES ('211', '18')`,
 				"Merge_passes":          0,
 				"InnoDB_pages_distinct": 18,
 				"Rows_sent":             0,
-				"Thread_id":             10,
 				"Rows_examined":         0,
 				"InnoDB_IO_r_ops":       0,
 			},
@@ -278,6 +278,7 @@ VALUES ('211', '18')`,
 		{
 			Query: `UPDATE foo.bar
 SET    biz = '91848182522'`,
+			ThreadID:  10,
 			Admin:     false,
 			User:      "[SQL_SLAVE]",
 			Host:      "",
@@ -295,7 +296,6 @@ SET    biz = '91848182522'`,
 				"Merge_passes":          0,
 				"InnoDB_pages_distinct": 18,
 				"Rows_sent":             0,
-				"Thread_id":             10,
 				"Rows_examined":         0,
 				"InnoDB_IO_r_ops":       0,
 			},
@@ -313,6 +313,7 @@ SET    biz = '91848182522'`,
 			Query: `UPDATE bizzle.bat
 SET    boop='bop: 899'
 WHERE  fillze='899'`,
+			ThreadID:  10,
 			Admin:     false,
 			User:      "[SQL_SLAVE]",
 			Host:      "",
@@ -330,7 +331,6 @@ WHERE  fillze='899'`,
 				"Merge_passes":          0,
 				"InnoDB_pages_distinct": 18,
 				"Rows_sent":             0,
-				"Thread_id":             10,
 				"Rows_examined":         0,
 				"InnoDB_IO_r_ops":       0,
 			},
@@ -347,6 +347,7 @@ WHERE  fillze='899'`,
 		{
 			Query: `UPDATE foo.bar
 SET    biz = '91848182522'`,
+			ThreadID:  10,
 			Admin:     false,
 			User:      "[SQL_SLAVE]",
 			Host:      "",
@@ -364,7 +365,6 @@ SET    biz = '91848182522'`,
 				"Merge_passes":          0,
 				"InnoDB_pages_distinct": 18,
 				"Rows_sent":             0,
-				"Thread_id":             10,
 				"Rows_examined":         0,
 				"InnoDB_IO_r_ops":       0,
 			},
@@ -387,6 +387,7 @@ func TestParserSlowLog003(t *testing.T) {
 	got := parseSlowLog("slow003.log", opt)
 	expect := []log.Event{
 		{
+			ThreadID:  10,
 			Query:     "BEGIN",
 			Admin:     false,
 			Host:      "",
@@ -411,7 +412,6 @@ func TestParserSlowLog003(t *testing.T) {
 				"Merge_passes":  0,
 				"Rows_examined": 0,
 				"Rows_sent":     0,
-				"Thread_id":     10,
 			},
 		},
 	}
@@ -455,6 +455,7 @@ func TestParserSlowLog005(t *testing.T) {
 	got := parseSlowLog("slow005.log", opt)
 	expect := []log.Event{
 		{
+			ThreadID:  10,
 			Query:     "foo\nbar\n\t\t\t0 AS counter\nbaz",
 			Admin:     false,
 			Host:      "",
@@ -479,7 +480,6 @@ func TestParserSlowLog005(t *testing.T) {
 				"Merge_passes":  0,
 				"Rows_examined": 0,
 				"Rows_sent":     0,
-				"Thread_id":     10,
 			},
 		},
 	}
@@ -492,6 +492,7 @@ func TestParserSlowLog006(t *testing.T) {
 	got := parseSlowLog("slow006.log", opt)
 	expect := []log.Event{
 		{
+			ThreadID:  10,
 			Query:     "SELECT col FROM foo_tbl",
 			Db:        "foo",
 			Admin:     false,
@@ -517,10 +518,10 @@ func TestParserSlowLog006(t *testing.T) {
 				"Merge_passes":  0,
 				"Rows_examined": 0,
 				"Rows_sent":     0,
-				"Thread_id":     10,
 			},
 		},
 		{
+			ThreadID:  10,
 			Query:     "SELECT col FROM foo_tbl",
 			Db:        "foo",
 			Admin:     false,
@@ -546,10 +547,10 @@ func TestParserSlowLog006(t *testing.T) {
 				"Merge_passes":  0,
 				"Rows_examined": 0,
 				"Rows_sent":     0,
-				"Thread_id":     10,
 			},
 		},
 		{
+			ThreadID:  20,
 			Query:     "SELECT col FROM bar_tbl",
 			Db:        "bar",
 			Admin:     false,
@@ -575,10 +576,10 @@ func TestParserSlowLog006(t *testing.T) {
 				"Merge_passes":  0,
 				"Rows_examined": 0,
 				"Rows_sent":     0,
-				"Thread_id":     20,
 			},
 		},
 		{
+			ThreadID:  10,
 			Query:     "SELECT col FROM bar_tbl",
 			Db:        "bar",
 			Admin:     false,
@@ -604,10 +605,10 @@ func TestParserSlowLog006(t *testing.T) {
 				"Merge_passes":  0,
 				"Rows_examined": 0,
 				"Rows_sent":     0,
-				"Thread_id":     10,
 			},
 		},
 		{
+			ThreadID:  20,
 			Query:     "SELECT col FROM bar_tbl",
 			Db:        "bar",
 			Admin:     false,
@@ -633,10 +634,10 @@ func TestParserSlowLog006(t *testing.T) {
 				"Merge_passes":  0,
 				"Rows_examined": 0,
 				"Rows_sent":     0,
-				"Thread_id":     20,
 			},
 		},
 		{
+			ThreadID:  30,
 			Query:     "SELECT col FROM foo_tbl",
 			Db:        "foo",
 			Admin:     false,
@@ -662,7 +663,6 @@ func TestParserSlowLog006(t *testing.T) {
 				"Merge_passes":  0,
 				"Rows_examined": 0,
 				"Rows_sent":     0,
-				"Thread_id":     30,
 			},
 		},
 	}
@@ -681,6 +681,7 @@ func TestParserSlowLog007(t *testing.T) {
 			Ts:          time.Date(2007, 12, 18, 11, 48, 27, 0, time.UTC),
 			User:        "[SQL_SLAVE]",
 			Offset:      0,
+			ThreadID:    3,
 			OffsetEnd:   193,
 			BoolMetrics: map[string]bool{},
 			TimeMetrics: map[string]float64{
@@ -690,7 +691,6 @@ func TestParserSlowLog007(t *testing.T) {
 			NumberMetrics: map[string]uint64{
 				"Rows_examined": 0,
 				"Rows_sent":     0,
-				"Thread_id":     3,
 			},
 		},
 	}
@@ -713,6 +713,7 @@ func TestParserSlowLog008(t *testing.T) {
 			Host:        "",
 			User:        "meow",
 			Offset:      0,
+			ThreadID:    5,
 			OffsetEnd:   220,
 			BoolMetrics: map[string]bool{},
 			TimeMetrics: map[string]float64{
@@ -722,7 +723,6 @@ func TestParserSlowLog008(t *testing.T) {
 			NumberMetrics: map[string]uint64{
 				"Rows_examined": 0,
 				"Rows_sent":     0,
-				"Thread_id":     5,
 			},
 		},
 		{
@@ -731,6 +731,7 @@ func TestParserSlowLog008(t *testing.T) {
 			Admin:       false,
 			Host:        "",
 			User:        "meow",
+			ThreadID:    6,
 			Offset:      220,
 			OffsetEnd:   434,
 			BoolMetrics: map[string]bool{},
@@ -741,7 +742,6 @@ func TestParserSlowLog008(t *testing.T) {
 			NumberMetrics: map[string]uint64{
 				"Rows_examined": 0,
 				"Rows_sent":     0,
-				"Thread_id":     6,
 			},
 		},
 		{
@@ -750,6 +750,7 @@ func TestParserSlowLog008(t *testing.T) {
 			Admin:       false,
 			Host:        "",
 			User:        "meow",
+			ThreadID:    6,
 			Offset:      434,
 			OffsetEnd:   656,
 			BoolMetrics: map[string]bool{},
@@ -760,7 +761,6 @@ func TestParserSlowLog008(t *testing.T) {
 			NumberMetrics: map[string]uint64{
 				"Rows_examined": 0,
 				"Rows_sent":     0,
-				"Thread_id":     6,
 			},
 		},
 	}
@@ -776,6 +776,7 @@ func TestParserSlowLog009(t *testing.T) {
 	got := parseSlowLog("slow009.log", opt)
 	expect := []log.Event{
 		{
+			ThreadID:  47,
 			Query:     "Refresh",
 			Db:        "",
 			Admin:     true,
@@ -794,7 +795,6 @@ func TestParserSlowLog009(t *testing.T) {
 				"Rows_examined": 0,
 				"Rows_read":     0,
 				"Rows_sent":     0,
-				"Thread_id":     47,
 			},
 			BoolMetrics: map[string]bool{
 				"QC_Hit":            false,
@@ -824,6 +824,7 @@ func TestParserSlowLog011(t *testing.T) {
 			Ts:        time.Date(2013, 11, 28, 1, 05, 31, 0, time.UTC),
 			RateType:  "query",
 			RateLimit: 2,
+			ThreadID:  69194,
 			TimeMetrics: map[string]float64{
 				"Query_time":           0.000228,
 				"Lock_time":            0.000114,
@@ -866,6 +867,7 @@ func TestParserSlowLog011(t *testing.T) {
 			User:      "user1",
 			RateType:  "query",
 			RateLimit: 2,
+			ThreadID:  69195,
 			TimeMetrics: map[string]float64{
 				"Query_time":           0.000237,
 				"Lock_time":            0.000122,
@@ -908,6 +910,7 @@ func TestParserSlowLog011(t *testing.T) {
 			User:      "user1",
 			RateType:  "query",
 			RateLimit: 2,
+			ThreadID:  69195,
 			TimeMetrics: map[string]float64{
 				"Query_time":           0.000165,
 				"Lock_time":            0.000048,
@@ -949,6 +952,7 @@ func TestParserSlowLog012(t *testing.T) {
 	got := parseSlowLog("slow012.log", opt)
 	expect := []log.Event{
 		{
+			ThreadID:  168,
 			Query:     "select * from mysql.user",
 			Db:        "",
 			Host:      "localhost",
@@ -966,6 +970,7 @@ func TestParserSlowLog012(t *testing.T) {
 			BoolMetrics: map[string]bool{},
 		},
 		{
+			ThreadID:  168,
 			Query:     "Quit",
 			Admin:     true,
 			Db:        "",
@@ -984,6 +989,7 @@ func TestParserSlowLog012(t *testing.T) {
 			BoolMetrics: map[string]bool{},
 		},
 		{
+			ThreadID:  169,
 			Query:     "SELECT @@max_allowed_packet",
 			Db:        "dev_pct",
 			Host:      "localhost",
@@ -1010,6 +1016,7 @@ func TestParserSlowLog013(t *testing.T) {
 	got := parseSlowLog("slow013.log", opt)
 	expect := []log.Event{
 		{
+			ThreadID:  208333,
 			Offset:    0,
 			OffsetEnd: 353,
 			Ts:        time.Date(2014, 02, 24, 22, 39, 34, 0, time.UTC),
@@ -1032,6 +1039,7 @@ func TestParserSlowLog013(t *testing.T) {
 			BoolMetrics: map[string]bool{},
 		},
 		{
+			ThreadID:  208345,
 			Offset:    353,
 			OffsetEnd: 6138,
 			Ts:        time.Date(2014, 02, 24, 22, 39, 59, 0, time.UTC),
@@ -1054,6 +1062,7 @@ func TestParserSlowLog013(t *testing.T) {
 			BoolMetrics: map[string]bool{},
 		},
 		{
+			ThreadID:  50,
 			Offset:    6138,
 			OffsetEnd: 6666,
 			Ts:        time.Date(2014, 03, 11, 16, 07, 40, 0, time.UTC),
@@ -1076,6 +1085,7 @@ func TestParserSlowLog013(t *testing.T) {
 			BoolMetrics: map[string]bool{},
 		},
 		{
+			ThreadID:  45006,
 			Offset:    6666,
 			OffsetEnd: 7014,
 			Ts:        time.Date(2014, 03, 12, 20, 28, 40, 0, time.UTC),
@@ -1098,6 +1108,7 @@ func TestParserSlowLog013(t *testing.T) {
 			BoolMetrics: map[string]bool{},
 		},
 		{
+			ThreadID:  45321,
 			Offset:    7014,
 			OffsetEnd: 7370,
 			Ts:        time.Date(2014, 03, 12, 20, 29, 40, 0, time.UTC),
@@ -1128,6 +1139,7 @@ func TestParserSlowLog014(t *testing.T) {
 	got := parseSlowLog("slow014.log", opt)
 	expect := []log.Event{
 		{
+			ThreadID:  103375137,
 			Offset:    0,
 			OffsetEnd: 690,
 			Admin:     false,
@@ -1155,7 +1167,6 @@ func TestParserSlowLog014(t *testing.T) {
 				"Rows_examined":         1,
 				"Rows_read":             1,
 				"Rows_sent":             1,
-				"Thread_id":             103375137,
 				"Tmp_disk_tables":       0,
 				"Tmp_table_sizes":       0,
 				"Tmp_tables":            0,
@@ -1174,6 +1185,7 @@ func TestParserSlowLog014(t *testing.T) {
 			/**
 			 * Here it is:
 			 */
+			ThreadID:  103375137,
 			Offset:    690,
 			OffsetEnd: 2104,
 			Admin:     false,
@@ -1201,7 +1213,6 @@ func TestParserSlowLog014(t *testing.T) {
 				"Rows_examined":         0,
 				"Rows_read":             0,
 				"Rows_sent":             0,
-				"Thread_id":             103375137,
 				"Tmp_disk_tables":       0,
 				"Tmp_table_sizes":       0,
 				"Tmp_tables":            1,
@@ -1217,6 +1228,7 @@ func TestParserSlowLog014(t *testing.T) {
 			},
 		},
 		{
+			ThreadID:  103375137,
 			Offset:    2104,
 			OffsetEnd: 3163,
 			Query:     "SELECT COUNT(userfing.keyval) AS total\n\u0009\u0009\u0009FROM\n\u0009\u0009\u0009((### All Content ###\n\u0009\u0009\u0009\u0009\u0009SELECT f.nodeid AS keyval\n\u0009\u0009\u0009\u0009\u0009FROM node AS f\n\u0009\u0009\u0009\u0009\u0009INNER JOIN subscribed AS sd ON sd.did = f.nodeid AND sd.userid = 15965) UNION ALL (\n\u0009\u0009\u0009\u0009\u0009### Users ###\n\u0009\u0009\u0009\u0009\u0009SELECT f.userid AS keyval\n\u0009\u0009\u0009\u0009\u0009FROM user AS f\n\u0009\u0009\u0009\u0009\u0009INNER JOIN userlist AS ul ON ul.relationid = f.userid AND ul.userid = 15965\n\u0009\u0009\u0009\u0009\u0009WHERE ul.type = 'f' AND ul.aq = 'yes')\n) AS userfing",
@@ -1243,7 +1255,6 @@ func TestParserSlowLog014(t *testing.T) {
 				"Rows_examined":         0,
 				"Rows_read":             0,
 				"Rows_sent":             1,
-				"Thread_id":             103375137,
 				"Tmp_disk_tables":       0,
 				"Tmp_table_sizes":       0,
 				"Tmp_tables":            2,
@@ -1259,6 +1270,7 @@ func TestParserSlowLog014(t *testing.T) {
 			},
 		},
 		{
+			ThreadID:  103375137,
 			Offset:    3163,
 			OffsetEnd: 4410,
 			Query:     "SELECT u.userid, u.name AS name, u.usergroupid AS usergroupid, IFNULL(u.lastactivity, u.joindate) as lastactivity,\n\u0009\u0009\u0009\u0009IFNULL((SELECT userid FROM userlist AS ul2 WHERE ul2.userid = 15965 AND ul2.relationid = u.userid AND ul2.type = 'f' AND ul2.aq = 'yes'), 0) as isFollowing,\n\u0009\u0009\u0009\u0009IFNULL((SELECT userid FROM userlist AS ul2 WHERE ul2.userid = 15965 AND ul2.relationid = u.userid AND ul2.type = 'f' AND ul2.aq = 'pending'), 0) as isPending\nFROM user AS u\n\u0009\u0009\u0009\u0009INNER JOIN userlist AS ul ON (u.userid = ul.userid AND ul.relationid = 15965)\n\n\u0009\u0009\u0009WHERE ul.type = 'f' AND ul.aq = 'yes'\nORDER BY name ASC\nLIMIT 0, 100",
@@ -1285,7 +1297,6 @@ func TestParserSlowLog014(t *testing.T) {
 				"Rows_examined":         0,
 				"Rows_read":             0,
 				"Rows_sent":             0,
-				"Thread_id":             103375137,
 				"Tmp_disk_tables":       0,
 				"Tmp_table_sizes":       0,
 				"Tmp_tables":            1,
@@ -1345,6 +1356,7 @@ func TestParseSlow016(t *testing.T) {
 	got := parseSlowLog("slow016.log", log.Options{Debug: false})
 	expect := []log.Event{
 		{
+			ThreadID:  68181423,
 			Query:     `SHOW /*!50002 GLOBAL */ STATUS`,
 			User:      "pt_agent",
 			Host:      "localhost",
@@ -1372,6 +1384,7 @@ func TestParseSlow017(t *testing.T) {
 	got := parseSlowLog("slow017.log", opt)
 	expect := []log.Event{
 		{
+			ThreadID:  68181423,
 			Query:     `SHOW /*!50002 GLOBAL */ STATUS`,
 			User:      "pt_agent",
 			Host:      "localhost",
@@ -1398,6 +1411,7 @@ func TestParseSlow019(t *testing.T) {
 	got := parseSlowLog("slow019.log", opt)
 	expect := []log.Event{
 		{
+			ThreadID:  37911936,
 			Query:     `SELECT TABLE_SCHEMA, TABLE_NAME, ROWS_READ, ROWS_CHANGED, ROWS_CHANGED_X_INDEXES FROM INFORMATION_SCHEMA.TABLE_STATISTICS`,
 			User:      "percona-agent",
 			Host:      "localhost",
@@ -1416,7 +1430,6 @@ func TestParseSlow019(t *testing.T) {
 				"Rows_examined":   1473,
 				"Rows_read":       1473,
 				"Rows_sent":       1473,
-				"Thread_id":       37911936,
 				"Tmp_disk_tables": 0,
 				"Tmp_table_sizes": 0,
 				"Tmp_tables":      1,
@@ -1432,6 +1445,7 @@ func TestParseSlow019(t *testing.T) {
 			},
 		},
 		{
+			ThreadID:  57434695,
 			Query:     `SELECT cid, data, created, expire, serialized FROM cache_field WHERE cid IN ('field_info:bundle_extra:user:user')`,
 			User:      "root",
 			Host:      "localhost",
@@ -1451,7 +1465,6 @@ func TestParseSlow019(t *testing.T) {
 				"Rows_examined":   0,
 				"Rows_read":       0,
 				"Rows_sent":       0,
-				"Thread_id":       57434695,
 				"Tmp_disk_tables": 0,
 				"Tmp_table_sizes": 0,
 				"Tmp_tables":      0,
@@ -1467,6 +1480,7 @@ func TestParseSlow019(t *testing.T) {
 			},
 		},
 		{
+			ThreadID:  57434695,
 			Query:     "UPDATE captcha_sessions SET timestamp='1413583348', solution='1'\nWHERE  (csid = '28439')",
 			User:      "root",
 			Host:      "localhost",
@@ -1493,7 +1507,6 @@ func TestParseSlow019(t *testing.T) {
 				"Rows_examined":         1,
 				"Rows_read":             1,
 				"Rows_sent":             0,
-				"Thread_id":             57434695,
 				"Tmp_disk_tables":       0,
 				"Tmp_table_sizes":       0,
 				"Tmp_tables":            0,
@@ -1509,6 +1522,7 @@ func TestParseSlow019(t *testing.T) {
 			},
 		},
 		{
+			ThreadID:  37911936,
 			Query:     `SELECT TABLE_SCHEMA, TABLE_NAME, INDEX_NAME, ROWS_READ FROM INFORMATION_SCHEMA.INDEX_STATISTICS`,
 			User:      "percona-agent",
 			Host:      "localhost",
@@ -1527,7 +1541,6 @@ func TestParseSlow019(t *testing.T) {
 				"Rows_examined":   2146,
 				"Rows_read":       2146,
 				"Rows_sent":       2146,
-				"Thread_id":       37911936,
 				"Tmp_disk_tables": 0,
 				"Tmp_table_sizes": 0,
 				"Tmp_tables":      1,
@@ -1552,6 +1565,7 @@ func TestParseSlow023(t *testing.T) {
 	expect := []log.Event{
 		// Slice 0
 		{
+			ThreadID:  56601,
 			Offset:    176,
 			OffsetEnd: 418,
 			Admin:     false,
@@ -1573,6 +1587,7 @@ func TestParseSlow023(t *testing.T) {
 		},
 		// Slice 1
 		{
+			ThreadID:  56604,
 			Offset:    418,
 			OffsetEnd: 595,
 			Admin:     false,
@@ -1594,6 +1609,7 @@ func TestParseSlow023(t *testing.T) {
 		},
 		// Slice 2
 		{
+			ThreadID:  56603,
 			Offset:    595,
 			OffsetEnd: 794,
 			Admin:     false,
@@ -1615,6 +1631,7 @@ func TestParseSlow023(t *testing.T) {
 		},
 		// Slice 3
 		{
+			ThreadID:  56604,
 			Offset:    794,
 			OffsetEnd: 982,
 			Admin:     false,
@@ -1636,6 +1653,7 @@ func TestParseSlow023(t *testing.T) {
 		},
 		// Slice 4
 		{
+			ThreadID:  56601,
 			Offset:    982,
 			OffsetEnd: 1218,
 			Admin:     false,
@@ -1656,6 +1674,7 @@ func TestParseSlow023(t *testing.T) {
 		},
 		// Slice 5
 		{
+			ThreadID:  56458,
 			Offset:    1218,
 			OffsetEnd: 1388,
 			Admin:     false,
@@ -1677,6 +1696,7 @@ func TestParseSlow023(t *testing.T) {
 		},
 		// Slice 6
 		{
+			ThreadID:  56458,
 			Offset:    1388,
 			OffsetEnd: 1572,
 			Admin:     false,
@@ -1698,6 +1718,7 @@ func TestParseSlow023(t *testing.T) {
 		},
 		// Slice 7
 		{
+			ThreadID:  56601,
 			Offset:    1572,
 			OffsetEnd: 1817,
 			Admin:     false,
@@ -1821,6 +1842,7 @@ func TestParseSlowMariaDBWithExplain(t *testing.T) {
 	got := parseSlowLog("mariadb102-with-explain.log", opt)
 	expect := []log.Event{
 		{
+			ThreadID:  8,
 			Offset:    205,
 			OffsetEnd: 630,
 			Ts:        time.Date(2018, 02, 14, 16, 18, 07, 0, time.UTC),
@@ -1837,7 +1859,6 @@ func TestParseSlowMariaDBWithExplain(t *testing.T) {
 				"Rows_affected": 0,
 				"Rows_examined": 0,
 				"Rows_sent":     1,
-				"Thread_id":     8,
 			},
 			BoolMetrics: map[string]bool{
 				"QC_hit": false,
@@ -1861,6 +1882,7 @@ func TestParseSlow026(t *testing.T) {
 			User:      "test",
 			Host:      "",
 			Db:        "test",
+			ThreadID:  17,
 			TimeMetrics: map[string]float64{
 				"Lock_time":  0,
 				"Query_time": 1.000249,

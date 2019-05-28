@@ -1,7 +1,9 @@
 {
   "Global": {
-    "Id": "",
+    "ID": "",
     "Fingerprint": "",
+    "TsMin": "0001-01-01T00:00:00Z",
+    "TsMax": "0001-01-01T00:00:00Z",
     "Metrics": {
       "TimeMetrics": {
         "Lock_time": {
@@ -72,12 +74,15 @@
       }
     },
     "TotalQueries": 4,
-    "UniqueQueries": 1
+    "UniqueQueries": 1,
+    "LastThreadID": 0
   },
   "Class": {
     "B2414E722E8A89DD": {
-      "Id": "B2414E722E8A89DD",
+      "ID": "B2414E722E8A89DD",
       "Fingerprint": "select * from t where id in(?+)",
+      "TsMin": "0001-01-01T00:00:00Z",
+      "TsMax": "0001-01-01T00:00:00Z",
       "Metrics": {
         "TimeMetrics": {
           "Lock_time": {
@@ -154,7 +159,8 @@
         "Db": "db1",
         "Query": "select * from t where id in (10000,20000,30000)",
         "Size": 47
-      }
+      },
+      "LastThreadID": 0
     }
   },
   "RateLimit": 0,
