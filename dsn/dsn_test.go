@@ -24,8 +24,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/percona/go-mysql/test"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/percona/go-mysql/test"
 )
 
 func TestParseDefaults(t *testing.T) {

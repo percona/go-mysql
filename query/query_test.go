@@ -20,9 +20,10 @@ package query_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/percona/go-mysql/query"
 	_ "github.com/percona/go-mysql/test"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestFingerprintBasic(t *testing.T) {
@@ -370,21 +371,21 @@ func TestFingerprintOneLineComments(t *testing.T) {
 		query.Fingerprint(q),
 	)
 
-    // Removes multi-line comment followed by 'space' and '/'
-    q = "/* /e */ select * from table\n"
-    assert.Equal(
-        t,
-        "select * from table",
-        query.Fingerprint(q),
-    )
+	// Removes multi-line comment followed by 'space' and '/'
+	q = "/* /e */ select * from table\n"
+	assert.Equal(
+		t,
+		"select * from table",
+		query.Fingerprint(q),
+	)
 
-    // Remove multi-line comment immediately followed by '/'
-    q = "/*/this/is/also/a/comment*/ select * from table\n"
-    assert.Equal(
-        t,
-        "select * from table",
-        query.Fingerprint(q),
-    )
+	// Remove multi-line comment immediately followed by '/'
+	q = "/*/this/is/also/a/comment*/ select * from table\n"
+	assert.Equal(
+		t,
+		"select * from table",
+		query.Fingerprint(q),
+	)
 
 	// Removes one-line EOL comments in fingerprints
 	q = "select foo -- bar\n"

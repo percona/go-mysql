@@ -68,9 +68,12 @@
   revision = "bb4de0191aa41b5507caa14b0650cdbddcd9280b"
 
 [[projects]]
-  digest = "1:42e8c2456d7ec0f31e182c20022e74324c4da2cb3bd9069ff9b131fe33466308"
+  digest = "1:85adecf1dbfae5769cc62a8bcea6498f8e9f0e2452e4e6686eb36fa4428a5a6e"
   name = "github.com/stretchr/testify"
-  packages = ["assert"]
+  packages = [
+    "assert",
+    "require",
+  ]
   pruneopts = "NUT"
   revision = "ffdc059bfe9ce6a4e144ba849dbedead332c6053"
   version = "v1.3.0"
@@ -86,6 +89,27 @@
   pruneopts = "NUT"
   revision = "953cdadca894cdc07be76fc99f95b40c28f06623"
 
+[[projects]]
+  branch = "master"
+  digest = "1:c1e9186d6ddadf42c4f2c4029d873dc4d8c875c360c50190c0e8b8977d5e0554"
+  name = "golang.org/x/tools"
+  packages = [
+    "cmd/goimports",
+    "go/ast/astutil",
+    "go/gcexportdata",
+    "go/internal/gcimporter",
+    "go/internal/packagesdriver",
+    "go/packages",
+    "go/types/typeutil",
+    "internal/fastwalk",
+    "internal/gopathwalk",
+    "internal/imports",
+    "internal/module",
+    "internal/semver",
+  ]
+  pruneopts = "NUT"
+  revision = "7be61e1b0e514e106d83fc439d56a79143738603"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
@@ -93,6 +117,8 @@
     "github.com/pkg/errors",
     "github.com/shirou/gopsutil/process",
     "github.com/stretchr/testify/assert",
+    "github.com/stretchr/testify/require",
+    "golang.org/x/tools/cmd/goimports",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

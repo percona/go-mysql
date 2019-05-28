@@ -24,10 +24,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/percona/go-mysql/log"
 	parser "github.com/percona/go-mysql/log/slow"
 	"github.com/percona/go-mysql/test"
-	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -38,15 +40,11 @@ var (
 	}
 )
 
-func parseSlowLog(filename string, o log.Options) []log.Event {
+func parseSlowLog(t *testing.T, filename string, o log.Options) []log.Event {
 	file, err := os.Open(path.Join(sample, "/", filename))
-	if err != nil {
-		l.Fatal(err)
-	}
+	require.NoError(t, err)
 	p := parser.NewSlowLogParser(file, o)
-	if err != nil {
-		l.Fatal(err)
-	}
+	require.NoError(t, err)
 	got := []log.Event{}
 	go p.Start()
 	for e := range p.EventChan() {
@@ -59,14 +57,14 @@ func parseSlowLog(filename string, o log.Options) []log.Event {
 
 // No input, no events.
 func TestParserEmptySlowLog(t *testing.T) {
-	got := parseSlowLog("empty.log", opt)
+	got := parseSlowLog(t, "empty.log", opt)
 	expect := []log.Event{}
 	assert.EqualValues(t, expect, got)
 }
 
 // slow001 is a most basic basic, normal slow log--nothing exotic.
 func TestParserSlowLog001(t *testing.T) {
-	got := parseSlowLog("slow001.log", opt)
+	got := parseSlowLog(t, "slow001.log", opt)
 	expect := []log.Event{
 		{
 			Ts:        time.Date(2007, 10, 15, 21, 43, 52, 0, time.UTC),
@@ -112,7 +110,7 @@ func TestParserSlowLog001(t *testing.T) {
 
 // slow002 is a basic slow log like slow001 but with more metrics, multi-line queries, etc.
 func TestParseSlowLog002(t *testing.T) {
-	got := parseSlowLog("slow002.log", opt)
+	got := parseSlowLog(t, "slow002.log", opt)
 	expect := []log.Event{
 		{
 			Query:     "BEGIN",
@@ -145,13 +143,13 @@ func TestParseSlowLog002(t *testing.T) {
 		{
 			Db: "db1",
 			Query: `update db2.tuningdetail_21_265507 n
-      inner join db1.gonzo a using(gonzo) 
+      inner join db1.gonzo a using(gonzo)
       set n.column1 = a.column1, n.word3 = a.word3`,
 			Admin:     false,
 			User:      "[SQL_SLAVE]",
 			Host:      "",
 			Offset:    337,
-			OffsetEnd: 814,
+			OffsetEnd: 813,
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.726052,
 				"Lock_time":  0.000091,
@@ -178,8 +176,8 @@ VALUES ('', 'Exact')`,
 			Admin:     false,
 			User:      "[SQL_SLAVE]",
 			Host:      "",
-			Offset:    814,
-			OffsetEnd: 1333,
+			Offset:    813,
+			OffsetEnd: 1332,
 			TimeMetrics: map[string]float64{
 				"InnoDB_queue_wait":    0.000000,
 				"Lock_time":            0.000077,
@@ -213,8 +211,8 @@ WHERE  vab3concept1upload='6994465'`,
 			Admin:     false,
 			User:      "[SQL_SLAVE]",
 			Host:      "",
-			Offset:    1333,
-			OffsetEnd: 1863,
+			Offset:    1332,
+			OffsetEnd: 1862,
 			TimeMetrics: map[string]float64{
 				"Query_time":           0.033384,
 				"InnoDB_IO_r_wait":     0.000000,
@@ -247,8 +245,8 @@ VALUES ('211', '18')`,
 			Admin:     false,
 			User:      "[SQL_SLAVE]",
 			Host:      "",
-			Offset:    1863,
-			OffsetEnd: 2392,
+			Offset:    1862,
+			OffsetEnd: 2391,
 			TimeMetrics: map[string]float64{
 				"InnoDB_queue_wait":    0.000000,
 				"Query_time":           0.000530,
@@ -281,8 +279,8 @@ SET    biz = '91848182522'`,
 			Admin:     false,
 			User:      "[SQL_SLAVE]",
 			Host:      "",
-			Offset:    2392,
-			OffsetEnd: 2860,
+			Offset:    2391,
+			OffsetEnd: 2859,
 			TimeMetrics: map[string]float64{
 				"Lock_time":            0.000027,
 				"InnoDB_rec_lock_wait": 0.000000,
@@ -316,8 +314,8 @@ WHERE  fillze='899'`,
 			Admin:     false,
 			User:      "[SQL_SLAVE]",
 			Host:      "",
-			Offset:    2860,
-			OffsetEnd: 3373,
+			Offset:    2859,
+			OffsetEnd: 3372,
 			TimeMetrics: map[string]float64{
 				"Query_time":           0.000530,
 				"InnoDB_IO_r_wait":     0.000000,
@@ -350,8 +348,8 @@ SET    biz = '91848182522'`,
 			Admin:     false,
 			User:      "[SQL_SLAVE]",
 			Host:      "",
-			Offset:    3373,
-			OffsetEnd: 3841,
+			Offset:    3372,
+			OffsetEnd: 3840,
 			TimeMetrics: map[string]float64{
 				"Query_time":           0.000530,
 				"Lock_time":            0.000027,
@@ -384,7 +382,7 @@ SET    biz = '91848182522'`,
 
 // slow003 starts with a blank line.  I guess this once messed up SlowLogParser.pm?
 func TestParserSlowLog003(t *testing.T) {
-	got := parseSlowLog("slow003.log", opt)
+	got := parseSlowLog(t, "slow003.log", opt)
 	expect := []log.Event{
 		{
 			Query:     "BEGIN",
@@ -420,7 +418,7 @@ func TestParserSlowLog003(t *testing.T) {
 
 // I don't know what's special about this slow004.
 func TestParserSlowLog004(t *testing.T) {
-	got := parseSlowLog("slow004.log", opt)
+	got := parseSlowLog(t, "slow004.log", opt)
 	expect := []log.Event{
 		{
 			Query:       "select 12_13_foo from (select 12foo from 123_bar) as 123baz",
@@ -452,7 +450,7 @@ func TestParserSlowLog004(t *testing.T) {
 // There's no easy way to detect that "# Query_time" is part of the query and
 // not part of the next event's header.
 func TestParserSlowLog005(t *testing.T) {
-	got := parseSlowLog("slow005.log", opt)
+	got := parseSlowLog(t, "slow005.log", opt)
 	expect := []log.Event{
 		{
 			Query:     "foo\nbar\n\t\t\t0 AS counter\nbaz",
@@ -489,7 +487,7 @@ func TestParserSlowLog005(t *testing.T) {
 // slow006 has the Schema: db metric _or_ use db; lines before the queries.
 // Schema value should be used for log.Event.Db is no use db; line is present.
 func TestParserSlowLog006(t *testing.T) {
-	got := parseSlowLog("slow006.log", opt)
+	got := parseSlowLog(t, "slow006.log", opt)
 	expect := []log.Event{
 		{
 			Query:     "SELECT col FROM foo_tbl",
@@ -671,7 +669,7 @@ func TestParserSlowLog006(t *testing.T) {
 
 // slow007 has Schema: db1 _and_ use db2;.  db2 should be used.
 func TestParserSlowLog007(t *testing.T) {
-	got := parseSlowLog("slow007.log", opt)
+	got := parseSlowLog(t, "slow007.log", opt)
 	expect := []log.Event{
 		{
 			Query:       "SELECT fruit FROM trees",
@@ -704,7 +702,7 @@ func TestParserSlowLog007(t *testing.T) {
 //   3) No Time metrics
 //   4) IPs in the host metric, but we don't currently support these
 func TestParserSlowLog008(t *testing.T) {
-	got := parseSlowLog("slow008.log", opt)
+	got := parseSlowLog(t, "slow008.log", opt)
 	expect := []log.Event{
 		{
 			Query:       "Quit",
@@ -773,7 +771,7 @@ func TestParserSlowLog009(t *testing.T) {
 	opt.FilterAdminCommand = map[string]bool{
 		"Quit": true,
 	}
-	got := parseSlowLog("slow009.log", opt)
+	got := parseSlowLog(t, "slow009.log", opt)
 	expect := []log.Event{
 		{
 			Query:     "Refresh",
@@ -812,7 +810,7 @@ func TestParserSlowLog009(t *testing.T) {
 
 // Rate limit
 func TestParserSlowLog011(t *testing.T) {
-	got := parseSlowLog("slow011.log", opt)
+	got := parseSlowLog(t, "slow011.log", opt)
 	expect := []log.Event{
 		{
 			Offset:    0,
@@ -946,7 +944,7 @@ func TestParserSlowLog011(t *testing.T) {
 }
 
 func TestParserSlowLog012(t *testing.T) {
-	got := parseSlowLog("slow012.log", opt)
+	got := parseSlowLog(t, "slow012.log", opt)
 	expect := []log.Event{
 		{
 			Query:     "select * from mysql.user",
@@ -1007,7 +1005,7 @@ func TestParserSlowLog012(t *testing.T) {
 
 // Stack overflow bug due to meta lines.
 func TestParserSlowLog013(t *testing.T) {
-	got := parseSlowLog("slow013.log", opt)
+	got := parseSlowLog(t, "slow013.log", opt)
 	expect := []log.Event{
 		{
 			Offset:    0,
@@ -1125,7 +1123,7 @@ func TestParserSlowLog013(t *testing.T) {
 
 // Query line looks like header line.
 func TestParserSlowLog014(t *testing.T) {
-	got := parseSlowLog("slow014.log", opt)
+	got := parseSlowLog(t, "slow014.log", opt)
 	expect := []log.Event{
 		{
 			Offset:    0,
@@ -1309,7 +1307,7 @@ func TestParserSlowLog001StartOffset(t *testing.T) {
 	opt := opt
 	opt.StartOffset = 358
 	// 358 is the first byte of the second (of 2) events.
-	got := parseSlowLog("slow001.log", opt)
+	got := parseSlowLog(t, "slow001.log", opt)
 	expect := []log.Event{
 		{
 			Ts:        time.Date(2007, 10, 15, 21, 45, 10, 0, time.UTC),
@@ -1336,13 +1334,13 @@ func TestParserSlowLog001StartOffset(t *testing.T) {
 // Line > bufio.MaxScanTokenSize = 64KiB
 // https://jira.percona.com/browse/PCT-552
 func TestParserSlowLog015(t *testing.T) {
-	got := parseSlowLog("slow015.log", log.Options{})
+	got := parseSlowLog(t, "slow015.log", log.Options{})
 	assert.Len(t, got, 2)
 }
 
 // Start in header
 func TestParseSlow016(t *testing.T) {
-	got := parseSlowLog("slow016.log", log.Options{Debug: false})
+	got := parseSlowLog(t, "slow016.log", log.Options{Debug: false})
 	expect := []log.Event{
 		{
 			Query:     `SHOW /*!50002 GLOBAL */ STATUS`,
@@ -1369,7 +1367,7 @@ func TestParseSlow016(t *testing.T) {
 
 // Start in query
 func TestParseSlow017(t *testing.T) {
-	got := parseSlowLog("slow017.log", opt)
+	got := parseSlowLog(t, "slow017.log", opt)
 	expect := []log.Event{
 		{
 			Query:     `SHOW /*!50002 GLOBAL */ STATUS`,
@@ -1395,7 +1393,7 @@ func TestParseSlow017(t *testing.T) {
 }
 
 func TestParseSlow019(t *testing.T) {
-	got := parseSlowLog("slow019.log", opt)
+	got := parseSlowLog(t, "slow019.log", opt)
 	expect := []log.Event{
 		{
 			Query:     `SELECT TABLE_SCHEMA, TABLE_NAME, ROWS_READ, ROWS_CHANGED, ROWS_CHANGED_X_INDEXES FROM INFORMATION_SCHEMA.TABLE_STATISTICS`,
@@ -1548,7 +1546,7 @@ func TestParseSlow019(t *testing.T) {
 
 // Test db is not inherited and multiple "use" commands.
 func TestParseSlow023(t *testing.T) {
-	got := parseSlowLog("slow023.log", opt)
+	got := parseSlowLog(t, "slow023.log", opt)
 	expect := []log.Event{
 		// Slice 0
 		{
@@ -1748,7 +1746,7 @@ func TestParseSlow023A(t *testing.T) {
    Test header with invalid # Time or invalid # User lines
 */
 func TestParseSlow024(t *testing.T) {
-	got := parseSlowLog("slow024.log", opt)
+	got := parseSlowLog(t, "slow024.log", opt)
 	expect := []log.Event{
 		{
 			Offset:    199,
@@ -1818,7 +1816,7 @@ func TestParseSlow024(t *testing.T) {
 
 // https://jira.percona.com/browse/PMM-1834
 func TestParseSlowMariaDBWithExplain(t *testing.T) {
-	got := parseSlowLog("mariadb102-with-explain.log", opt)
+	got := parseSlowLog(t, "mariadb102-with-explain.log", opt)
 	expect := []log.Event{
 		{
 			Offset:    205,
@@ -1850,7 +1848,7 @@ func TestParseSlowMariaDBWithExplain(t *testing.T) {
 }
 
 func TestParseSlow026(t *testing.T) {
-	got := parseSlowLog("slow026.log", opt)
+	got := parseSlowLog(t, "slow026.log", opt)
 	expect := []log.Event{
 		{
 			Offset:    0,
