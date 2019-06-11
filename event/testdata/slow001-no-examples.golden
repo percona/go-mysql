@@ -43,7 +43,10 @@
       }
     },
     "TotalQueries": 2,
-    "UniqueQueries": 2
+    "UniqueQueries": 2,
+    "NumQueriesWithErrors": 0,
+    "ErrorsCode": null,
+    "ErrorsCount": null
   },
   "Class": {
     "3A99CC42AEDCCFCD;root;localhost;sakila;": {
@@ -90,7 +93,10 @@
         }
       },
       "TotalQueries": 1,
-      "UniqueQueries": 1
+      "UniqueQueries": 1,
+      "NumQueriesWithErrors": 0,
+      "ErrorsCode": null,
+      "ErrorsCount": null
     },
     "7F7D57ACDD8A346E;root;localhost;test;": {
       "Id": "7F7D57ACDD8A346E",
@@ -136,7 +142,10 @@
         }
       },
       "TotalQueries": 1,
-      "UniqueQueries": 1
+      "UniqueQueries": 1,
+      "NumQueriesWithErrors": 0,
+      "ErrorsCode": null,
+      "ErrorsCount": null
     }
   },
   "RateLimit": 0,

@@ -63,7 +63,10 @@
       }
     },
     "TotalQueries": 1,
-    "UniqueQueries": 1
+    "UniqueQueries": 1,
+    "NumQueriesWithErrors": 0,
+    "ErrorsCode": null,
+    "ErrorsCount": null
   },
   "Class": {
     "16219655761820A2;root;localhost;;": {
@@ -137,7 +140,10 @@
         "Query": "SELECT 1",
         "Size": 8,
         "Ts": "2018-02-14 16:18:07"
-      }
+      },
+      "NumQueriesWithErrors": 0,
+      "ErrorsCode": null,
+      "ErrorsCount": null
     }
   },
   "RateLimit": 0,

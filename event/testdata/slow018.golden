@@ -80,7 +80,10 @@
       }
     },
     "TotalQueries": 4,
-    "UniqueQueries": 2
+    "UniqueQueries": 2,
+    "NumQueriesWithErrors": 0,
+    "ErrorsCode": null,
+    "ErrorsCount": null
   },
   "Class": {
     "B2414E722E8A89DD;[SQL_SLAVE];;;": {
@@ -170,7 +173,10 @@
         "Db": "",
         "Query": "select * from t where id in (10000,20000,30000)",
         "Size": 47
-      }
+      },
+      "NumQueriesWithErrors": 0,
+      "ErrorsCode": null,
+      "ErrorsCount": null
     },
     "B2414E722E8A89DD;[SQL_SLAVE];;db1;": {
       "Id": "B2414E722E8A89DD",
@@ -259,7 +265,10 @@
         "Db": "db1",
         "Query": "select * from t where id in (1,2,3)",
         "Size": 35
-      }
+      },
+      "NumQueriesWithErrors": 0,
+      "ErrorsCode": null,
+      "ErrorsCount": null
     }
   },
   "RateLimit": 0,

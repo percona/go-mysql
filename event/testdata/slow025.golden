@@ -43,7 +43,10 @@
       }
     },
     "TotalQueries": 2001,
-    "UniqueQueries": 1
+    "UniqueQueries": 1,
+    "NumQueriesWithErrors": 0,
+    "ErrorsCode": null,
+    "ErrorsCount": null
   },
   "Class": {
     "FDE00DF974C61E9F;root;localhost;;": {
@@ -97,7 +100,10 @@
         "Query": "select c from t",
         "Size": 15,
         "Ts": "2007-10-15 00:00:02"
-      }
+      },
+      "NumQueriesWithErrors": 0,
+      "ErrorsCode": null,
+      "ErrorsCount": null
     }
   },
   "RateLimit": 1000,
