@@ -43,7 +43,10 @@
       }
     },
     "TotalQueries": 8,
-    "UniqueQueries": 8
+    "UniqueQueries": 8,
+    "NumQueriesWithErrors": 0,
+    "ErrorsCode": null,
+    "ErrorsCount": null
   },
   "Class": {
     "54FB1194093381DB;percona-agent;localhost;;": {
@@ -96,7 +99,10 @@
         "Db": "",
         "Query": "SET GLOBAL slow_query_log=ON",
         "Size": 28
-      }
+      },
+      "NumQueriesWithErrors": 0,
+      "ErrorsCode": null,
+      "ErrorsCount": null
     },
     "6C099B0B73EA7633;backup;localhost;dbnameb;": {
       "Id": "6C099B0B73EA7633",
@@ -148,7 +154,10 @@
         "Db": "dbnameb",
         "Query": "use `dbnameb`",
         "Size": 13
-      }
+      },
+      "NumQueriesWithErrors": 0,
+      "ErrorsCode": null,
+      "ErrorsCount": null
     },
     "7C1934E82086DF57;bookblogs;localhost;;": {
       "Id": "7C1934E82086DF57",
@@ -200,7 +209,10 @@
         "Db": "",
         "Query": "SET NAMES utf8",
         "Size": 14
-      }
+      },
+      "NumQueriesWithErrors": 0,
+      "ErrorsCode": null,
+      "ErrorsCount": null
     },
     "83497A0046FCD7A7;bookblogs;localhost;dbnamea;": {
       "Id": "83497A0046FCD7A7",
@@ -252,7 +264,10 @@
         "Db": "dbnamea",
         "Query": "SELECT field FROM table_a WHERE some_other_field = 'yahoo' LIMIT 1",
         "Size": 66
-      }
+      },
+      "NumQueriesWithErrors": 0,
+      "ErrorsCode": null,
+      "ErrorsCount": null
     },
     "9FD5245EAE433B90;bookblogs;localhost;;": {
       "Id": "9FD5245EAE433B90",
@@ -304,7 +319,10 @@
         "Db": "",
         "Query": "SELECT another_field FROM table_c WHERE a_third_field = 'tiruriru' AND site_id = 1",
         "Size": 82
-      }
+      },
+      "NumQueriesWithErrors": 0,
+      "ErrorsCode": null,
+      "ErrorsCount": null
     },
     "AC5C18B304F9DE87;backup;localhost;;": {
       "Id": "AC5C18B304F9DE87",
@@ -356,7 +374,10 @@
         "Db": "",
         "Query": "select @@collation_database",
         "Size": 27
-      }
+      },
+      "NumQueriesWithErrors": 0,
+      "ErrorsCode": null,
+      "ErrorsCount": null
     },
     "B98E038C9D12BDA1;bookblogs;localhost;;": {
       "Id": "B98E038C9D12BDA1",
@@ -408,7 +429,10 @@
         "Db": "",
         "Query": "SELECT field FROM table_b WHERE another_field = 'bazinga' AND site_id = 1",
         "Size": 73
-      }
+      },
+      "NumQueriesWithErrors": 0,
+      "ErrorsCode": null,
+      "ErrorsCount": null
     },
     "F0265D81808CE240;bookblogs;localhost;;": {
       "Id": "F0265D81808CE240",
@@ -460,7 +484,10 @@
         "Db": "",
         "Query": "SELECT @@SESSION.sql_mode",
         "Size": 25
-      }
+      },
+      "NumQueriesWithErrors": 0,
+      "ErrorsCode": null,
+      "ErrorsCount": null
     }
   },
   "RateLimit": 0,
