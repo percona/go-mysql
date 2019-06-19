@@ -768,12 +768,39 @@ func TestParserSlowLog008(t *testing.T) {
 }
 
 // Filter admin commands
-func TestParserSlowLog009(t *testing.T) {
+func TestParserSlowLog027(t *testing.T) {
 	opt := opt
 	opt.FilterAdminCommand = map[string]bool{
 		"Quit": true,
 	}
-	got := parseSlowLog("slow009.log", opt)
+	got := parseSlowLog("slow027.log", opt)
+	expect := []log.Event{
+		{
+			Offset:        0x0,
+			OffsetEnd:     150,
+			Ts:            time.Date(2007, 12, 18, 11, 48, 27, 0, time.UTC),
+			Admin:         false,
+			Query:         "SELECT c FROM t WHERE id=1",
+			User:          "[SQL_SLAVE]",
+			Host:          "test_host",
+			Db:            "",
+			TimeMetrics:   map[string]float64{"Query_time": 0.003512, "Lock_time": 0},
+			NumberMetrics: map[string]uint64{"Rows_sent": 0x1},
+			BoolMetrics:   map[string]bool{},
+			RateType:      "",
+			RateLimit:     0x0,
+		},
+	}
+
+	assert.EqualValues(t, expect, got)
+}
+
+func TestParserSlowLog010(t *testing.T) {
+	opt := opt
+	opt.FilterAdminCommand = map[string]bool{
+		"Quit": true,
+	}
+	got := parseSlowLog("slow027.log", opt)
 	expect := []log.Event{
 		{
 			Query:     "Refresh",
