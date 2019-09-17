@@ -18,6 +18,7 @@ install:
 script:
   - make init
   - make test-travis
+  - make check
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -X fix

@@ -13,3 +13,6 @@ test:
 
 test-travis:
 	gocoverutil test -v -race $(PACKAGES)
+
+check:
+	go run .github/check-license.go
