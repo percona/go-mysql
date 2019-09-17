@@ -23,3 +23,13 @@ test|Sample data
 ## Versioning
 
 Packages are not versioned. Interfaces, data structures, and overall usage are subject to change without notice.
+
+## Licensing
+
+As of September 2019, percona/go-mysql has dropped AGPLv3 and is now licensed using the BSD 3-clause license.
+
+Copyright (c) 2019, Percona LLC.
+All rights reserved.
+
+This source code is licensed under the BSD-style license found in the
+LICENSE file in the root directory of this source tree.
