@@ -58,10 +58,10 @@ var (
 	useRe     = regexp.MustCompile(`^(?i)use `)
 )
 
-// A SlowLogParser parses a MySQL slow log. It implements the LogParser interface.
+// SlowLogParser parses a MySQL slow log. It implements the LogParser interface.
 type SlowLogParser struct {
-	file *os.File
-	opt  log.Options
+	reader io.ReadSeeker
+	opt    log.Options
 	// --
 	stopChan    chan bool
 	eventChan   chan *log.Event
@@ -77,14 +77,15 @@ type SlowLogParser struct {
 }
 
 // NewSlowLogParser returns a new SlowLogParser that reads from the open file.
-func NewSlowLogParser(file *os.File, opt log.Options) *SlowLogParser {
+func NewSlowLogParser(r io.ReadSeeker, opt log.Options) *SlowLogParser {
 	if opt.DefaultLocation == nil {
 		// Old MySQL format assumes time is taken from SYSTEM.
 		opt.DefaultLocation = time.Local
 	}
+
 	p := &SlowLogParser{
-		file: file,
-		opt:  opt,
+		reader: r,
+		opt:    opt,
 		// --
 		stopChan:    make(chan bool, 1),
 		eventChan:   make(chan *log.Event),
@@ -122,20 +123,20 @@ func (p *SlowLogParser) Start() error {
 	if p.opt.Debug {
 		l.SetFlags(l.Ltime | l.Lmicroseconds)
 		fmt.Println()
-		l.Println("parsing " + p.file.Name())
+		l.Println("start parsing")
 	}
 
 	// Seek to the offset, if any.
 	// @todo error if start off > file size
 	if p.opt.StartOffset > 0 {
-		if _, err := p.file.Seek(int64(p.opt.StartOffset), os.SEEK_SET); err != nil {
+		if _, err := p.reader.Seek(int64(p.opt.StartOffset), os.SEEK_SET); err != nil {
 			return err
 		}
 	}
 
 	defer close(p.eventChan)
 
-	r := bufio.NewReader(p.file)
+	r := bufio.NewReader(p.reader)
 
 SCANNER_LOOP:
 	for !p.stopped {
