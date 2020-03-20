@@ -37,6 +37,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/mattetti/filebuffer"
 	"github.com/percona/go-mysql/log"
 	parser "github.com/percona/go-mysql/log/slow"
 	"github.com/percona/go-mysql/test"
@@ -1904,4 +1905,26 @@ func TestParseSlow026(t *testing.T) {
 		},
 	}
 	assert.EqualValues(t, expect, got)
+}
+
+func TestParseFromBuffer(t *testing.T) {
+	query := `
+# Time: 071218 11:48:27
+# User@Host: [SQL_SLAVE] @  []
+# Thread_id: 3  Schema: db1
+# Query_time: 0.000012  Lock_time: 0.000000  Rows_sent: 0  Rows_examined: 0
+use db2;
+SELECT fruit FROM trees;
+`
+
+	buf := filebuffer.New([]byte(query))
+	p := parser.NewSlowLogParser(buf, opt)
+
+	got := []log.Event{}
+	go p.Start()
+	for e := range p.EventChan() {
+		got = append(got, *e)
+	}
+
+	assert.NotEqual(t, 0, len(got))
 }
