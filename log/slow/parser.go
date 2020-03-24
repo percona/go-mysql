@@ -54,7 +54,7 @@ var (
 	headerRe  = regexp.MustCompile(`^#\s+[A-Z]`)
 	metricsRe = regexp.MustCompile(`(\w+): (\S+|\z)`)
 	adminRe   = regexp.MustCompile(`command: (.+)`)
-	setRe     = regexp.MustCompile(`^SET (?:last_insert_id|insert_id|timestamp)`)
+	setRe     = regexp.MustCompile(`^SET (last_insert_id|insert_id|timestamp)\s*=\s*(.*?)\s*;`)
 	useRe     = regexp.MustCompile(`^(?i)use `)
 )
 
@@ -343,11 +343,26 @@ func (p *SlowLogParser) parseQuery(line string) {
 		// In case we are on a group of lines like in test23, lines 27~28, the
 		// query will be "use dbnameb" since the user executed a use command
 		p.event.Query = line
-	} else if setRe.MatchString(line) {
-		if p.opt.Debug {
-			l.Println("set var")
+	} else if m := setRe.FindAllStringSubmatch(line, -1); len(m) > 0 {
+		var name, val string
+		if len(m[0]) > 2 {
+			name = m[0][1]
+			val = m[0][2]
 		}
-		// @todo ignore or use these lines?
+
+		if p.opt.Debug {
+			l.Println("set var", name)
+		}
+
+		switch name {
+		// @todo: use other params that are being set
+		case "timestamp":
+			t, err := strconv.ParseInt(val, 10, 64)
+			if err == nil && p.event.Ts.IsZero() {
+				p.event.Ts = time.Unix(t, 0)
+			}
+		}
+
 	} else {
 		if p.opt.Debug {
 			l.Println("query")
