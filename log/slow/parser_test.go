@@ -31,13 +31,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package slow_test
 
 import (
+	"bytes"
 	l "log"
 	"os"
 	"path"
 	"testing"
 	"time"
 
-	"github.com/mattetti/filebuffer"
 	"github.com/percona/go-mysql/log"
 	parser "github.com/percona/go-mysql/log/slow"
 	"github.com/percona/go-mysql/test"
@@ -1917,7 +1917,7 @@ use db2;
 SELECT fruit FROM trees;
 `
 
-	buf := filebuffer.New([]byte(query))
+	buf := bytes.NewReader([]byte(query))
 	p := parser.NewSlowLogParser(buf, opt)
 
 	got := []log.Event{}

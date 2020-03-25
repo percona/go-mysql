@@ -6,7 +6,3 @@
 [[constraint]]
   name = "github.com/shirou/gopsutil"
   branch = "master"
-
-[[constraint]]
-  name = "github.com/mattetti/filebuffer"
-  version = "1.0.0"

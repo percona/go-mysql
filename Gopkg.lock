@@ -29,14 +29,6 @@
   version = "v1.2.1"
 
 [[projects]]
-  digest = "1:a1349cc14c4f93ba64258695d96580397ef4eed55e94401cddde485f8ea72ac6"
-  name = "github.com/mattetti/filebuffer"
-  packages = ["."]
-  pruneopts = "NUT"
-  revision = "dcb943334ad8fcc158b4ab408c2ba17d050838c3"
-  version = "v1.0.0"
-
-[[projects]]
   digest = "1:5cf3f025cbee5951a4ee961de067c8a89fc95a5adabead774f82822efabab121"
   name = "github.com/pkg/errors"
   packages = ["."]
@@ -98,7 +90,6 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/mattetti/filebuffer",
     "github.com/pkg/errors",
     "github.com/shirou/gopsutil/process",
     "github.com/stretchr/testify/assert",
