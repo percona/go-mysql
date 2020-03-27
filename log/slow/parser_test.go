@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package slow_test
 
 import (
+	"bytes"
 	l "log"
 	"os"
 	"path"
@@ -164,7 +165,7 @@ func TestParseSlowLog002(t *testing.T) {
 			User:      "[SQL_SLAVE]",
 			Host:      "",
 			Offset:    337,
-			OffsetEnd: 814,
+			OffsetEnd: 813,
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.726052,
 				"Lock_time":  0.000091,
@@ -191,8 +192,8 @@ VALUES ('', 'Exact')`,
 			Admin:     false,
 			User:      "[SQL_SLAVE]",
 			Host:      "",
-			Offset:    814,
-			OffsetEnd: 1333,
+			Offset:    813,
+			OffsetEnd: 1332,
 			TimeMetrics: map[string]float64{
 				"InnoDB_queue_wait":    0.000000,
 				"Lock_time":            0.000077,
@@ -226,8 +227,8 @@ WHERE  vab3concept1upload='6994465'`,
 			Admin:     false,
 			User:      "[SQL_SLAVE]",
 			Host:      "",
-			Offset:    1333,
-			OffsetEnd: 1863,
+			Offset:    1332,
+			OffsetEnd: 1862,
 			TimeMetrics: map[string]float64{
 				"Query_time":           0.033384,
 				"InnoDB_IO_r_wait":     0.000000,
@@ -260,8 +261,8 @@ VALUES ('211', '18')`,
 			Admin:     false,
 			User:      "[SQL_SLAVE]",
 			Host:      "",
-			Offset:    1863,
-			OffsetEnd: 2392,
+			Offset:    1862,
+			OffsetEnd: 2391,
 			TimeMetrics: map[string]float64{
 				"InnoDB_queue_wait":    0.000000,
 				"Query_time":           0.000530,
@@ -294,8 +295,8 @@ SET    biz = '91848182522'`,
 			Admin:     false,
 			User:      "[SQL_SLAVE]",
 			Host:      "",
-			Offset:    2392,
-			OffsetEnd: 2860,
+			Offset:    2391,
+			OffsetEnd: 2859,
 			TimeMetrics: map[string]float64{
 				"Lock_time":            0.000027,
 				"InnoDB_rec_lock_wait": 0.000000,
@@ -329,8 +330,8 @@ WHERE  fillze='899'`,
 			Admin:     false,
 			User:      "[SQL_SLAVE]",
 			Host:      "",
-			Offset:    2860,
-			OffsetEnd: 3373,
+			Offset:    2859,
+			OffsetEnd: 3372,
 			TimeMetrics: map[string]float64{
 				"Query_time":           0.000530,
 				"InnoDB_IO_r_wait":     0.000000,
@@ -363,8 +364,8 @@ SET    biz = '91848182522'`,
 			Admin:     false,
 			User:      "[SQL_SLAVE]",
 			Host:      "",
-			Offset:    3373,
-			OffsetEnd: 3841,
+			Offset:    3372,
+			OffsetEnd: 3840,
 			TimeMetrics: map[string]float64{
 				"Query_time":           0.000530,
 				"Lock_time":            0.000027,
@@ -1904,4 +1905,26 @@ func TestParseSlow026(t *testing.T) {
 		},
 	}
 	assert.EqualValues(t, expect, got)
+}
+
+func TestParseFromBuffer(t *testing.T) {
+	query := `
+# Time: 071218 11:48:27
+# User@Host: [SQL_SLAVE] @  []
+# Thread_id: 3  Schema: db1
+# Query_time: 0.000012  Lock_time: 0.000000  Rows_sent: 0  Rows_examined: 0
+use db2;
+SELECT fruit FROM trees;
+`
+
+	buf := bytes.NewReader([]byte(query))
+	p := parser.NewSlowLogParser(buf, opt)
+
+	got := []log.Event{}
+	go p.Start()
+	for e := range p.EventChan() {
+		got = append(got, *e)
+	}
+
+	assert.NotEqual(t, 0, len(got))
 }
