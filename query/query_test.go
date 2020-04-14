@@ -556,6 +556,13 @@ func TestFingerprintPanicChallenge2(t *testing.T) {
 		query.Fingerprint(q),
 	)
 
+	q = "delete from db.table where col1 in(1) and col2=1"
+	assert.Equal(
+		t,
+		"delete from db.table where col1 in(?+) and col2=?",
+		query.Fingerprint(q),
+	)
+
 	q = "delete from db.table where col1 in(1) and col2=1;"
 	assert.Equal(
 		t,
