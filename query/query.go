@@ -772,7 +772,7 @@ func Fingerprint(q string) string {
 				addSpace = false
 				s = inValues
 				sqlState = inValues
-			} else if addSpace {
+			} else if addSpace && fi < len(q)-1 {
 				if Debug {
 					fmt.Println("Add space")
 				}
