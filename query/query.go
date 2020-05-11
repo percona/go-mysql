@@ -530,7 +530,7 @@ func Fingerprint(q string) string {
 				if Debug {
 					fmt.Println("Lost in space")
 				}
-				if fi > 0 && !isSpace(rune(f[fi-1])) {
+				if fi <= len(f)-1 && fi > 0 && !isSpace(rune(f[fi-1])) {
 					if Debug {
 						fmt.Println("Add space")
 					}
@@ -772,7 +772,7 @@ func Fingerprint(q string) string {
 				addSpace = false
 				s = inValues
 				sqlState = inValues
-			} else if addSpace {
+			} else if addSpace && fi <= len(f)-1 {
 				if Debug {
 					fmt.Println("Add space")
 				}
