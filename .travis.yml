@@ -1,5 +1,6 @@
 dist: xenial
 language: go
+os: linux
 
 services:
   - mysql
@@ -9,7 +10,7 @@ go:
   - 1.14.x
   # - TODO master
 
-matrix:
+jobs:
   allow_failures:
     - go: master
 
@@ -56,4 +57,4 @@ notifications:
     on_success: change
     on_failure: always
     rooms:
-      secure: AysgwfvVB+5AAwhTn0+m3yGywVeEWsBwu2KOGDBBB16T+5ktXxiWK16qMkRHazzruQcYAiM6IXtDz3xT9PMeROr1VmsmnAGPgxE1KOilVioFBqTUAKqxtx0KY5W/RBYgbUueBy2ugC7y3vwuzMq9VkmvQWiGp9Bl5Nm55kExLRc=
+      - secure: Oa4GIV4rgAr+Sa4It/GIGPWO6fVC/pcaRPiaIMfZf+xVXS07EA25CgLw2VvNVwUd7xrAxRfEDQ3fvOHE1ruiGYWjPDvVlZsLIzuOCCifcH3hcpVV6NPBMO4arbfc8NsrOtcOHaoZoOfC8CJFt4buQ+ytjY56gstJMLy7iwbjVh0=
