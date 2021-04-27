@@ -1,6 +1,6 @@
 # go-mysql
 
-[![Build Status](https://travis-ci.org/percona/go-mysql.svg?branch=master)](https://travis-ci.org/percona/go-mysql)
+[![Build Status](https://travis-ci.com/percona/go-mysql.svg?branch=master)](https://travis-ci.com/percona/go-mysql)
 [![Go Report Card](https://goreportcard.com/badge/github.com/percona/go-mysql)](https://goreportcard.com/report/github.com/percona/go-mysql)
 [![CLA assistant](https://cla-assistant.percona.com/readme/badge/percona/go-mysql)](https://cla-assistant.percona.com/percona/go-mysql)
 
