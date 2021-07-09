@@ -151,7 +151,8 @@ var ReplaceNumbersInWords = false
 func Fingerprint(q string) string {
 	q += " " // need range to run off end of original query
 	prevWord := ""
-	f := make([]byte, len(q))
+	// allocate enough memory to replace (x) with (?+).
+	f := make([]byte, len(q)+len(q)/3)
 	fi := 0
 	pr := rune(0) // previous rune
 	s := unknown  // current state
