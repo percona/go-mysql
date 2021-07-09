@@ -241,6 +241,13 @@ func TestFingerprintBasic(t *testing.T) {
 		"select * from prices.rt_5min where id=?",
 		query.Fingerprint(q),
 	)
+	// Fingerprint Insert into tables;
+	q = "insert into t3 values(2);"
+	t.Check(
+		query.Fingerprint(q),
+		Equals,
+		"insert into t3 values(?+);",
+	)
 
 	// Fingerprint /* -- comment */ SELECT (bug 1174956)
 	q = "/* -- S++ SU ABORTABLE -- spd_user: rspadim */SELECT SQL_SMALL_RESULT SQL_CACHE DISTINCT centro_atividade FROM est_dia WHERE unidade_id=1001 AND item_id=67 AND item_id_red=573"
