@@ -82,6 +82,7 @@ import (
 	"crypto/md5"
 	"fmt"
 	"io"
+	"regexp"
 	"strings"
 )
 
@@ -139,6 +140,12 @@ var Debug bool = false
 // look at test query_test.go/TestFingerprintWithNumberInDbName.
 var ReplaceNumbersInWords = false
 
+// spaceRe add a space character back and forth "/*%+-"
+var spaceRe = regexp.MustCompile("([0-9]+)([/*%+-])([0-9]+)")
+
+// questionMarksRe replace from several question mark to single one (e.i ??? -> ?)
+var questionMarksRe = regexp.MustCompile("\\?+")
+
 // Fingerprint returns the canonical form of q. The primary transformations are:
 //   - Replace values with ?
 //   - Collapse whitespace
@@ -149,7 +156,8 @@ var ReplaceNumbersInWords = false
 // example, "ORDER BY col ASC" is the same as "ORDER BY col", so "ASC" in the
 // fingerprint is removed.
 func Fingerprint(q string) string {
-	q += " " // need range to run off end of original query
+	q = spaceRe.ReplaceAllString(q, "$1 $2 $3") // spaceRe add a space character back and forth "/*%+-"
+	q += " "                                    // need range to run off end of original query
 	prevWord := ""
 	f := make([]byte, len(q))
 	fi := 0
@@ -790,8 +798,11 @@ func Fingerprint(q string) string {
 		fi--
 	}
 
-	// Clean up control characters, and return the fingerprint
-	return strings.Replace(string(f[0:fi]), "\x00", "", -1)
+	// Clean up control characters
+	f2 := strings.Replace(string(f[0:fi]), "\x00", "", -1)
+
+	// Replace from several question mark to single one, and return the fingerprint
+	return questionMarksRe.ReplaceAllString(f2, "?")
 }
 
 func isSpace(r rune) bool {
