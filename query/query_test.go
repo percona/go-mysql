@@ -662,4 +662,11 @@ func TestFingerprintWithNumberInDbName(t *testing.T) {
 		"select 123foo from 123foo",
 		query.Fingerprint(q),
 	)
+	// fix fi overflow cause index out of range panic
+	q = "insert into tb values(1)"
+	assert.Equal(
+		t,
+		"insert into tb values(?+)",
+		query.Fingerprint(q),
+	)
 }
