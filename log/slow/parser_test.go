@@ -166,6 +166,7 @@ func TestParseSlowLog002(t *testing.T) {
 			Host:      "",
 			Offset:    337,
 			OffsetEnd: 813,
+			Ts:        time.Unix(1197996507, 0),
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.726052,
 				"Lock_time":  0.000091,
@@ -194,6 +195,7 @@ VALUES ('', 'Exact')`,
 			Host:      "",
 			Offset:    813,
 			OffsetEnd: 1332,
+			Ts:        time.Unix(1197996507, 0),
 			TimeMetrics: map[string]float64{
 				"InnoDB_queue_wait":    0.000000,
 				"Lock_time":            0.000077,
@@ -332,6 +334,7 @@ WHERE  fillze='899'`,
 			Host:      "",
 			Offset:    2859,
 			OffsetEnd: 3372,
+			Ts:        time.Unix(1197996508, 0),
 			TimeMetrics: map[string]float64{
 				"Query_time":           0.000530,
 				"InnoDB_IO_r_wait":     0.000000,
@@ -880,6 +883,7 @@ func TestParserSlowLog011(t *testing.T) {
 			User:      "user1",
 			RateType:  "query",
 			RateLimit: 2,
+			Ts:        time.Unix(1385600731, 0),
 			TimeMetrics: map[string]float64{
 				"Query_time":           0.000237,
 				"Lock_time":            0.000122,
@@ -922,6 +926,7 @@ func TestParserSlowLog011(t *testing.T) {
 			User:      "user1",
 			RateType:  "query",
 			RateLimit: 2,
+			Ts:        time.Unix(1385600731, 0),
 			TimeMetrics: map[string]float64{
 				"Query_time":           0.000165,
 				"Lock_time":            0.000048,
@@ -969,6 +974,7 @@ func TestParserSlowLog012(t *testing.T) {
 			User:      "msandbox",
 			Offset:    0,
 			OffsetEnd: 185,
+			Ts:        time.Unix(1397442852, 0),
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.000214,
 				"Lock_time":  0.000086,
@@ -987,6 +993,7 @@ func TestParserSlowLog012(t *testing.T) {
 			User:      "msandbox",
 			Offset:    185,
 			OffsetEnd: 375,
+			Ts:        time.Unix(1397442852, 0),
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.000016,
 				"Lock_time":  0.000000,
@@ -1149,6 +1156,7 @@ func TestParserSlowLog014(t *testing.T) {
 			User:      "root",
 			Host:      "localhost",
 			Db:        "db1",
+			Ts:        time.Unix(1398555955, 0),
 			TimeMetrics: map[string]float64{
 				"InnoDB_IO_r_wait":     0,
 				"InnoDB_queue_wait":    0,
@@ -1195,6 +1203,7 @@ func TestParserSlowLog014(t *testing.T) {
 			User:      "root",
 			Host:      "localhost",
 			Db:        "db1",
+			Ts:        time.Unix(1398555955, 0),
 			TimeMetrics: map[string]float64{
 				"InnoDB_IO_r_wait":     0,
 				"InnoDB_queue_wait":    0,
@@ -1237,6 +1246,7 @@ func TestParserSlowLog014(t *testing.T) {
 			User:      "root",
 			Host:      "localhost",
 			Db:        "db1",
+			Ts:        time.Unix(1398555955, 0),
 			TimeMetrics: map[string]float64{
 				"InnoDB_IO_r_wait":     0,
 				"InnoDB_queue_wait":    0,
@@ -1279,6 +1289,7 @@ func TestParserSlowLog014(t *testing.T) {
 			User:      "root",
 			Host:      "localhost",
 			Db:        "db1",
+			Ts:        time.Unix(1398555955, 0),
 			TimeMetrics: map[string]float64{
 				"InnoDB_IO_r_wait":     0,
 				"InnoDB_queue_wait":    0,
@@ -1364,6 +1375,7 @@ func TestParseSlow016(t *testing.T) {
 			Host:      "localhost",
 			Offset:    159,
 			OffsetEnd: 413,
+			Ts:        time.Unix(1400193480, 0),
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.003953,
 				"Lock_time":  0.000059,
@@ -1391,6 +1403,7 @@ func TestParseSlow017(t *testing.T) {
 			Host:      "localhost",
 			Offset:    26,
 			OffsetEnd: 280,
+			Ts:        time.Unix(1400193480, 0),
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.003953,
 				"Lock_time":  0.000059,
@@ -1417,6 +1430,7 @@ func TestParseSlow019(t *testing.T) {
 			Host:      "localhost",
 			Offset:    0,
 			OffsetEnd: 641,
+			Ts:        time.Unix(1413583349, 0),
 			TimeMetrics: map[string]float64{
 				"Lock_time":  0.0001,
 				"Query_time": 0.004599,
@@ -1452,6 +1466,7 @@ func TestParseSlow019(t *testing.T) {
 			Offset:    641,
 			OffsetEnd: 1273,
 			Db:        "cod7_plos15",
+			Ts:        time.Unix(1413583349, 0),
 			TimeMetrics: map[string]float64{
 				"Lock_time":  0,
 				"Query_time": 2.2e-05,
@@ -1487,6 +1502,7 @@ func TestParseSlow019(t *testing.T) {
 			Offset:    1273,
 			OffsetEnd: 2005,
 			Db:        "cod7_plos15",
+			Ts:        time.Unix(1413583349, 0),
 			TimeMetrics: map[string]float64{
 				"InnoDB_IO_r_wait":     0,
 				"InnoDB_queue_wait":    0,
@@ -1528,6 +1544,7 @@ func TestParseSlow019(t *testing.T) {
 			Host:      "localhost",
 			Offset:    2005,
 			OffsetEnd: 2621,
+			Ts:        time.Unix(1413583349, 0),
 			TimeMetrics: map[string]float64{
 				"Lock_time":  0.000115,
 				"Query_time": 0.011565,
@@ -1573,6 +1590,7 @@ func TestParseSlow023(t *testing.T) {
 			User:      "bookblogs",
 			Host:      "localhost",
 			Db:        "dbnamea",
+			Ts:        time.Unix(1415210700, 0),
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.321092,
 				"Lock_time":  3.8e-05,
@@ -1594,6 +1612,7 @@ func TestParseSlow023(t *testing.T) {
 			User:      "bookblogs",
 			Host:      "localhost",
 			Db:        "",
+			Ts:        time.Unix(1415210700, 0),
 			TimeMetrics: map[string]float64{
 				"Lock_time":  0,
 				"Query_time": 0.253052,
@@ -1615,6 +1634,7 @@ func TestParseSlow023(t *testing.T) {
 			User:      "percona-agent",
 			Host:      "localhost",
 			Db:        "",
+			Ts:        time.Unix(1415210700, 0),
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.31645,
 				"Lock_time":  0,
@@ -1636,6 +1656,7 @@ func TestParseSlow023(t *testing.T) {
 			User:      "bookblogs",
 			Host:      "localhost",
 			Db:        "",
+			Ts:        time.Unix(1415210700, 0),
 			TimeMetrics: map[string]float64{
 				"Query_time": 3.7e-05,
 				"Lock_time":  0,
@@ -1657,6 +1678,7 @@ func TestParseSlow023(t *testing.T) {
 			User:      "bookblogs",
 			Host:      "localhost",
 			Db:        "",
+			Ts:        time.Unix(1415210700, 0),
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.000297,
 				"Lock_time":  0.000141,
@@ -1677,6 +1699,7 @@ func TestParseSlow023(t *testing.T) {
 			User:      "backup",
 			Host:      "localhost",
 			Db:        "dbnameb",
+			Ts:        time.Unix(1415210700, 0),
 			TimeMetrics: map[string]float64{
 				"Lock_time":  0,
 				"Query_time": 0.000558,
@@ -1698,6 +1721,7 @@ func TestParseSlow023(t *testing.T) {
 			User:      "backup",
 			Host:      "localhost",
 			Db:        "",
+			Ts:        time.Unix(1415210700, 0),
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.000204,
 				"Lock_time":  0,
@@ -1719,6 +1743,7 @@ func TestParseSlow023(t *testing.T) {
 			User:      "bookblogs",
 			Host:      "localhost",
 			Db:        "",
+			Ts:        time.Unix(1415210700, 0),
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.000164,
 				"Lock_time":  5.9e-05,
