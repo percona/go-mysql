@@ -687,7 +687,7 @@ func Fingerprint(q string) string {
 				if Debug {
 					fmt.Println("CALL sp_name")
 				}
-				return "call " + q[cpFromOffset:qi]
+				return string(f[0:fi]) + q[cpFromOffset:qi]
 			} else if sqlState != onDupeKeyUpdate && (((s == inSpace || s == moreValuesOrUnknown) && (prevWord == "value" || prevWord == "values" || prevWord == "in")) || wordIn(q[cpFromOffset:qi], "value", "values", "in")) {
 				// VALUE(, VALUE (, VALUES(, VALUES (, IN(, or IN(
 				// but not after ON DUPLICATE KEY UPDATE

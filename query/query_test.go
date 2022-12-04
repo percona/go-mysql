@@ -663,3 +663,14 @@ func TestFingerprintWithNumberInDbName(t *testing.T) {
 		query.Fingerprint(q),
 	)
 }
+
+func TestFingerprintUnexpected(t *testing.T) {
+	var q string
+
+	q = "EXPLAIN CALL foo(1, 2, 3)"
+	assert.Equal(
+		t,
+		"explain call foo",
+		query.Fingerprint(q),
+	)
+}
