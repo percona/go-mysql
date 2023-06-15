@@ -1,0 +1,13 @@
+/usr/sbin/mariadbd, Version: 10.8.3-MariaDB (MariaDB Server). started with:
+Tcp port: 3306  Unix socket: /var/lib/mysql/mysql.sock
+Time		    Id Command	Argument
+# Time: 220813 12:04:19
+# User@Host: root[root] @ localhost []
+# Thread_id: 4  Schema:   QC_hit: No
+# Query_time: 15.000337  Lock_time: 0.000000  Rows_sent: 1  Rows_examined: 0
+# Rows_affected: 0  Bytes_sent: 117
+SET timestamp=1660392259;
+select sleep(15), @@version;
+/usr/sbin/mariadbd, Version: 10.8.3-MariaDB (MariaDB Server). started with:
+Tcp port: 3306  Unix socket: /var/lib/mysql/mysql.sock
+Time		    Id Command	Argument
