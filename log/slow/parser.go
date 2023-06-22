@@ -61,7 +61,7 @@ var (
 
 // SlowLogParser parses a MySQL slow log. It implements the LogParser interface.
 type SlowLogParser struct {
-	reader io.ReadSeeker
+	reader io.Reader
 	opt    log.Options
 	// --
 	stopChan    chan bool
@@ -78,7 +78,7 @@ type SlowLogParser struct {
 }
 
 // NewSlowLogParser returns a new SlowLogParser that reads from the open file.
-func NewSlowLogParser(r io.ReadSeeker, opt log.Options) *SlowLogParser {
+func NewSlowLogParser(r io.Reader, opt log.Options) *SlowLogParser {
 	if opt.DefaultLocation == nil {
 		// Old MySQL format assumes time is taken from SYSTEM.
 		opt.DefaultLocation = time.Local
@@ -130,8 +130,14 @@ func (p *SlowLogParser) Start() error {
 	// Seek to the offset, if any.
 	// @todo error if start off > file size
 	if p.opt.StartOffset > 0 {
-		if _, err := p.reader.Seek(int64(p.opt.StartOffset), os.SEEK_SET); err != nil {
-			return err
+		if reader, ok := p.reader.(io.ReadSeeker); ok {
+			if _, err := reader.Seek(int64(p.opt.StartOffset), os.SEEK_SET); err != nil {
+				return err
+			}
+		} else {
+			if _, err := io.CopyN(io.Discard, p.reader, int64(p.opt.StartOffset)); err != nil {
+				return err
+			}
 		}
 	}
 
