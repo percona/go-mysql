@@ -1889,6 +1889,39 @@ func TestParseSlowMariaDBWithExplain(t *testing.T) {
 	assert.EqualValues(t, expect, got)
 }
 
+func TestParseSlowMariaDBWithTab(t *testing.T) {
+	got := parseSlowLog("mariadb108-with-tab.log", opt)
+	expect := []log.Event{
+		{
+			Offset:    161,
+			OffsetEnd: 590,
+			Ts:        time.Date(2022, 8, 13, 12, 04, 19, 0, time.UTC),
+			Admin:     false,
+			Query:     "select sleep(15), @@version",
+			User:      "root",
+			Host:      "localhost",
+			Db:        "",
+			TimeMetrics: map[string]float64{
+				"Lock_time":  0,
+				"Query_time": 15.000337,
+			},
+			NumberMetrics: map[string]uint64{
+				"Bytes_sent":    117,
+				"Rows_affected": 0,
+				"Rows_examined": 0,
+				"Rows_sent":     1,
+				"Thread_id":     4,
+			},
+			BoolMetrics: map[string]bool{
+				"QC_hit": false,
+			},
+			RateType:  "",
+			RateLimit: 0,
+		},
+	}
+	assert.EqualValues(t, expect, got)
+}
+
 func TestParseSlow026(t *testing.T) {
 	got := parseSlowLog("slow026.log", opt)
 	expect := []log.Event{

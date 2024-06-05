@@ -41,6 +41,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/percona/go-mysql/log"
 )
@@ -174,7 +175,7 @@ SCANNER_LOOP:
 		//   Tcp port: 3306  Unix socket: /var/lib/mysql/mysql.sock
 		//   Time                 Id Command    Argument
 		if lineLen >= 20 && ((line[0] == '/' && line[lineLen-6:lineLen] == "with:\n") ||
-			(line[0:5] == "Time ") ||
+			(line[0:4] == "Time" && unicode.IsSpace(rune(line[5]))) ||
 			(line[0:4] == "Tcp ") ||
 			(line[0:4] == "TCP ")) {
 			if p.opt.Debug {
