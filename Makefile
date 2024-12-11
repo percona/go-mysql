@@ -32,6 +32,6 @@ FILES = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
 format:                         ## Format source code.
 	gofmt -w -s $(FILES)
-	goimports -local github.com/percona/go-mysql -l -w $(FILES)
+	goimports -local github.com/yehornaumenko/go-mysql -l -w $(FILES)
 
 .PHONY: test

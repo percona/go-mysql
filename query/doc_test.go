@@ -33,7 +33,7 @@ package query_test
 import (
 	"fmt"
 
-	"github.com/percona/go-mysql/query"
+	"github.com/yehornaumenko/go-mysql/query"
 )
 
 func ExampleFingerprint() {

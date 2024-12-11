@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package event
 
 import (
-	"github.com/percona/go-mysql/log"
+	"github.com/yehornaumenko/go-mysql/log"
 )
 
 const (

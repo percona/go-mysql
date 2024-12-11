@@ -40,9 +40,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/percona/go-mysql/log"
-	parser "github.com/percona/go-mysql/log/slow"
-	"github.com/percona/go-mysql/test"
+	"github.com/yehornaumenko/go-mysql/log"
+	parser "github.com/yehornaumenko/go-mysql/log/slow"
+	"github.com/yehornaumenko/go-mysql/test"
 )
 
 var (
@@ -457,9 +457,11 @@ func TestParserSlowLog004(t *testing.T) {
 
 // slow005 has a multi-line query with tabs in it.  A pathological case that
 // would probably break the parser is a query like:
-//   SELECT * FROM foo WHERE col = "Hello
-//   # Query_time: 10
-//   " LIMIT 1;
+//
+//	SELECT * FROM foo WHERE col = "Hello
+//	# Query_time: 10
+//	" LIMIT 1;
+//
 // There's no easy way to detect that "# Query_time" is part of the query and
 // not part of the next event's header.
 func TestParserSlowLog005(t *testing.T) {
@@ -710,10 +712,10 @@ func TestParserSlowLog007(t *testing.T) {
 
 // slow008 has 4 interesting things (which makes it a poor test case since we're
 // testing many things at once):
-//   1) an admin command, e.g.: # administrator command: Quit;
-//   2) a SET NAMES query; SET <certain vars> are ignored
-//   3) No Time metrics
-//   4) IPs in the host metric, but we don't currently support these
+//  1. an admin command, e.g.: # administrator command: Quit;
+//  2. a SET NAMES query; SET <certain vars> are ignored
+//  3. No Time metrics
+//  4. IPs in the host metric, but we don't currently support these
 func TestParserSlowLog008(t *testing.T) {
 	got := parseSlowLog(t, "slow008.log", opt)
 	expect := []log.Event{
@@ -1756,7 +1758,7 @@ func TestParseSlow023A(t *testing.T) {
 }
 
 /*
-   Test header with invalid # Time or invalid # User lines
+Test header with invalid # Time or invalid # User lines
 */
 func TestParseSlow024(t *testing.T) {
 	got := parseSlowLog(t, "slow024.log", opt)

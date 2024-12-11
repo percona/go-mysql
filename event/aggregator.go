@@ -34,7 +34,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/percona/go-mysql/log"
+	"github.com/yehornaumenko/go-mysql/log"
 )
 
 // A Result contains a global class and per-ID classes with finalized metric
