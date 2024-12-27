@@ -541,8 +541,8 @@ func Fingerprint(q string) string {
 					// so advance cpFromOffset to whatever is after the space
 					// and if it's more space then space skipping block will
 					// handle it.
-					cpFromOffset = qi + 1
 				}
+				cpFromOffset = qi + 1
 			} else if s == inDash {
 				if Debug {
 					fmt.Println("One-line comment begin")
