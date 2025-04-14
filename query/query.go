@@ -144,17 +144,18 @@ var ReplaceNumbersInWords = false
 //   - Collapse whitespace
 //   - Remove comments
 //   - Lowercase everything
-// Additional trasnformations are performed which change the syntax of the
+//
+// Additional transformations are performed which change the syntax of the
 // original query without affecting its performance characteristics. For
 // example, "ORDER BY col ASC" is the same as "ORDER BY col", so "ASC" in the
 // fingerprint is removed.
 func Fingerprint(q string) string {
 	q += " " // need range to run off end of original query
 	prevWord := ""
-	f := make([]byte, len(q))
-	fi := 0
-	pr := rune(0) // previous rune
-	s := unknown  // current state
+	f := make([]byte, len(q)) // buffer to hold the final fingerprint
+	fi := 0                   // tracks the next index/position in f where a character should be written.
+	pr := rune(0)             // previous rune
+	s := unknown              // current state
 	sqlState := unknown
 	quoteChar := rune(0)
 	cpFromOffset := 0
