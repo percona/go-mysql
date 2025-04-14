@@ -1,9 +1,0 @@
-# tools
-required = [
-  "golang.org/x/tools/cmd/goimports",
-]
-
-[prune]
-  non-go = true
-  go-tests = true
-  unused-packages = true
