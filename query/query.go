@@ -144,25 +144,27 @@ var ReplaceNumbersInWords = false
 //   - Collapse whitespace
 //   - Remove comments
 //   - Lowercase everything
-// Additional trasnformations are performed which change the syntax of the
+//
+// Additional transformations are performed which change the syntax of the
 // original query without affecting its performance characteristics. For
 // example, "ORDER BY col ASC" is the same as "ORDER BY col", so "ASC" in the
 // fingerprint is removed.
 func Fingerprint(q string) string {
 	q += " " // need range to run off end of original query
 	prevWord := ""
-	f := make([]byte, len(q))
-	fi := 0
-	pr := rune(0) // previous rune
-	s := unknown  // current state
+	f := make([]byte, len(q)) // buffer to hold the final fingerprint
+	fi := 0                   // tracks the next index/position in f where a character should be written.
+	pr := rune(0)             // previous rune
+	s := unknown              // current state
 	sqlState := unknown
 	quoteChar := rune(0)
 	cpFromOffset := 0
 	cpToOffset := 0
 	addSpace := false
 	escape := false
-	parOpen := 0
-	parOpenTotal := 0
+	valuesParOpen := 0 // tracks the number of open parenthesis containing a value list
+	valuesParOpenTotal := 0
+	parOpen := 0 // tracks the number of open parenthesis in the query (not just the ones containing values)
 	valueNo := 0
 	firstPar := 0
 
@@ -330,17 +332,17 @@ func Fingerprint(q string) string {
 			// We're in the (val1),...,(valN) after IN or VALUE[S].  A single
 			// () value ends when the parenthesis are balanced, but...
 			if r == ')' {
-				parOpen--
-				parOpenTotal++
+				valuesParOpen--
+				valuesParOpenTotal++
 				if Debug {
-					fmt.Println("Close parenthesis", parOpen)
+					fmt.Println("Close parenthesis", valuesParOpen)
 				}
 			} else if r == '(' {
-				parOpen++
+				valuesParOpen++
 				if Debug {
-					fmt.Println("Open parenthesis", parOpen)
+					fmt.Println("Open parenthesis", valuesParOpen)
 				}
-				if parOpen == 1 {
+				if valuesParOpen == 1 {
 					firstPar = qi
 				}
 			} else if r == '\'' || r == '"' {
@@ -359,12 +361,12 @@ func Fingerprint(q string) string {
 				}
 				continue
 			}
-			if parOpen > 0 {
+			if valuesParOpen > 0 {
 				// Parenthesis are not balanced yet; i.e. haven't reached
 				// closing ) for this value.
 				continue
 			}
-			if parOpenTotal == 0 {
+			if valuesParOpenTotal == 0 {
 				// SELECT value FROM t
 				if Debug {
 					fmt.Println("Literal values not VALUES()")
@@ -394,7 +396,7 @@ func Fingerprint(q string) string {
 			s = moreValuesOrUnknown
 			pr = r
 			cpFromOffset = qi + 1
-			parOpenTotal = 0
+			valuesParOpenTotal = 0
 			continue
 		} else if s == inMLC {
 			// We're in a /* mutli-line comments */.  Skip and ignore it all.
@@ -682,6 +684,7 @@ func Fingerprint(q string) string {
 				cpToOffset = qi
 			}
 		case r == '(':
+			parOpen++
 			if prevWord == "call" {
 				// 'CALL foo(...)' -> 'call foo'
 				if Debug {
@@ -696,7 +699,7 @@ func Fingerprint(q string) string {
 				}
 				s = inValues
 				sqlState = inValues
-				parOpen = 1
+				valuesParOpen = 1
 				firstPar = qi
 				if valueNo == 0 {
 					cpToOffset = qi
@@ -708,6 +711,10 @@ func Fingerprint(q string) string {
 				valueNo = 0
 				cpFromOffset = qi
 				s = inWord
+			}
+		case r == ')':
+			if parOpen > 0 {
+				parOpen--
 			}
 		case r == ',' && s == moreValuesOrUnknown:
 			if Debug {
@@ -766,7 +773,10 @@ func Fingerprint(q string) string {
 			copy(f[fi:fi+l], prevWord)
 			fi += l
 			cpFromOffset = cpToOffset
-			if wordIn(prevWord, "in", "value", "values") && sqlState != onDupeKeyUpdate {
+			valueKeywords := []string{"in", "value", "values"}
+			// since the keywords should only exist at a top-level (outside of parenthesis) except onDupeKeyUpdate,
+			// we only do the conversion below if the "keywords" actually open a value list (i.e., outside an opened parenthesis).
+			if parOpen == 0 && wordIn(prevWord, valueKeywords...) && sqlState != onDupeKeyUpdate {
 				// IN ()     -> in(?+)
 				// VALUES () -> values(?+)
 				addSpace = false
