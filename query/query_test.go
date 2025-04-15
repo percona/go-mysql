@@ -165,16 +165,6 @@ func TestFingerprintBasic(t *testing.T) {
 			query:    "select * from foo limit 5 offset 10",
 			expected: "select * from foo limit ? offset ?",
 		},
-		/*{
-			name: "insert with keyword as column",
-			query: "INSERT INTO test (ID, \"Value \") VALUES (1,1)",
-			expected: "insert into test (id, ?) values(?+)",
-		},
-		{
-			name: "insert with space in column name",
-			query: "INSERT INTO test (ID, Value ) VALUES (1,1)",
-			expected: "insert into test (id, ?) values(?+)",
-		},*/
 		{
 			name:     "fingerprint load data infile",
 			query:    "LOAD DATA INFILE '/tmp/foo.txt' INTO db.tbl",
@@ -594,7 +584,7 @@ func TestFingerprintWithNumberInDbName(t *testing.T) {
 
 func TestFingerprintMaxExecTimeWithBackticks(t *testing.T) {
 	q := "/* test-test-5775b87c5d-fczwg|@test-test|test-test|internal|/internal/test|test-test */\n\n  SELECT /*+ MAX_EXECUTION_TIME(7995) */ `id`, `domain`, `city_id`, `name`, `polygon`, `state`, `translations` AS `translations`\n  FROM `area`\n  WHERE `state` IN ('active', 'disabled', 'removed') AND `domain` = 'test'"
-	
+
 	assert.Equal(
 		t,
 		"select `id`, `domain`, `city_id`, `name`, `polygon`, `state`, `translations` as `translations` from `area` where `state` in(?+) and `domain` = ?",
@@ -604,7 +594,7 @@ func TestFingerprintMaxExecTimeWithBackticks(t *testing.T) {
 
 func TestFingerprintMaxExecTimeNoBackticks(t *testing.T) {
 	q := "/* test-test-5775b87c5d-fczwg|@test-test|test-test|internal|/internal/test|test-test */\n\n  SELECT /*+ MAX_EXECUTION_TIME(7995) */ id, domain, city_id, name, polygon, state, translations AS translations\n  FROM area\n  WHERE state IN ('active', 'disabled', 'removed') AND domain = 'test'"
-	
+
 	assert.Equal(t,
 		"select id, domain, city_id, name, polygon, state, translations as translations from area where state in(?+) and domain = ?",
 		query.Fingerprint(q),
