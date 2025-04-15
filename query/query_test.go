@@ -40,237 +40,168 @@ import (
 )
 
 func TestFingerprintBasic(t *testing.T) {
-	var q string
+	type testCase struct {
+		name     string
+		query    string
+		expected string
+	}
+	// Test cases for fingerprinting SQL queries
+	testCases := []testCase{
+		{
+			name:     "Basic SELECT",
+			query:    "SELECT c FROM t WHERE id=1",
+			expected: "select c from t where id=?",
+		},
+		{
+			name:     "UPDATE with value similar to one-line-comment",
+			query:    `UPDATE groups_search SET  charter = '   -------3\'\' XXXXXXXXX.\n    \n    -----------------------------------------------------', show_in_list = 'Y' WHERE group_id='aaaaaaaa'`,
+			expected: "update groups_search set charter = ?, show_in_list = ? where group_id=?",
+		},
+		{
+			// PT treats this as "mysqldump", but we don't do any special fingerprints.
+			name:     "no special fingerprint",
+			query:    "SELECT /*!40001 SQL_NO_CACHE */ * FROM `film`",
+			expected: "select /*!40001 sql_no_cache */ * from `film`",
+		},
+		{
+			name:     "stored procedure calls",
+			query:    "CALL foo(1, 2, 3)",
+			expected: "call foo",
+		},
+		{
+			name:     "fingerprint admin commands as themselves",
+			query:    "administrator command: Init DB",
+			expected: "administrator command: Init DB",
+		},
+		{
+			name:     "remove identifier from USE",
+			query:    "use `foo`",
+			expected: "use ?",
+		},
+		{
+			name:     "handle bug from perlmonks thread 728718",
+			query:    "select null, 5.001, 5001. from foo",
+			expected: "select ?, ?, ? from foo",
+		},
+		{
+			name:     "quoted strings",
+			query:    "select 'hello', '\nhello\n', \"hello\", '\\'' from foo",
+			expected: "select ?, ?, ?, ? from foo",
+		},
+		{
+			name:     "handles trailing newline",
+			query:    "select 'hello'\n",
+			expected: "select ?",
+		},
+		{
+			name:     "handle backslashes in values",
+			query:    "select '\\\\' from foo", // interpreted as "select '\\' from foo"
+			expected: "select ? from foo",
+		},
+		{
+			name:     "collapse whitespace",
+			query:    "select   foo",
+			expected: "select foo",
+		},
+		{
+			name:     "lowercases, replaces integer",
+			query:    "SELECT * from foo where a = 5",
+			expected: "select * from foo where a = ?",
+		},
+		{
+			name:     "handles floating point numbers",
+			query:    "select 0e0, +6e-30, -6.00 from foo where a = 5.5 or b=0.5 or c=.5",
+			expected: "select ?, ?, ? from foo where a = ? or b=? or c=?",
+		},
+		{
+			name:     "hex/bit",
+			query:    "select 0x0, x'123', 0b1010, b'10101' from foo",
+			expected: "select ?, ?, ?, ? from foo",
+		},
+		{
+			name:     "collapses whitespaces",
+			query:    " select  * from\nfoo where a = 5",
+			expected: "select * from foo where a = ?",
+		},
+		{
+			name:     "IN lists with spaces",
+			query:    "select * from foo where a in (5) and b in (5, 8,9 ,9 , 10)",
+			expected: "select * from foo where a in(?+) and b in(?+)",
+		},
+		{
+			// Numeric table names.  By default, PT will return foo_n, etc. because
+			// match_embedded_numbers is false by default for speed.
+			name:     "numeric table names",
+			query:    "select foo_1 from foo_2_3",
+			expected: "select foo_1 from foo_2_3",
+		},
+		{
+			name:     "numeric table name prefixes",
+			query:    "select 123foo from 123foo",
+			expected: "select 123foo from 123foo",
+		},
+		{
+			name:     "numeric table name prefixes with underscores",
+			query:    "select 123_foo from 123_foo",
+			expected: "select 123_foo from 123_foo",
+		},
+		{
+			name:     "string that needs no changes",
+			query:    "insert into abtemp.coxed select foo.bar from foo",
+			expected: "insert into abtemp.coxed select foo.bar from foo",
+		},
+		{
+			name:     "limit alone",
+			query:    "select * from foo limit 5",
+			expected: "select * from foo limit ?",
+		},
+		{
+			name:     "limit with comma-offset",
+			query:    "select * from foo limit 5, 10",
+			expected: "select * from foo limit ?, ?",
+		},
+		{
+			name:     "limit with offset",
+			query:    "select * from foo limit 5 offset 10",
+			expected: "select * from foo limit ? offset ?",
+		},
+		{
+			name:     "fingerprint load data infile",
+			query:    "LOAD DATA INFILE '/tmp/foo.txt' INTO db.tbl",
+			expected: "load data infile ? into db.tbl",
+		},
+		{
+			name:     "fingerprint db.tbl<number>name (preserve number()",
+			query:    "SELECT * FROM prices.rt_5min where id=1",
+			expected: "select * from prices.rt_5min where id=?",
+		},
+		{
+			name:     "fingerprint /* -- comment */ SELECT", // bug 1174956
+			query:    "/* -- S++ SU ABORTABLE -- spd_user: rspadim */SELECT SQL_SMALL_RESULT SQL_CACHE DISTINCT centro_atividade FROM est_dia WHERE unidade_id=1001 AND item_id=67 AND item_id_red=573",
+			expected: "select sql_small_result sql_cache distinct centro_atividade from est_dia where unidade_id=? and item_id=? and item_id_red=?",
+		},
+		{
+			name:     "fingerprint INSERT INTO t (ts) VALUES (NOW())",
+			query:    "INSERT INTO t (ts) VALUES (NOW())",
+			expected: "insert into t (ts) values(?+)",
+		},
+		{
+			name:     "fingerprint INSERT INTO t (ts) VALUES ('()', '\\(', '\\)')",
+			query:    "INSERT INTO t (ts) VALUES ('()', '\\(', '\\)')",
+			expected: "insert into t (ts) values(?+)",
+		},
+		{
+			name:     "select with backticks",
+			query:    "SELECT `col` FROM `table-1` WHERE `id` = 5",
+			expected: "select `col` from `table-1` where `id` = ?",
+		},
+	}
 
-	// A most basic case.
-	q = "SELECT c FROM t WHERE id=1"
-	assert.Equal(
-		t,
-		"select c from t where id=?",
-		query.Fingerprint(q),
-	)
-
-	// The values looks like one line -- comments, but they're not.
-	q = `UPDATE groups_search SET  charter = '   -------3\'\' XXXXXXXXX.\n    \n    -----------------------------------------------------', show_in_list = 'Y' WHERE group_id='aaaaaaaa'`
-	assert.Equal(
-		t,
-		"update groups_search set charter = ?, show_in_list = ? where group_id=?",
-		query.Fingerprint(q),
-	)
-
-	// PT treats this as "mysqldump", but we don't do any special fingerprints.
-	q = "SELECT /*!40001 SQL_NO_CACHE */ * FROM `film`"
-	assert.Equal(
-		t,
-		"select /*!40001 sql_no_cache */ * from `film`",
-		query.Fingerprint(q),
-	)
-
-	// Fingerprints stored procedure calls specially
-	q = "CALL foo(1, 2, 3)"
-	assert.Equal(
-		t,
-		"call foo",
-		query.Fingerprint(q),
-	)
-
-	// Fingerprints admin commands as themselves
-	q = "administrator command: Init DB"
-	assert.Equal(
-		t,
-		"administrator command: Init DB",
-		query.Fingerprint(q),
-	)
-
-	// Removes identifier from USE
-	q = "use `foo`"
-	assert.Equal(
-		t,
-		"use ?",
-		query.Fingerprint(q),
-	)
-
-	// Handles bug from perlmonks thread 728718
-	q = "select null, 5.001, 5001. from foo"
-	assert.Equal(
-		t,
-		"select ?, ?, ? from foo",
-		query.Fingerprint(q),
-	)
-
-	// Handles quoted strings
-	q = "select 'hello', '\nhello\n', \"hello\", '\\'' from foo"
-	assert.Equal(
-		t,
-		"select ?, ?, ?, ? from foo",
-		query.Fingerprint(q),
-	)
-
-	// Handles trailing newline
-	q = "select 'hello'\n"
-	assert.Equal(
-		t,
-		"select ?",
-		query.Fingerprint(q),
-	)
-
-	q = "select '\\\\' from foo"
-	//"select '\\ from foo",
-	assert.Equal(
-		t,
-		"select ? from foo",
-		query.Fingerprint(q),
-	)
-
-	// Collapses whitespace
-	q = "select   foo"
-	assert.Equal(
-		t,
-		"select foo",
-		query.Fingerprint(q),
-	)
-
-	// Lowercases, replaces integer
-	q = "SELECT * from foo where a = 5"
-	assert.Equal(
-		t,
-		"select * from foo where a = ?",
-		query.Fingerprint(q),
-	)
-
-	// Floats
-	q = "select 0e0, +6e-30, -6.00 from foo where a = 5.5 or b=0.5 or c=.5"
-	assert.Equal(
-		t,
-		"select ?, ?, ? from foo where a = ? or b=? or c=?",
-		query.Fingerprint(q),
-	)
-
-	// Hex/bit
-	q = "select 0x0, x'123', 0b1010, b'10101' from foo"
-	assert.Equal(
-		t,
-		"select ?, ?, ?, ? from foo",
-		query.Fingerprint(q),
-	)
-
-	// Collapses whitespace
-	q = " select  * from\nfoo where a = 5"
-	assert.Equal(
-		t,
-		"select * from foo where a = ?",
-		query.Fingerprint(q),
-	)
-
-	// IN lists
-	q = "select * from foo where a in (5) and b in (5, 8,9 ,9 , 10)"
-	assert.Equal(
-		t,
-		"select * from foo where a in(?+) and b in(?+)",
-		query.Fingerprint(q),
-	)
-
-	// Numeric table names.  By default, PT will return foo_n, etc. because
-	// match_embedded_numbers is false by default for speed.
-	q = "select foo_1 from foo_2_3"
-	assert.Equal(
-		t,
-		"select foo_1 from foo_2_3",
-		query.Fingerprint(q),
-	)
-
-	// Numeric table name prefixes
-	q = "select 123foo from 123foo"
-	assert.Equal(
-		t,
-		"select 123foo from 123foo",
-		query.Fingerprint(q),
-	)
-
-	// Numeric table name prefixes with underscores
-	q = "select 123_foo from 123_foo"
-	assert.Equal(
-		t,
-		"select 123_foo from 123_foo",
-		query.Fingerprint(q),
-	)
-
-	// A string that needs no changes
-	q = "insert into abtemp.coxed select foo.bar from foo"
-	assert.Equal(
-		t,
-		"insert into abtemp.coxed select foo.bar from foo",
-		query.Fingerprint(q),
-	)
-
-	// limit alone
-	q = "select * from foo limit 5"
-	assert.Equal(
-		t,
-		"select * from foo limit ?",
-		query.Fingerprint(q),
-	)
-
-	// limit with comma-offset
-	q = "select * from foo limit 5, 10"
-	assert.Equal(
-		t,
-		"select * from foo limit ?, ?",
-		query.Fingerprint(q),
-	)
-
-	// limit with offset
-	q = "select * from foo limit 5 offset 10"
-	assert.Equal(
-		t,
-		"select * from foo limit ? offset ?",
-		query.Fingerprint(q),
-	)
-
-	// Fingerprint LOAD DATA INFILE
-	q = "LOAD DATA INFILE '/tmp/foo.txt' INTO db.tbl"
-	assert.Equal(
-		t,
-		"load data infile ? into db.tbl",
-		query.Fingerprint(q),
-	)
-
-	// Fingerprint db.tbl<number>name (preserve number)
-	q = "SELECT * FROM prices.rt_5min where id=1"
-	assert.Equal(
-		t,
-		"select * from prices.rt_5min where id=?",
-		query.Fingerprint(q),
-	)
-
-	// Fingerprint /* -- comment */ SELECT (bug 1174956)
-	q = "/* -- S++ SU ABORTABLE -- spd_user: rspadim */SELECT SQL_SMALL_RESULT SQL_CACHE DISTINCT centro_atividade FROM est_dia WHERE unidade_id=1001 AND item_id=67 AND item_id_red=573"
-	assert.Equal(
-		t,
-		"select sql_small_result sql_cache distinct centro_atividade from est_dia where unidade_id=? and item_id=? and item_id_red=?",
-		query.Fingerprint(q),
-	)
-
-	q = "INSERT INTO t (ts) VALUES (NOW())"
-	assert.Equal(
-		t,
-		"insert into t (ts) values(?+)",
-		query.Fingerprint(q),
-	)
-
-	q = "INSERT INTO t (ts) VALUES ('()', '\\(', '\\)')"
-	assert.Equal(
-		t,
-		"insert into t (ts) values(?+)",
-		query.Fingerprint(q),
-	)
-
-	q = "select `col` from `table-1` where `id` = 5"
-	assert.Equal(
-		t,
-		"select `col` from `table-1` where `id` = ?",
-		query.Fingerprint(q),
-	)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.expected, query.Fingerprint(tc.query))
+		})
+	}
 }
 
 func TestFingerprintValueList(t *testing.T) {
@@ -653,7 +584,7 @@ func TestFingerprintWithNumberInDbName(t *testing.T) {
 
 func TestFingerprintMaxExecTimeWithBackticks(t *testing.T) {
 	q := "/* test-test-5775b87c5d-fczwg|@test-test|test-test|internal|/internal/test|test-test */\n\n  SELECT /*+ MAX_EXECUTION_TIME(7995) */ `id`, `domain`, `city_id`, `name`, `polygon`, `state`, `translations` AS `translations`\n  FROM `area`\n  WHERE `state` IN ('active', 'disabled', 'removed') AND `domain` = 'test'"
-	
+
 	assert.Equal(
 		t,
 		"select `id`, `domain`, `city_id`, `name`, `polygon`, `state`, `translations` as `translations` from `area` where `state` in(?+) and `domain` = ?",
@@ -663,7 +594,7 @@ func TestFingerprintMaxExecTimeWithBackticks(t *testing.T) {
 
 func TestFingerprintMaxExecTimeNoBackticks(t *testing.T) {
 	q := "/* test-test-5775b87c5d-fczwg|@test-test|test-test|internal|/internal/test|test-test */\n\n  SELECT /*+ MAX_EXECUTION_TIME(7995) */ id, domain, city_id, name, polygon, state, translations AS translations\n  FROM area\n  WHERE state IN ('active', 'disabled', 'removed') AND domain = 'test'"
-	
+
 	assert.Equal(t,
 		"select id, domain, city_id, name, polygon, state, translations as translations from area where state in(?+) and domain = ?",
 		query.Fingerprint(q),
