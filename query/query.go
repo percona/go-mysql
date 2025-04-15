@@ -379,6 +379,9 @@ func Fingerprint(q string) string {
 			valueNo++
 			if valueNo == 1 {
 				if qi-firstPar > 1 {
+					if qi-firstPar == 2 {
+						f = append(f, 0)
+					}
 					copy(f[fi:fi+4], "(?+)")
 					fi += 4
 				} else {
