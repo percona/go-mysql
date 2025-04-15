@@ -165,16 +165,36 @@ func TestFingerprintBasic(t *testing.T) {
 			query:    "select * from foo limit 5 offset 10",
 			expected: "select * from foo limit ? offset ?",
 		},
-		/*{
-			name: "insert with keyword as column",
-			query: "INSERT INTO test (ID, \"Value \") VALUES (1,1)",
-			expected: "insert into test (id, ?) values(?+)",
+		{
+			name:     "insert with quoted keyword as column",
+			query:    "INSERT INTO test (ID, `Value`) VALUES (1 ,1)",
+			expected: "insert into test (id, `value`) values(?+)",
 		},
 		{
-			name: "insert with space in column name",
-			query: "INSERT INTO test (ID, Value ) VALUES (1,1)",
-			expected: "insert into test (id, ?) values(?+)",
-		},*/
+			name:     "insert with non-quoted keyword as column",
+			query:    "INSERT INTO test (ID, Value) VALUES (1 ,1)",
+			expected: "insert into test (id, value) values(?+)",
+		},
+		{
+			name:     "insert with non-quoted keyword and space as column",
+			query:    "INSERT INTO test (ID, Value ) VALUES (1 ,1)",
+			expected: "insert into test (id, value ) values(?+)",
+		},
+		{
+			name:     "insert with keyword as first column name",
+			query:    "INSERT INTO test ( In , ID) VALUES (1,1)",
+			expected: "insert into test ( in , id) values(?+)",
+		},
+		{
+			name:     "insert duplicate with keyword as column name",
+			query:    "INSERT INTO test (id, value) VALUES (1, 10) ON DUPLICATE KEY UPDATE value = VALUES(value) + 5",
+			expected: "insert into test (id, value) values(?+) on duplicate key update value = values(value) + ?",
+		},
+		{
+			name:     "insert duplicate with keyword and space as column name",
+			query:    "INSERT INTO test (id, value ) VALUES (1, 10) ON DUPLICATE KEY UPDATE value = VALUES(value ) + 5",
+			expected: "insert into test (id, value ) values(?+) on duplicate key update value = values(value ) + ?",
+		},
 		{
 			name:     "fingerprint load data infile",
 			query:    "LOAD DATA INFILE '/tmp/foo.txt' INTO db.tbl",
