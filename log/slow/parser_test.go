@@ -596,7 +596,7 @@ func TestParserSlowLog006(t *testing.T) {
 			Db:        "bar",
 			Admin:     false,
 			Host:      "",
-			Ts:        time.Date(2007, 12, 18, 11, 49, 05, 0, time.UTC),
+			Ts:        time.Date(2007, 12, 18, 11, 49, 0o5, 0, time.UTC),
 			User:      "[SQL_SLAVE]",
 			Offset:    1100,
 			OffsetEnd: 1468,
@@ -625,7 +625,7 @@ func TestParserSlowLog006(t *testing.T) {
 			Db:        "bar",
 			Admin:     false,
 			Host:      "",
-			Ts:        time.Date(2007, 12, 18, 11, 49, 07, 0, time.UTC),
+			Ts:        time.Date(2007, 12, 18, 11, 49, 0o7, 0, time.UTC),
 			User:      "[SQL_SLAVE]",
 			Offset:    1468,
 			OffsetEnd: 1832,
@@ -796,7 +796,7 @@ func TestParserSlowLog009(t *testing.T) {
 			User:      "root",
 			Offset:    196,
 			OffsetEnd: 562,
-			Ts:        time.Date(2009, 03, 11, 18, 11, 50, 0, time.UTC),
+			Ts:        time.Date(2009, 0o3, 11, 18, 11, 50, 0, time.UTC),
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.017850,
 				"Lock_time":  0.000000,
@@ -834,7 +834,7 @@ func TestParserSlowLog011(t *testing.T) {
 			Db:        "maindb",
 			Host:      "localhost",
 			User:      "user1",
-			Ts:        time.Date(2013, 11, 28, 1, 05, 31, 0, time.UTC),
+			Ts:        time.Date(2013, 11, 28, 1, 0o5, 31, 0, time.UTC),
 			RateType:  "query",
 			RateLimit: 2,
 			TimeMetrics: map[string]float64{
@@ -1003,7 +1003,7 @@ func TestParserSlowLog012(t *testing.T) {
 			User:      "msandbox",
 			Offset:    375,
 			OffsetEnd: 609,
-			Ts:        time.Date(2014, 04, 13, 19, 34, 13, 0, time.UTC),
+			Ts:        time.Date(2014, 0o4, 13, 19, 34, 13, 0, time.UTC),
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.000127,
 				"Lock_time":  0.000000,
@@ -1025,7 +1025,7 @@ func TestParserSlowLog013(t *testing.T) {
 		{
 			Offset:    0,
 			OffsetEnd: 353,
-			Ts:        time.Date(2014, 02, 24, 22, 39, 34, 0, time.UTC),
+			Ts:        time.Date(2014, 0o2, 24, 22, 39, 34, 0, time.UTC),
 			Query:     "select 950,q.* from qcm q INTO OUTFILE '/mnt/pct/exp/qcm_db950.txt'",
 			User:      "root",
 			Host:      "localhost",
@@ -1047,7 +1047,7 @@ func TestParserSlowLog013(t *testing.T) {
 		{
 			Offset:    353,
 			OffsetEnd: 6138,
-			Ts:        time.Date(2014, 02, 24, 22, 39, 59, 0, time.UTC),
+			Ts:        time.Date(2014, 0o2, 24, 22, 39, 59, 0, time.UTC),
 			Query:     "select 961,q.* from qcm q INTO OUTFILE '/mnt/pct/exp/qcm_db961.txt'",
 			User:      "root",
 			Host:      "localhost",
@@ -1069,7 +1069,7 @@ func TestParserSlowLog013(t *testing.T) {
 		{
 			Offset:    6138,
 			OffsetEnd: 6666,
-			Ts:        time.Date(2014, 03, 11, 16, 07, 40, 0, time.UTC),
+			Ts:        time.Date(2014, 0o3, 11, 16, 0o7, 40, 0, time.UTC),
 			Query:     "select count(*) into @discard from `information_schema`.`PARTITIONS`",
 			User:      "debian-sys-maint",
 			Host:      "localhost",
@@ -1091,7 +1091,7 @@ func TestParserSlowLog013(t *testing.T) {
 		{
 			Offset:    6666,
 			OffsetEnd: 7014,
-			Ts:        time.Date(2014, 03, 12, 20, 28, 40, 0, time.UTC),
+			Ts:        time.Date(2014, 0o3, 12, 20, 28, 40, 0, time.UTC),
 			Query:     "select 1,q.* from qcm q INTO OUTFILE '/mnt/pct/exp/qcm_db1.txt'",
 			User:      "root",
 			Host:      "localhost",
@@ -1113,7 +1113,7 @@ func TestParserSlowLog013(t *testing.T) {
 		{
 			Offset:    7014,
 			OffsetEnd: 7370,
-			Ts:        time.Date(2014, 03, 12, 20, 29, 40, 0, time.UTC),
+			Ts:        time.Date(2014, 0o3, 12, 20, 29, 40, 0, time.UTC),
 			Query:     "select 1006,q.* from qcm q INTO OUTFILE '/mnt/pct/exp/qcm_db1006.txt'",
 			User:      "root",
 			Host:      "localhost",
@@ -1836,7 +1836,7 @@ func TestParseSlowMariaDBWithExplain(t *testing.T) {
 		{
 			Offset:    205,
 			OffsetEnd: 630,
-			Ts:        time.Date(2018, 02, 14, 16, 18, 07, 0, time.UTC),
+			Ts:        time.Date(2018, 0o2, 14, 16, 18, 0o7, 0, time.UTC),
 			Admin:     false,
 			Query:     "SELECT 1",
 			User:      "root",
@@ -1868,7 +1868,7 @@ func TestParseSlow026(t *testing.T) {
 		{
 			Offset:    0,
 			OffsetEnd: 463,
-			Ts:        time.Date(2017, 12, 13, 02, 41, 18, 673330000, time.UTC),
+			Ts:        time.Date(2017, 12, 13, 0o2, 41, 18, 673330000, time.UTC),
 			Admin:     false,
 			Query:     "select 1",
 			User:      "test",

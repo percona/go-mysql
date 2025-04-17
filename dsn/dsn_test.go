@@ -43,7 +43,6 @@ import (
 )
 
 func TestParseDefaults(t *testing.T) {
-
 	input := "--user=root\n--password=rootpwd\n--port=3306\n--host=localhost\n--socket=/var/run/mysqld/mysqld.sock\n"
 	dsn := ParseMySQLDefaults(input)
 	assert.Equal(t, "root", dsn.Username)
@@ -59,7 +58,6 @@ func TestParseDefaults(t *testing.T) {
 	assert.Equal(t, "localhost", dsn.Hostname)
 	assert.Equal(t, "3306", dsn.Port)
 	assert.Equal(t, "", dsn.Socket)
-
 }
 
 func TestDefaults(t *testing.T) {

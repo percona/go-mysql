@@ -78,7 +78,7 @@ func aggregateSlowLog(input, output string, utcOffset time.Duration, examples bo
 
 	resultOutputPath := filepath.Join("testdata", output)
 	if *test.Update {
-		if err := ioutil.WriteFile(resultOutputPath, gotJson, 0666); err != nil {
+		if err := ioutil.WriteFile(resultOutputPath, gotJson, 0o666); err != nil {
 			l.Fatal(err)
 		}
 	}

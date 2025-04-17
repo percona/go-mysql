@@ -27,7 +27,7 @@ check:                          ## Run required checkers and linters.
 FILES = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
 format:                         ## Format source code.
-	gofmt -w -s $(FILES)
-	goimports -local github.com/percona/go-mysql -l -w $(FILES)
+	bin/gofumpt -l -w .
+	bin/goimports -local github.com/percona/go-mysql -l -w $(FILES)
 
 .PHONY: test
