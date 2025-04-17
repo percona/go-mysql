@@ -3,13 +3,9 @@ help:                           ## Display this help message.
 	@grep '^[a-zA-Z]' $(MAKEFILE_LIST) | \
 		awk -F ':.*?## ' 'NF==2 {printf "  %-26s%s\n", $$1, $$2}'
 
-init:                           ## Installs tools to $GOPATH/bin (which is expected to be in $PATH).
-	curl https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin
-
-	go install ./vendor/golang.org/x/tools/cmd/goimports
-
-	go test -i ./...
-	go test -race -i ./...
+init:                           ## Installs development tools.
+	rm -rf bin
+	cd tools && go generate -x -tags=tools
 
 TEST_FLAGS ?= -timeout=20s
 
@@ -31,7 +27,7 @@ check:                          ## Run required checkers and linters.
 FILES = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
 format:                         ## Format source code.
-	gofmt -w -s $(FILES)
-	goimports -local github.com/percona/go-mysql -l -w $(FILES)
+	bin/gofumpt -l -w .
+	bin/goimports -local github.com/percona/go-mysql -l -w $(FILES)
 
 .PHONY: test

@@ -144,6 +144,7 @@ var ReplaceNumbersInWords = false
 //   - Collapse whitespace
 //   - Remove comments
 //   - Lowercase everything
+//
 // Additional trasnformations are performed which change the syntax of the
 // original query without affecting its performance characteristics. For
 // example, "ORDER BY col ASC" is the same as "ORDER BY col", so "ASC" in the
@@ -262,7 +263,7 @@ func Fingerprint(q string) string {
 
 				// qi = the closing backtick, so +1 to ensure we don't copy
 				// anything before this, i.e. quoted value is done, move on.
-				//cpFromOffset = qi + 1
+				// cpFromOffset = qi + 1
 				cpToOffset = qi + 1
 
 				s = inWord
@@ -636,7 +637,6 @@ func Fingerprint(q string) string {
 					}
 					s = inBackticks
 				}
-
 			}
 		case r == '=' || r == '<' || r == '>' || r == '!':
 			if Debug {
