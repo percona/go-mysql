@@ -21,6 +21,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Install MySQL
+        run: |
+          sudo apt remove --purge mysql* -y
+          sudo apt autoremove -y
+          sudo apt autoclean
+          
+          sudo DEBIAN_FRONTEND=noninteractive apt update
+          sudo DEBIAN_FRONTEND=noninteractive apt install -y mysql-server-8.0
+          
+          sudo systemctl start mysql.service
+          sudo systemctl status mysql.service
+
+      - name: Configure MySQL
+        run: |
+          sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '';"
+          sudo mysql -e "FLUSH PRIVILEGES;"
+
       - name: Checkout code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
