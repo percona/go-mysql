@@ -1,5 +1,5 @@
-//go:build ignore
-// +build ignore
+//go:build tools
+// +build tools
 
 /*
 Copyright (c) 2019, Percona LLC.
@@ -154,13 +154,13 @@ func checkBuildIgnoreHeader(path string) bool {
 	}
 	defer f.Close()
 
-	headerPattern := regexp.MustCompile(`^//go:build ignore
-// \+build ignore
+	headerPattern := regexp.MustCompile(`^//go:build tools
+// \+build tools
 
 ` + copyrightPattern.String())
 
-	headerText := `//go:build ignore
-// +build ignore
+	headerText := `//go:build tools
+// +build tools
 
 ` + copyrightText
 
