@@ -186,6 +186,11 @@ func TestFingerprintBasic(t *testing.T) {
 			expected: "insert into test ( in , id) values(?+)",
 		},
 		{
+			name:     "insert with value keyword as first column name",
+			query:    "INSERT INTO test ( In , ID) VALUES (1,1)",
+			expected: "insert into test ( in , id) values(?+)",
+		},
+		{
 			name:     "insert duplicate with keyword as column name",
 			query:    "INSERT INTO test (id, value) VALUES (1, 10) ON DUPLICATE KEY UPDATE value = VALUES(value) + 5",
 			expected: "insert into test (id, value) values(?+) on duplicate key update value = values(value) + ?",
