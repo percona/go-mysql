@@ -68,10 +68,8 @@ const (
 	HiddenPassword    = "***"
 )
 
-var (
-	// ErrNoSocket is returned when GetSocketFromProcessLists can't locate socket.
-	ErrNoSocket = errors.New("cannot auto-detect MySQL socket")
-)
+// ErrNoSocket is returned when GetSocketFromProcessLists can't locate socket.
+var ErrNoSocket = errors.New("cannot auto-detect MySQL socket")
 
 func (dsn DSN) AutoDetect(ctx context.Context) (DSN, error) {
 	defaults, err := Defaults(dsn.DefaultsFile)

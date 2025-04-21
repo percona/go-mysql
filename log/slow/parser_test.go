@@ -457,9 +457,11 @@ func TestParserSlowLog004(t *testing.T) {
 
 // slow005 has a multi-line query with tabs in it.  A pathological case that
 // would probably break the parser is a query like:
-//   SELECT * FROM foo WHERE col = "Hello
-//   # Query_time: 10
-//   " LIMIT 1;
+//
+//	SELECT * FROM foo WHERE col = "Hello
+//	# Query_time: 10
+//	" LIMIT 1;
+//
 // There's no easy way to detect that "# Query_time" is part of the query and
 // not part of the next event's header.
 func TestParserSlowLog005(t *testing.T) {
@@ -594,7 +596,7 @@ func TestParserSlowLog006(t *testing.T) {
 			Db:        "bar",
 			Admin:     false,
 			Host:      "",
-			Ts:        time.Date(2007, 12, 18, 11, 49, 05, 0, time.UTC),
+			Ts:        time.Date(2007, 12, 18, 11, 49, 5, 0, time.UTC),
 			User:      "[SQL_SLAVE]",
 			Offset:    1100,
 			OffsetEnd: 1468,
@@ -623,7 +625,7 @@ func TestParserSlowLog006(t *testing.T) {
 			Db:        "bar",
 			Admin:     false,
 			Host:      "",
-			Ts:        time.Date(2007, 12, 18, 11, 49, 07, 0, time.UTC),
+			Ts:        time.Date(2007, 12, 18, 11, 49, 7, 0, time.UTC),
 			User:      "[SQL_SLAVE]",
 			Offset:    1468,
 			OffsetEnd: 1832,
@@ -710,10 +712,10 @@ func TestParserSlowLog007(t *testing.T) {
 
 // slow008 has 4 interesting things (which makes it a poor test case since we're
 // testing many things at once):
-//   1) an admin command, e.g.: # administrator command: Quit;
-//   2) a SET NAMES query; SET <certain vars> are ignored
-//   3) No Time metrics
-//   4) IPs in the host metric, but we don't currently support these
+//  1. an admin command, e.g.: # administrator command: Quit;
+//  2. a SET NAMES query; SET <certain vars> are ignored
+//  3. No Time metrics
+//  4. IPs in the host metric, but we don't currently support these
 func TestParserSlowLog008(t *testing.T) {
 	got := parseSlowLog(t, "slow008.log", opt)
 	expect := []log.Event{
@@ -794,7 +796,7 @@ func TestParserSlowLog009(t *testing.T) {
 			User:      "root",
 			Offset:    196,
 			OffsetEnd: 562,
-			Ts:        time.Date(2009, 03, 11, 18, 11, 50, 0, time.UTC),
+			Ts:        time.Date(2009, 3, 11, 18, 11, 50, 0, time.UTC),
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.017850,
 				"Lock_time":  0.000000,
@@ -832,7 +834,7 @@ func TestParserSlowLog011(t *testing.T) {
 			Db:        "maindb",
 			Host:      "localhost",
 			User:      "user1",
-			Ts:        time.Date(2013, 11, 28, 1, 05, 31, 0, time.UTC),
+			Ts:        time.Date(2013, 11, 28, 1, 5, 31, 0, time.UTC),
 			RateType:  "query",
 			RateLimit: 2,
 			TimeMetrics: map[string]float64{
@@ -1001,7 +1003,7 @@ func TestParserSlowLog012(t *testing.T) {
 			User:      "msandbox",
 			Offset:    375,
 			OffsetEnd: 609,
-			Ts:        time.Date(2014, 04, 13, 19, 34, 13, 0, time.UTC),
+			Ts:        time.Date(2014, 4, 13, 19, 34, 13, 0, time.UTC),
 			TimeMetrics: map[string]float64{
 				"Query_time": 0.000127,
 				"Lock_time":  0.000000,
@@ -1023,7 +1025,7 @@ func TestParserSlowLog013(t *testing.T) {
 		{
 			Offset:    0,
 			OffsetEnd: 353,
-			Ts:        time.Date(2014, 02, 24, 22, 39, 34, 0, time.UTC),
+			Ts:        time.Date(2014, 2, 24, 22, 39, 34, 0, time.UTC),
 			Query:     "select 950,q.* from qcm q INTO OUTFILE '/mnt/pct/exp/qcm_db950.txt'",
 			User:      "root",
 			Host:      "localhost",
@@ -1045,7 +1047,7 @@ func TestParserSlowLog013(t *testing.T) {
 		{
 			Offset:    353,
 			OffsetEnd: 6138,
-			Ts:        time.Date(2014, 02, 24, 22, 39, 59, 0, time.UTC),
+			Ts:        time.Date(2014, 2, 24, 22, 39, 59, 0, time.UTC),
 			Query:     "select 961,q.* from qcm q INTO OUTFILE '/mnt/pct/exp/qcm_db961.txt'",
 			User:      "root",
 			Host:      "localhost",
@@ -1067,7 +1069,7 @@ func TestParserSlowLog013(t *testing.T) {
 		{
 			Offset:    6138,
 			OffsetEnd: 6666,
-			Ts:        time.Date(2014, 03, 11, 16, 07, 40, 0, time.UTC),
+			Ts:        time.Date(2014, 3, 11, 16, 7, 40, 0, time.UTC),
 			Query:     "select count(*) into @discard from `information_schema`.`PARTITIONS`",
 			User:      "debian-sys-maint",
 			Host:      "localhost",
@@ -1089,7 +1091,7 @@ func TestParserSlowLog013(t *testing.T) {
 		{
 			Offset:    6666,
 			OffsetEnd: 7014,
-			Ts:        time.Date(2014, 03, 12, 20, 28, 40, 0, time.UTC),
+			Ts:        time.Date(2014, 3, 12, 20, 28, 40, 0, time.UTC),
 			Query:     "select 1,q.* from qcm q INTO OUTFILE '/mnt/pct/exp/qcm_db1.txt'",
 			User:      "root",
 			Host:      "localhost",
@@ -1111,7 +1113,7 @@ func TestParserSlowLog013(t *testing.T) {
 		{
 			Offset:    7014,
 			OffsetEnd: 7370,
-			Ts:        time.Date(2014, 03, 12, 20, 29, 40, 0, time.UTC),
+			Ts:        time.Date(2014, 3, 12, 20, 29, 40, 0, time.UTC),
 			Query:     "select 1006,q.* from qcm q INTO OUTFILE '/mnt/pct/exp/qcm_db1006.txt'",
 			User:      "root",
 			Host:      "localhost",
@@ -1756,7 +1758,7 @@ func TestParseSlow023A(t *testing.T) {
 }
 
 /*
-   Test header with invalid # Time or invalid # User lines
+Test header with invalid # Time or invalid # User lines
 */
 func TestParseSlow024(t *testing.T) {
 	got := parseSlowLog(t, "slow024.log", opt)
@@ -1834,7 +1836,7 @@ func TestParseSlowMariaDBWithExplain(t *testing.T) {
 		{
 			Offset:    205,
 			OffsetEnd: 630,
-			Ts:        time.Date(2018, 02, 14, 16, 18, 07, 0, time.UTC),
+			Ts:        time.Date(2018, 2, 14, 16, 18, 7, 0, time.UTC),
 			Admin:     false,
 			Query:     "SELECT 1",
 			User:      "root",
@@ -1866,7 +1868,7 @@ func TestParseSlow026(t *testing.T) {
 		{
 			Offset:    0,
 			OffsetEnd: 463,
-			Ts:        time.Date(2017, 12, 13, 02, 41, 18, 673330000, time.UTC),
+			Ts:        time.Date(2017, 12, 13, 2, 41, 18, 673330000, time.UTC),
 			Admin:     false,
 			Query:     "select 1",
 			User:      "test",

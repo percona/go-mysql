@@ -520,7 +520,6 @@ func TestFingerprintPanicChallenge2(t *testing.T) {
 }
 
 func TestFingerprintDashesInNames(t *testing.T) {
-
 	q := "select field from `master-db-1`.`table-1` order by id, ?;"
 	assert.Equal(
 		t,
