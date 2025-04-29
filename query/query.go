@@ -728,13 +728,13 @@ func Fingerprint(q string) string {
 		default:
 			if s != inWord && s != inOp {
 				// If in a word or operator then keep copying the query, else
-				// previous chars were being ignored for some reasons but now
+				// previous chars were being ignored for some reason, but now
 				// we should start copying again, so set cpFromOffset.  Example:
 				// col=NOW(). 'col' will be set to copy, but then '=' will put
 				// us in inOp state which, if a value follows, will trigger a
 				// copy of "col=", but "NOW()" is not a value so "N" is caught
 				// here and since s=inOp still we do not copy yet (this block is
-				// is not entered).
+				//  not entered).
 				if Debug {
 					fmt.Println("Random character")
 				}
@@ -766,12 +766,21 @@ func Fingerprint(q string) string {
 			copy(f[fi:fi+l], prevWord)
 			fi += l
 			cpFromOffset = cpToOffset
-			if wordIn(prevWord, "in", "value", "values") && sqlState != onDupeKeyUpdate {
-				// IN ()     -> in(?+)
-				// VALUES () -> values(?+)
+			valueKeywords := []string{"in", "value", "values"}
+			if wordIn(prevWord, valueKeywords...) && sqlState != onDupeKeyUpdate {
 				addSpace = false
-				s = inValues
-				sqlState = inValues
+				// since we only consider the keywords if it exists at a top-level (except onDupeKeyUpdate),
+				// we only do the conversion below if the "keywords" actually open a value list (i.e., before opening a parenthesis).
+				if r == '(' || (isSpace(r) && (q[qi+1] == '(') || (q[qi+1] == ' ')) {
+					// IN ()     -> in(?+)
+					// VALUES () -> values(?+)
+					s = inValues
+					sqlState = inValues
+				} else {
+					f[fi] = ' '
+					fi++
+					cpFromOffset++
+				}
 			} else if addSpace {
 				if Debug {
 					fmt.Println("Add space")
