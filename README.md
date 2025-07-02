@@ -1,10 +1,10 @@
 # go-mysql
 
-[![Build Status](https://travis-ci.com/percona/go-mysql.svg?branch=master)](https://travis-ci.com/percona/go-mysql)
+[![Build](https://github.com/percona/go-mysql/actions/workflows/go.yml/badge.svg)](https://github.com/percona/go-mysql/actions/workflows/go.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/percona/go-mysql)](https://goreportcard.com/report/github.com/percona/go-mysql)
 [![CLA assistant](https://cla-assistant.percona.com/readme/badge/percona/go-mysql)](https://cla-assistant.percona.com/percona/go-mysql)
 
-This repo contains Go packages to help build tools for MySQL. For example, there's a [slow log parser](https://github.com/percona/go-mysql/tree/master/log/slow) and a [query fingerprinter](https://github.com/percona/go-mysql/tree/master/query). Feedback, pull requests, and bug reports are welcome.
+This repo contains Go packages to help build tools for MySQL. For example, there's a [slow log parser](https://github.com/percona/go-mysql/tree/main/log/slow) and a [query fingerprinter](https://github.com/percona/go-mysql/tree/main/query). Feedback, pull requests, and bug reports are welcome.
 
 ## Docs
 
