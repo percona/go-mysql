@@ -373,15 +373,29 @@ func Fingerprint(q string) string {
 				s = inWord
 				continue
 			}
-			// (<anything>) -> (?+) only for first value
+			// (<anything>) -> (?+) only for first value, but check for subqueries
 			if Debug {
 				fmt.Println("Values end")
 			}
 			valueNo++
 			if valueNo == 1 {
 				if qi-firstPar > 1 {
-					copy(f[fi:fi+4], "(?+)")
-					fi += 4
+					// Check if this is a subquery by looking for SELECT keyword
+					content := strings.ToLower(strings.TrimSpace(q[firstPar+1 : qi]))
+					if strings.HasPrefix(content, "select") {
+						// This is a subquery, fingerprint it recursively
+						subqueryFingerprint := Fingerprint(q[firstPar+1 : qi])
+						subqueryResult := "(" + subqueryFingerprint + ")"
+						if Debug {
+							fmt.Printf("Subquery detected: %s -> %s\n", q[firstPar+1:qi], subqueryFingerprint)
+						}
+						copy(f[fi:fi+len(subqueryResult)], subqueryResult)
+						fi += len(subqueryResult)
+					} else {
+						// Regular value list
+						copy(f[fi:fi+4], "(?+)")
+						fi += 4
+					}
 				} else {
 					// INSERT INTO t VALUES ()
 					copy(f[fi:fi+2], "()")
