@@ -381,10 +381,10 @@ func Fingerprint(q string) string {
 			if valueNo == 1 {
 				if qi-firstPar > 1 {
 					// Check if this is a subquery by looking for SELECT keyword
-					content := strings.ToLower(strings.TrimSpace(q[firstPar+1:qi]))
+					content := strings.ToLower(strings.TrimSpace(q[firstPar+1 : qi]))
 					if strings.HasPrefix(content, "select") {
 						// This is a subquery, fingerprint it recursively
-						subqueryFingerprint := Fingerprint(q[firstPar+1:qi])
+						subqueryFingerprint := Fingerprint(q[firstPar+1 : qi])
 						subqueryResult := "(" + subqueryFingerprint + ")"
 						if Debug {
 							fmt.Printf("Subquery detected: %s -> %s\n", q[firstPar+1:qi], subqueryFingerprint)
