@@ -634,3 +634,62 @@ func TestFingerprintMaxExecTimeNoBackticks(t *testing.T) {
 		query.Fingerprint(q),
 	)
 }
+
+func TestFingerprintSubqueries(t *testing.T) {
+	type testCase struct {
+		name     string
+		query    string
+		expected string
+	}
+	// Test cases for subqueries in IN clauses
+	testCases := []testCase{
+		{
+			name:     "Simple subquery",
+			query:    "select * from a where a.id in (select b from c)",
+			expected: "select * from a where a.id in(select b from c)",
+		},
+		{
+			name:     "multi subquery",
+			query:    "select a, b from t1,t2 where t1.c in (select a from t where b in (select b from c where d like 'foo%') and e > (select 3 * sum(a) from h where b = c and e = d and d >= '1994-01-01' and f < date_add ('1994-01-01',interval '1' year) and a = b and c = 'abc' order by e LIMIT 0,200))",
+			expected: "select a, b from t1,t2 where t1.c in(select a from t where b in(select b from c where d like ?) and e > (select ? * sum(a) from h where b = c and e = d and d >= ? and f < date_add (?,interval ? year) and a = b and c = ? order by e limit ?,?))",
+		},
+
+		{
+			name:     "Subquery with different table",
+			query:    "select * from a where a.id in (select d from e)",
+			expected: "select * from a where a.id in(select d from e)",
+		},
+		{
+			name:     "Subquery with different column",
+			query:    "select * from a where a.id in (select f from c)",
+			expected: "select * from a where a.id in(select f from c)",
+		},
+		{
+			name:     "Subquery with WHERE clause",
+			query:    "select * from a where a.id in (select b from c where c.status = 'active')",
+			expected: "select * from a where a.id in(select b from c where c.status = ?)",
+		},
+		{
+			name:     "Value list should still use (?+)",
+			query:    "select * from a where a.id in (1, 2, 3)",
+			expected: "select * from a where a.id in(?+)",
+		},
+		{
+			name:     "Mixed case SELECT",
+			query:    "select * from a where a.id in (SELECT b FROM c)",
+			expected: "select * from a where a.id in(select b from c)",
+		},
+		{
+			name:     "Subquery with spaces",
+			query:    "select * from a where a.id in ( select b from c )",
+			expected: "select * from a where a.id in(select b from c)",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			actual := query.Fingerprint(tc.query)
+			assert.Equal(t, tc.expected, actual, "Query: %s", tc.query)
+		})
+	}
+}
