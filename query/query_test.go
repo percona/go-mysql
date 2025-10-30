@@ -693,3 +693,25 @@ func TestFingerprintSubqueries(t *testing.T) {
 		})
 	}
 }
+
+func TestFingerprintSystemVariableQueries(t *testing.T) {
+	type testCase struct {
+		name     string
+		query    string
+		expected string
+	}
+	// Test cases for subqueries in IN clauses
+	testCases := []testCase{
+		{
+			name:     "global read_only",
+			query:    "set long_query_time = 0; SELECT @@GLOBAL.read_only AS Value",
+			expected: "set long_query_time = ?; select @@global.read_only as value",
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			actual := query.Fingerprint(tc.query)
+			assert.Equal(t, tc.expected, actual, "Query: %s", tc.query)
+		})
+	}
+}
