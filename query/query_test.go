@@ -700,7 +700,7 @@ func TestFingerprintSystemVariableQueries(t *testing.T) {
 		query    string
 		expected string
 	}
-	// Test cases for subqueries in IN clauses
+	// Test cases for system variable queries
 	testCases := []testCase{
 		{
 			name:     "global read_only",
