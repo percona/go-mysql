@@ -785,7 +785,7 @@ func Fingerprint(q string) string {
 				addSpace = false
 				// since we only consider the keywords if it exists at a top-level (except onDupeKeyUpdate),
 				// we only do the conversion below if the "keywords" actually open a value list (i.e., before opening a parenthesis).
-				if r == '(' || (isSpace(r) && (q[qi+1] == '(') || (q[qi+1] == ' ')) {
+				if r == '(' || (isSpace(r) && qi+1 < len(q) && ((q[qi+1] == '(') || (q[qi+1] == ' '))) {
 					// IN ()     -> in(?+)
 					// VALUES () -> values(?+)
 					s = inValues
