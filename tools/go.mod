@@ -6,7 +6,7 @@ require (
 	github.com/golangci/golangci-lint/v2 v2.6.2
 	github.com/quasilyte/go-consistent v0.6.1
 	github.com/reviewdog/reviewdog v0.20.3
-	golang.org/x/tools v0.38.0
+	golang.org/x/tools v0.44.0
 	mvdan.cc/gofumpt v0.9.2
 )
 
@@ -220,14 +220,14 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/build v0.0.0-20240906172953-ad8de1aafeaf // indirect
-	golang.org/x/crypto v0.45.0 // indirect
+	golang.org/x/crypto v0.52.0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20251023183803-a4bb9ffd2546 // indirect
-	golang.org/x/mod v0.29.0 // indirect
+	golang.org/x/mod v0.35.0 // indirect
 	golang.org/x/oauth2 v0.27.0 // indirect
-	golang.org/x/sync v0.18.0 // indirect
-	golang.org/x/sys v0.38.0 // indirect
-	golang.org/x/telemetry v0.0.0-20251008203120-078029d740a8 // indirect
-	golang.org/x/text v0.31.0 // indirect
+	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
+	golang.org/x/telemetry v0.0.0-20260409153401-be6f6cb8b1fa // indirect
+	golang.org/x/text v0.37.0 // indirect
 	golang.org/x/time v0.10.0 // indirect
 	google.golang.org/protobuf v1.36.8 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
